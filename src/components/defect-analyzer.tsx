@@ -2,7 +2,7 @@
 
 import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2 } from 'lucide-react';
+import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Pill, Calendar, Stethoscope } from 'lucide-react';
 
 import { analyzeDefect } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
@@ -12,8 +12,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 type AnalysisData = {
-  defectIdentification: string;
-  estimatedRepairCost: string;
+  medicineName: string;
+  illness: string;
+  expiryDate: string;
 };
 
 export function DefectAnalyzer() {
@@ -66,21 +67,10 @@ export function DefectAnalyzer() {
   const AnalysisResult = () => {
     if (isLoading) {
       return (
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card>
-            <CardContent className="p-6 space-y-4">
-              <h3 className="font-headline text-lg font-semibold">Identified Defect</h3>
-              <Skeleton className="h-4 w-4/5" />
-              <Skeleton className="h-4 w-3/5" />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6 space-y-4">
-              <h3 className="font-headline text-lg font-semibold">Estimated Repair Cost (in Hindi)</h3>
-              <Skeleton className="h-4 w-4/5" />
-              <Skeleton className="h-4 w-3/5" />
-            </CardContent>
-          </Card>
+        <div className="grid md:grid-cols-3 gap-8">
+          <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><Pill /> Medicine Name</h3><Skeleton className="h-4 w-4/5" /></CardContent></Card>
+          <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><Stethoscope /> For Illness</h3><Skeleton className="h-4 w-3/5" /></CardContent></Card>
+          <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><Calendar /> Expiry Date</h3><Skeleton className="h-4 w-2/5" /></CardContent></Card>
         </div>
       )
     }
@@ -97,17 +87,23 @@ export function DefectAnalyzer() {
 
     if (result) {
       return (
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-3 gap-8 text-center">
           <Card>
             <CardContent className="p-6">
-              <h3 className="font-headline text-lg font-semibold mb-2">Identified Defect</h3>
-              <p className="text-foreground">{result.defectIdentification}</p>
+              <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><Pill /> Medicine Name</h3>
+              <p className="text-foreground text-xl">{result.medicineName}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6">
-              <h3 className="font-headline text-lg font-semibold mb-2">Estimated Repair Cost (in Hindi)</h3>
-              <p className="text-foreground">{result.estimatedRepairCost}</p>
+              <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><Stethoscope /> For Illness</h3>
+              <p className="text-foreground text-xl">{result.illness}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><Calendar /> Expiry Date</h3>
+              <p className="text-foreground text-xl">{result.expiryDate}</p>
             </CardContent>
           </Card>
         </div>
@@ -130,7 +126,7 @@ export function DefectAnalyzer() {
             >
               <UploadCloud className="w-12 h-12 text-muted-foreground" />
               <p className="mt-4 text-lg font-semibold font-headline">Click to upload or drag and drop</p>
-              <p className="text-sm text-muted-foreground">PNG, JPG, or WEBP</p>
+              <p className="text-sm text-muted-foreground">PNG, JPG, or WEBP of medicine strip</p>
               <Input
                 ref={fileInputRef}
                 type="file"
@@ -143,7 +139,7 @@ export function DefectAnalyzer() {
           ) : (
             <div className="space-y-6">
               <div className="relative w-full max-w-md mx-auto aspect-video rounded-lg overflow-hidden border bg-muted/20">
-                <Image src={imagePreview} alt="Defect preview" layout="fill" objectFit="contain" />
+                <Image src={imagePreview} alt="Medicine preview" layout="fill" objectFit="contain" />
                 <input type="hidden" name="photoDataUri" value={imagePreview} />
               </div>
               
@@ -157,7 +153,7 @@ export function DefectAnalyzer() {
                     ) : (
                       <>
                         <Sparkles className="mr-2 h-4 w-4" />
-                        Analyze Defect
+                        Analyze Medicine
                       </>
                     )}
                   </Button>

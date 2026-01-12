@@ -1,25 +1,25 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { UploadCloud, Sparkles, Users } from 'lucide-react';
+import { UploadCloud, Sparkles, MessageSquareHeart } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const steps = [
   {
     icon: <UploadCloud className="w-8 h-8 text-primary" />,
-    title: '1. फोटो अपलोड करें',
-    description: 'घर में जो भी खराबी है, उसकी एक साफ तस्वीर खींचें और हमारे ऐप पर अपलोड करें।',
+    title: '1. दवा की फोटो अपलोड करें',
+    description: 'अपनी दवा के पत्ते की एक साफ तस्वीर खींचें और हमारे ऐप पर अपलोड करें।',
     imageId: 'how-it-works-upload',
   },
   {
     icon: <Sparkles className="w-8 h-8 text-primary" />,
     title: '2. AI से विश्लेषण पाएं',
-    description: 'हमारी एडवांस्ड AI टेक्नोलॉजी तस्वीर का विश्लेषण करेगी, समस्या की पहचान करेगी और मरम्मत की अनुमानित लागत हिंदी में बताएगी।',
+    description: 'हमारी AI तकनीक तस्वीर का विश्लेषण करेगी, दवा, उसके उपयोग और एक्सपायरी डेट की पहचान करेगी।',
     imageId: 'how-it-works-analyze',
   },
   {
-    icon: <Users className="w-8 h-8 text-primary" />,
-    title: '3. विशेषज्ञ से जुड़ें',
-    description: 'अनुमान से संतुष्ट होने पर, हम आपको आपके क्षेत्र के सबसे भरोसेमंद और कुशल कारीगरों से मिलाएंगे।',
+    icon: <MessageSquareHeart className="w-8 h-8 text-primary" />,
+    title: '3. तुरंत सलाह लें',
+    description: 'हमारे "Get Instant Advice" फीचर का उपयोग करके अपनी स्वास्थ्य संबंधी चिंताओं के लिए बुनियादी सलाह प्राप्त करें।',
     imageId: 'how-it-works-connect',
   },
 ];
@@ -31,7 +31,7 @@ export function HowItWorks() {
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">यह कैसे काम करता है?</h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            केवल तीन आसान स्टेप्स में अपने घर की समस्याओं का समाधान पाएं।
+            तीन आसान स्टेप्स में अपनी दवाओं का प्रबंधन करें और सलाह प्राप्त करें।
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

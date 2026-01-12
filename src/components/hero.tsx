@@ -22,13 +22,13 @@ export function Hero() {
       <div className="container relative z-10 px-4 md:px-6">
         <div className="max-w-3xl mx-auto space-y-4">
           <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
-            घर की मरम्मत, अब AI की मदद से।
+            दवाओं का प्रबंधन, अब AI की मदद से।
           </h1>
           <p className="text-lg text-foreground/80 md:text-xl">
-            फोटो खींचो, समस्या बताओ, और तुरंत समाधान पाओ। GrihSevaAI आपके घर की सभी मरम्मत की ज़रूरतों के लिए आपका विश्वसनीय साथी है।
+            दवा के पत्ते की फोटो खींचो, एक्सपायरी डेट जानो, और तुरंत मेडिकल सलाह पाओ। DawaAI आपकी स्वास्थ्य संबंधी ज़रूरतों के लिए आपका विश्वसनीय साथी है।
           </p>
-          <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link href="/analyze">तुरंत शुरू करें</Link>
+          <Button size="lg" asChild>
+            <Link href="/analyze">दवा एनालाइज करें</Link>
           </Button>
         </div>
       </div>

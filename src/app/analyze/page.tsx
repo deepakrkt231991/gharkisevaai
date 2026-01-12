@@ -9,9 +9,9 @@ export default function AnalyzePage() {
       <main className="flex-1 py-12 md:py-16">
         <div className="container">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">AI Defect Analyzer</h1>
+            <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">AI Medicine Analyzer</h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              Upload an image of the defect in your home, and our AI will identify the problem and provide a repair estimate.
+              Upload an image of the medicine strip, and our AI will identify the medicine, its use, and the expiry date.
             </p>
           </div>
           <DefectAnalyzer />
