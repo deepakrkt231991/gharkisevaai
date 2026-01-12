@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-image-1",
+      "description": "A well-lit, modern living room with a toolbox on a table.",
+      "imageUrl": "https://images.unsplash.com/photo-1505798577917-a65157d3320a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxob21lJTIwcmVwYWlyfGVufDB8fHx8MTc2ODE1ODU0OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "home repair"
+    },
+    {
+      "id": "how-it-works-upload",
+      "description": "A person taking a photo of a cracked wall with their smartphone.",
+      "imageUrl": "https://images.unsplash.com/photo-1607524584052-b0e56c42c017?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwaG9uZSUyMHdhbGx8ZW58MHx8fHwxNzY4MjE2MTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "phone wall"
+    },
+    {
+      "id": "how-it-works-analyze",
+      "description": "An abstract representation of AI analyzing an image.",
+      "imageUrl": "https://images.unsplash.com/photo-1762330467572-5199bc772a20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxBSSUyMGFuYWx5c2lzfGVufDB8fHx8MTc2ODIxNjEyMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "AI analysis"
+    },
+    {
+      "id": "how-it-works-connect",
+      "description": "A friendly handshake between a homeowner and a repair worker.",
+      "imageUrl": "https://images.unsplash.com/photo-1602629726749-61bfe80aadca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxoYW5kc2hha2UlMjB3b3JrZXJ8ZW58MHx8fHwxNzY4MjE2MTIyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "handshake worker"
+    },
+    {
+      "id": "worker-1",
+      "description": "Portrait of a friendly male plumber.",
+      "imageUrl": "https://images.unsplash.com/photo-1651480343182-5053ab153db6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwbHVtYmVyJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzY4MTk2NTI3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plumber portrait"
+    },
+    {
+      "id": "worker-2",
+      "description": "Portrait of a confident female electrician.",
+      "imageUrl": "https://images.unsplash.com/photo-1745169921021-3304a3eed8ed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxlbGVjdHJpY2lhbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODExODczMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "electrician portrait"
+    },
+    {
+      "id": "worker-3",
+      "description": "Portrait of a skilled male carpenter.",
+      "imageUrl": "https://images.unsplash.com/photo-1753288695368-ee8f41681243?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y2FycGVudGVyJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzY4MTE4NzMwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "carpenter portrait"
+    }
+  ]
 }
