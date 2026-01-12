@@ -32,7 +32,7 @@ export function Hero() {
               <Link href="/analyze">Analyze Medicine</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="/get-advice">Get Instant Advice</Link>
+              <Link href="/get-advice">Get Advice</Link>
             </Button>
           </div>
         </div>

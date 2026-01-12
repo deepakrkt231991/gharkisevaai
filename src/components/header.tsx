@@ -13,7 +13,7 @@ export function Header() {
         </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
           <Link href="/#how-it-works" className="transition-colors hover:text-primary">How it Works</Link>
-          <Link href="/get-advice" className="transition-colors hover:text-primary">Get Instant Advice</Link>
+          <Link href="/get-advice" className="transition-colors hover:text-primary">Get Advice</Link>
         </nav>
         <div className="flex items-center gap-4 ml-auto md:ml-4">
           <Button asChild>
@@ -33,7 +33,7 @@ export function Header() {
                   <span>DawaAI</span>
                 </Link>
                 <Link href="/#how-it-works" className="hover:text-primary">How it Works</Link>
-                <Link href="/get-advice" className="hover:text-primary">Get Instant Advice</Link>
+                <Link href="/get-advice" className="hover:text-primary">Get Advice</Link>
                  <Button asChild className="mt-4">
                     <Link href="/analyze">Analyze Medicine</Link>
                 </Button>
