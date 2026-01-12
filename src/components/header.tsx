@@ -13,6 +13,7 @@ export function Header() {
         </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
           <Link href="/#how-it-works" className="transition-colors hover:text-primary">How it Works</Link>
+          <Link href="/find-a-worker" className="transition-colors hover:text-primary">Find a Worker</Link>
         </nav>
         <div className="flex items-center gap-4 ml-auto md:ml-4">
           <Button asChild>
@@ -32,6 +33,7 @@ export function Header() {
                   <span>GrihSevaAI</span>
                 </Link>
                 <Link href="/#how-it-works" className="hover:text-primary">How it Works</Link>
+                <Link href="/find-a-worker" className="hover:text-primary">Find a Worker</Link>
                  <Button asChild className="mt-4">
                     <Link href="/analyze">Get Started</Link>
                 </Button>
