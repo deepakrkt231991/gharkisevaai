@@ -65,5 +65,16 @@ service cloud.firestore {
       allow create: if false; // Transactions should only be created by the backend (Cloud Functions/Server Actions).
       allow update, delete: if false;
     }
+
+    // SOS_ALERTS Collection
+    // Any signed-in user can create an SOS alert.
+    // Reading/updating should be restricted to admins or the user who created it.
+    match /sos_alerts/{alertId} {
+        allow create: if isSignedIn();
+        allow read, update: if isOwner(resource.data.userId); // Or an admin role
+        allow delete: if false; // Deletes should be handled by an admin/backend process.
+    }
   }
 }
+
+    

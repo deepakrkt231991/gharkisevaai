@@ -225,6 +225,28 @@
         "timestamp": { "type": "string", "format": "date-time" }
       },
       "required": ["transactionId", "userId", "amount", "type"]
+    },
+    "SOSAlert": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SOSAlert",
+      "type": "object",
+      "description": "Represents an emergency SOS alert.",
+      "properties": {
+        "alertId": { "type": "string" },
+        "userId": { "type": "string", "description": "The ID of the user/worker who triggered the alert." },
+        "location": {
+          "type": "object",
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" }
+          },
+          "description": "Geographical location where the alert was triggered."
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["active", "resolved"] },
+        "audio_url": { "type": "string", "description": "URL of the background audio recording."}
+      },
+      "required": ["alertId", "userId", "location", "timestamp", "status"]
     }
   },
   "auth": {
@@ -291,7 +313,17 @@
           "schema": { "$ref": "#/backend/entities/Transaction" },
           "description": "Stores wallet transactions like referral commissions."
         }
+      },
+      {
+        "path": "/sos_alerts/{alertId}",
+        "definition": {
+          "entityName": "SOSAlert",
+          "schema": { "$ref": "#/backend/entities/SOSAlert" },
+          "description": "Stores emergency SOS alerts."
+        }
       }
     ]
   }
 }
+
+    
