@@ -2,7 +2,7 @@
 /**
  * @fileOverview The Guardian - An AI agent for trust and verification.
  *
- * - verifyWorkerIdentity - A function to verify a worker's identity using their documents.
+ * - verifyWorker - A function to verify a worker's identity using their documents.
  * - VerifyWorkerInput - The input type for the verification function.
  * - VerifyWorkerOutput - The return type for the verification function.
  */
