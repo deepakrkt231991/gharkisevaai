@@ -2,7 +2,7 @@
 
 import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee } from 'lucide-react';
+import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer } from 'lucide-react';
 
 import { analyzeDefect } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 type AnalysisData = {
   defect: string;
   estimatedCost: string;
+  diySteps: string[];
 };
 
 type Media = {
@@ -94,19 +95,35 @@ export function DefectAnalyzer() {
 
     if (result) {
       return (
-        <div className="grid md:grid-cols-2 gap-8 text-center">
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><Wrench /> Defect Identified</h3>
-              <p className="text-foreground text-xl">{result.defect}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><IndianRupee /> Estimated Cost (Hindi)</h3>
-              <p className="text-foreground text-xl">{result.estimatedCost}</p>
-            </CardContent>
-          </Card>
+        <div className="space-y-8">
+          <div className="grid md:grid-cols-2 gap-8 text-center">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><Wrench /> Defect Identified</h3>
+                <p className="text-foreground text-xl">{result.defect}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><IndianRupee /> Estimated Cost (Hindi)</h3>
+                <p className="text-foreground text-xl">{result.estimatedCost}</p>
+              </CardContent>
+            </Card>
+          </div>
+          {result.diySteps && result.diySteps.length > 0 && (
+             <Card className="bg-background">
+                <CardContent className="p-6">
+                  <h3 className="font-headline text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Hammer /> आप इसे स्वयं ठीक करने का प्रयास कर सकते हैं!
+                  </h3>
+                  <ol className="list-decimal list-inside space-y-2 text-left text-foreground">
+                    {result.diySteps.map((step, index) => (
+                      <li key={index}>{step}</li>
+                    ))}
+                  </ol>
+                </CardContent>
+              </Card>
+          )}
         </div>
       );
     }

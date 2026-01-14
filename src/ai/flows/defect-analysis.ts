@@ -23,6 +23,8 @@ export type AnalyzeDefectInput = z.infer<typeof AnalyzeDefectInputSchema>;
 const AnalyzeDefectOutputSchema = z.object({
   defect: z.string().describe('The identified defect (e.g., "Leaky faucet washer").'),
   estimatedCost: z.string().describe('The estimated repair cost in Hindi (e.g., "₹500 - ₹800").'),
+  // Add a new field for DIY steps
+  diySteps: z.array(z.string()).describe('A list of simple, step-by-step instructions for a user to potentially fix the issue themselves. This should be empty if the repair is complex or dangerous.'),
 });
 export type AnalyzeDefectOutput = z.infer<typeof AnalyzeDefectOutputSchema>;
 
@@ -39,6 +41,8 @@ const prompt = ai.definePrompt({
 Your tasks are:
 1. Identify the specific defect (e.g., 'Leaky faucet washer', 'Broken switchboard'). Use both the visual media and the text description for your analysis.
 2. Provide a transparent estimated repair cost range in simple Hindi (e.g., "₹500 - ₹800"). This ensures the user is not overcharged.
+3. If the repair is simple and safe for a user to do themselves, provide a list of clear, step-by-step DIY instructions. For example, for a leaky faucet, you might suggest tightening a nut.
+4. If the repair is complex or dangerous (e.g., anything involving high-voltage electricity, gas lines, or major plumbing), do NOT provide DIY steps. The diySteps array should be empty.
 
 Analyze the following:
 Media: {{media url=mediaDataUri}}
