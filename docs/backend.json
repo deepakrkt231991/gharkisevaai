@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -10,124 +11,119 @@
           "type": "string",
           "description": "Unique identifier for the user."
         },
-        "phoneNumber": {
-          "type": "string",
-          "description": "User's phone number.",
-          "format": "string"
-        },
-        "email": {
-          "type": "string",
-          "description": "User's email address.",
-          "format": "email"
-        },
         "name": {
           "type": "string",
           "description": "User's full name."
+        },
+        "phone": {
+          "type": "string",
+          "description": "User's phone number."
         },
         "address": {
           "type": "string",
           "description": "User's address."
         },
-        "languagePreference": {
+        "userType": {
           "type": "string",
-          "description": "User's preferred language for communication."
+          "description": "Type of user.",
+          "enum": ["customer", "worker", "doctor"]
         }
       },
-      "required": [
-        "id"
-      ]
+      "required": ["id", "userType"]
+    },
+    "Job": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Job",
+      "type": "object",
+      "description": "Represents a job booking in the GrihSevaAI app.",
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "description": "Unique identifier for the job."
+        },
+        "customerId": {
+          "type": "string",
+          "description": "ID of the customer who created the job."
+        },
+        "problem_image_url": {
+          "type": "string",
+          "description": "URL of the uploaded problem image."
+        },
+        "ai_diagnosis": {
+          "type": "string",
+          "description": "Diagnosis provided by the AI."
+        },
+        "estimated_cost": {
+          "type": "string",
+          "description": "Estimated cost provided by the AI."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the job (e.g., pending, assigned, completed)."
+        }
+      },
+      "required": ["jobId", "customerId", "status"]
     },
     "Worker": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Worker",
       "type": "object",
-      "description": "Represents a worker in the GrihSevaAI app.",
+      "description": "Represents a service worker.",
       "properties": {
-        "id": {
+        "workerId": {
           "type": "string",
-          "description": "Unique identifier for the worker."
-        },
-        "name": {
-          "type": "string",
-          "description": "Worker's full name."
+          "description": "Unique identifier for the worker (same as their userId)."
         },
         "skills": {
           "type": "array",
-          "description": "List of skills possessed by the worker.",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" },
+          "description": "List of worker's skills (e.g., plumber, electrician)."
+        },
+        "rating": {
+          "type": "number",
+          "description": "Average rating of the worker."
         },
         "location": {
-          "type": "string",
-          "description": "Worker's current location."
+          "type": "object",
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" }
+          },
+          "description": "Geographical location of the worker."
         },
-        "availability": {
-          "type": "array",
-          "description": "Worker's availability schedule.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "hourlyRate": {
-          "type": "number",
-          "description": "Worker's hourly rate."
-        },
-        "languagePreference": {
-          "type": "string",
-          "description": "Worker's preferred language for communication."
+        "isVerified": {
+          "type": "boolean",
+          "description": "Whether the worker is verified."
         }
       },
-      "required": [
-        "id"
-      ]
+      "required": ["workerId", "isVerified"]
     },
-    "Booking": {
+    "Health": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Booking",
+      "title": "Health",
       "type": "object",
-      "description": "Represents a booking in the GrihSevaAI app.",
+      "description": "Stores health and medicine related information for a user.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the booking."
-        },
         "userId": {
           "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N Booking)"
+          "description": "ID of the user this health record belongs to."
         },
-        "workerId": {
+        "medicine_name": {
           "type": "string",
-          "description": "Reference to Worker. (Relationship: Worker 1:N Booking)"
+          "description": "Name of the medicine."
         },
-        "bookingDate": {
+        "expiry_date": {
           "type": "string",
-          "description": "Date of the booking.",
-          "format": "date-time"
+          "format": "date",
+          "description": "Expiry date of the medicine."
         },
-        "description": {
+        "dosage_reminder": {
           "type": "string",
-          "description": "Description of the repair needed."
-        },
-        "imageUrls": {
-          "type": "array",
-          "description": "URLs of images uploaded by the user.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "status": {
-          "type": "string",
-          "description": "Status of the booking (e.g., pending, accepted, completed, cancelled)."
-        },
-        "estimatedCost": {
-          "type": "number",
-          "description": "Estimated cost of the repair."
+          "format": "date-time",
+          "description": "Reminder time for the dosage."
         }
       },
-      "required": [
-        "id"
-      ]
+      "required": ["userId", "medicine_name"]
     }
   },
   "auth": {
@@ -142,55 +138,34 @@
         "path": "/users/{userId}",
         "definition": {
           "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Stores user profiles. Each user document is uniquely identified by their userId.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "Unique identifier for the user."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/User" },
+          "description": "Stores user profiles."
+        }
+      },
+      {
+        "path": "/jobs/{jobId}",
+        "definition": {
+          "entityName": "Job",
+          "schema": { "$ref": "#/backend/entities/Job" },
+          "description": "Stores details of all jobs."
         }
       },
       {
         "path": "/workers/{workerId}",
         "definition": {
           "entityName": "Worker",
-          "schema": {
-            "$ref": "#/backend/entities/Worker"
-          },
-          "description": "Stores worker profiles. Each worker document is uniquely identified by their workerId.",
-          "params": [
-            {
-              "name": "workerId",
-              "description": "Unique identifier for the worker."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/Worker" },
+          "description": "Stores public profiles for verified workers."
         }
       },
       {
-        "path": "/users/{userId}/bookings/{bookingId}",
+        "path": "/health/{healthId}",
         "definition": {
-          "entityName": "Booking",
-          "schema": {
-            "$ref": "#/backend/entities/Booking"
-          },
-          "description": "Stores booking information for each user. Includes denormalized 'userId' and 'workerId' for authorization independence.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "Unique identifier for the user."
-            },
-            {
-              "name": "bookingId",
-              "description": "Unique identifier for the booking."
-            }
-          ]
+          "entityName": "Health",
+          "schema": { "$ref": "#/backend/entities/Health" },
+          "description": "Stores health and medicine data for users."
         }
       }
-    ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence, scalability, and ease of debugging, adhering to the principles outlined. It leverages denormalization to avoid hierarchical authorization dependencies and structural segregation for homogeneous security postures. The design incorporates explicit state modeling and predictable schemas to ensure data clarity and consistency.\n\nAuthorization Independence:\nUser data is stored under `/users/{userId}`. Bookings are stored under `/users/{userId}/bookings/{bookingId}` with the `userId` and `workerId` denormalized into each booking document. This allows security rules to validate access based on the current user's ID without needing to perform `get()` operations to verify ownership or permissions from parent documents.\n\nQAPs (Rules are not Filters):\nThe structure supports secure `list` operations. Listing bookings under `/users/{userId}/bookings` only requires checking that `request.auth.uid == userId`. The worker information is also denormalized in the booking to support secure listing on the worker side.\n\nInvariants:\nThe structure ensures the integrity of ownership with the explicit `userId` and `workerId` fields within the booking documents. Timestamps are implicitly supported via Firestore's serverTimestamp() feature, and denormalized data (like the `userId` and `workerId` in bookings) is explicitly managed to maintain consistency.\n\nAuto-Cancel:\nTo implement auto-cancel functionality, the `bookings` documents include a `status` field which is used to track the state of the booking (e.g., `pending`, `accepted`, `cancelled`). A Cloud Function can be scheduled to run periodically and check for bookings with a `pending` status that have exceeded the 5-minute acceptance window, and then automatically cancel them.\n\nAI Translation:\nThe `users` and `workers` documents each include a `languagePreference` field which is used to store the preferred language of the user or worker. This field can be used to determine which language to translate the chat messages to using the Gemini API."
+    ]
   }
 }
