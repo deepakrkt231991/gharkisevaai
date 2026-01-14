@@ -41,11 +41,19 @@ const verificationPrompt = ai.definePrompt({
   name: 'verificationPrompt',
   input: {schema: VerifyWorkerInputSchema},
   output: {schema: VerifyWorkerOutputSchema},
-  prompt: `तुम GrihSevaAI के सुरक्षा एजेंट हो। 
-1. ID कार्ड से 'Name' और 'ID Number' निकालो।
-2. ID कार्ड की फोटो को वर्कर की सेल्फी से मैच करो।
-3. क्या यह ID असली लग रही है?
-4. अपने निर्णय के लिए एक संक्षिप्त कारण प्रदान करो।
+  prompt: `You are a security agent for GrihSevaAI. Your job is to verify a new worker's identity.
+
+You are given two images:
+1. A photo of the worker's ID card.
+2. A selfie of the worker.
+
+Your tasks:
+1.  Extract the 'Name' and 'ID Number' from the ID card.
+2.  Compare the face in the ID card photo to the worker's selfie. Do they match?
+3.  Assess if the ID card looks authentic. Are there signs of tampering or it being a digital fake?
+4.  Based on your assessment, decide if the worker is verified.
+5.  Provide a confidence score for your decision.
+6.  Provide a brief reasoning for your decision (e.g., "Face matches and ID appears authentic," or "ID photo is too blurry," or "Face in selfie does not match ID photo.").
 
 ID Card: {{media url=idCardDataUri}}
 Selfie: {{media url=selfieDataUri}}
