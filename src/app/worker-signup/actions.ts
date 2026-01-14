@@ -1,17 +1,20 @@
+
 "use server";
 
 import { z } from 'zod';
 import { addDoc, collection } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 
-// Updated schema to include new fields
+// Updated schema to include new fields for bank details
 const WorkerProfileSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   phone: z.string().min(10, { message: "Please enter a valid 10-digit phone number." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
-  address: z.string().min(10, { message: "Address must be at least 10 characters." }),
-  skills: z.string().min(2, { message: "Please list at least one skill." }),
+  skills: z.string().min(2, { message: "Please select a skill." }),
   emergencyContact: z.string().min(10, { message: "Please enter a valid 10-digit emergency contact number." }),
+  accountHolderName: z.string().min(2, { message: "Please enter the account holder's name." }),
+  accountNumber: z.string().min(9, { message: "Please enter a valid bank account number." }),
+  ifscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, { message: "Please enter a valid IFSC code." }),
   // For now, we'll just validate that a file is selected, not handle the upload itself.
   document: z.any().optional(), 
 });
@@ -31,9 +34,11 @@ export async function createWorkerProfile(
     name: formData.get('name'),
     phone: formData.get('phone'),
     email: formData.get('email'),
-    address: formData.get('address'),
     skills: formData.get('skills'),
     emergencyContact: formData.get('emergencyContact'),
+    accountHolderName: formData.get('accountHolderName'),
+    accountNumber: formData.get('accountNumber'),
+    ifscCode: formData.get('ifscCode'),
     document: formData.get('document'),
   });
 
@@ -48,13 +53,19 @@ export async function createWorkerProfile(
   try {
     // In a real app, you would handle the file upload to a service like Firebase Storage here
     // and get a URL to save in Firestore. For now, we are saving the text fields.
-    const { document, ...workerData } = validatedFields.data;
+    const { document, accountHolderName, accountNumber, ifscCode, ...workerData } = validatedFields.data;
 
     const { firestore } = initializeFirebase();
     const workersCollection = collection(firestore, 'workers');
     
     await addDoc(workersCollection, {
       ...workerData,
+      skills: [workerData.skills], // save skills as an array
+      bankDetails: {
+        accountHolderName,
+        accountNumber,
+        ifscCode
+      },
       isVerified: false, // Default to not verified
       rating: 0,
       createdAt: new Date(),

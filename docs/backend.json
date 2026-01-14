@@ -45,9 +45,17 @@
           "type": "string",
           "description": "ID of the customer who created the job."
         },
+        "workerId": {
+            "type": "string",
+            "description": "ID of the worker assigned to the job."
+        },
         "problem_image_url": {
           "type": "string",
           "description": "URL of the uploaded problem image."
+        },
+        "completion_image_url": {
+            "type": "string",
+            "description": "URL of the image uploaded by the worker upon completion."
         },
         "ai_diagnosis": {
           "type": "string",
@@ -57,9 +65,23 @@
           "type": "string",
           "description": "Estimated cost provided by the AI."
         },
+        "final_cost": {
+            "type": "number",
+            "description": "The final agreed-upon cost for the job."
+        },
+        "paymentId": {
+            "type": "string",
+            "description": "ID of the payment transaction from the payment gateway."
+        },
+        "paymentStatus": {
+            "type": "string",
+            "enum": ["pending", "held_in_escrow", "paid_to_worker", "refunded"],
+            "description": "The status of the payment."
+        },
         "status": {
           "type": "string",
-          "description": "Status of the job (e.g., pending, assigned, completed)."
+          "description": "Current status of the job.",
+          "enum": ["pending_diagnosis", "awaiting_payment", "worker_assigned", "in_progress", "pending_confirmation", "completed", "disputed", "cancelled"]
         }
       },
       "required": ["jobId", "customerId", "status"]
@@ -94,6 +116,15 @@
         "isVerified": {
           "type": "boolean",
           "description": "Whether the worker is verified."
+        },
+        "bankDetails": {
+            "type": "object",
+            "description": "Bank account details for payouts.",
+            "properties": {
+                "accountNumber": { "type": "string" },
+                "ifscCode": { "type": "string" },
+                "accountHolderName": { "type": "string"}
+            }
         }
       },
       "required": ["workerId", "isVerified"]
