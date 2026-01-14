@@ -1,7 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from 'react-dom';
-import { useEffect } from 'react';
+import { useFormStatus } from 'react-dom';
+import { useEffect, useActionState } from 'react';
 import { AlertCircle, Loader2, UploadCloud } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
@@ -31,7 +31,7 @@ function SubmitButton() {
 
 export function WorkerSignupForm() {
   const initialState = { message: '', success: false, errors: [] };
-  const [state, dispatch] = useFormState(createWorkerProfile, initialState);
+  const [state, dispatch] = useActionState(createWorkerProfile, initialState);
   const { toast } = useToast();
 
   useEffect(() => {
