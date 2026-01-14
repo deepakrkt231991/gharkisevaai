@@ -1,15 +1,19 @@
 "use server";
 
 import { z } from 'zod';
-import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { collection, getFirestore } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 
+// Updated schema to include new fields
 const WorkerProfileSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   phone: z.string().min(10, { message: "Please enter a valid 10-digit phone number." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
   address: z.string().min(10, { message: "Address must be at least 10 characters." }),
   skills: z.string().min(2, { message: "Please list at least one skill." }),
+  emergencyContact: z.string().min(10, { message: "Please enter a valid 10-digit emergency contact number." }),
+  // For now, we'll just validate that a file is selected, not handle the upload itself.
+  document: z.any().optional(), 
 });
 
 type State = {
@@ -26,32 +30,35 @@ export async function createWorkerProfile(
   const validatedFields = WorkerProfileSchema.safeParse({
     name: formData.get('name'),
     phone: formData.get('phone'),
+    email: formData.get('email'),
     address: formData.get('address'),
     skills: formData.get('skills'),
+    emergencyContact: formData.get('emergencyContact'),
+    document: formData.get('document'),
   });
 
   if (!validatedFields.success) {
     return {
       success: false,
-      message: 'Invalid form data.',
+      message: 'Invalid form data. Please check the fields.',
       errors: validatedFields.error.issues,
     };
   }
   
   try {
-    // NOTE: This is a simplified example. In a real app, you would
-    // associate this worker profile with a user account (e.g., from Firebase Auth).
-    // For now, we are just creating a document in a 'workers' collection.
-    
-    // We can't use useFirestore() hook in server actions, so we initialize manually
+    // In a real app, you would handle the file upload to a service like Firebase Storage here
+    // and get a URL to save in Firestore. For now, we are saving the text fields.
+    const { document, ...workerData } = validatedFields.data;
+
     const { firestore } = initializeFirebase();
     const workersCollection = collection(firestore, 'workers');
     
     await addDoc(workersCollection, {
-      ...validatedFields.data,
+      ...workerData,
       isVerified: false, // Default to not verified
       rating: 0,
       createdAt: new Date(),
+      // documentUrl: "URL_from_storage_would_go_here" 
     });
 
     return {

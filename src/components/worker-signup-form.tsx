@@ -2,11 +2,11 @@
 
 import { useFormState, useFormStatus } from 'react-dom';
 import { useEffect } from 'react';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, UploadCloud } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -40,16 +40,20 @@ export function WorkerSignupForm() {
         title: "Profile Created!",
         description: state.message,
       });
+      // Optionally reset the form here
     }
   }, [state, toast]);
 
+  const getError = (path: string) => state.errors?.find(e => e.path.includes(path))?.message;
+
   return (
-    <Card className="max-w-md mx-auto">
+    <Card className="max-w-lg mx-auto">
       <form action={dispatch}>
         <CardHeader>
           <CardTitle>Worker Registration</CardTitle>
+          <CardDescription>Fill out the details below to join our network of professionals.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
            {state.message && !state.success && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -58,26 +62,43 @@ export function WorkerSignupForm() {
             </Alert>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input id="name" name="name" placeholder="Rajesh Kumar" required />
-            {state.errors?.find(e => e.path.includes('name')) && <p className="text-sm text-destructive">{state.errors?.find(e => e.path.includes('name'))?.message}</p>}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input id="name" name="name" placeholder="Rajesh Kumar" required />
+              {getError('name') && <p className="text-sm text-destructive">{getError('name')}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input id="phone" name="phone" placeholder="9876543210" required />
+              {getError('phone') && <p className="text-sm text-destructive">{getError('phone')}</p>}
+            </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input id="phone" name="phone" placeholder="9876543210" required />
-             {state.errors?.find(e => e.path.includes('phone')) && <p className="text-sm text-destructive">{state.errors?.find(e => e.path.includes('phone'))?.message}</p>}
+            <Label htmlFor="email">Email Address</Label>
+            <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+            {getError('email') && <p className="text-sm text-destructive">{getError('email')}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="address">Address</Label>
             <Input id="address" name="address" placeholder="123, Main Street, Delhi" required />
-            {state.errors?.find(e => e.path.includes('address')) && <p className="text-sm text-destructive">{state.errors?.find(e => e.path.includes('address'))?.message}</p>}
+            {getError('address') && <p className="text-sm text-destructive">{getError('address')}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="skills">Skills</Label>
             <Input id="skills" name="skills" placeholder="e.g., Plumber, Electrician, Carpenter" required />
             <p className="text-xs text-muted-foreground">Please separate skills with a comma.</p>
-            {state.errors?.find(e => e.path.includes('skills')) && <p className="text-sm text-destructive">{state.errors?.find(e => e.path.includes('skills'))?.message}</p>}
+            {getError('skills') && <p className="text-sm text-destructive">{getError('skills')}</p>}
+          </div>
+           <div className="space-y-2">
+            <Label htmlFor="emergencyContact">Family Emergency Contact</Label>
+            <Input id="emergencyContact" name="emergencyContact" placeholder="Emergency contact number" required />
+            {getError('emergencyContact') && <p className="text-sm text-destructive">{getError('emergencyContact')}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="document">Upload Document</Label>
+            <Input id="document" name="document" type="file" className="pt-1.5" accept="image/*,application/pdf" />
+            <p className="text-xs text-muted-foreground">Upload your ID card or a relevant certificate (PDF or Image).</p>
           </div>
         </CardContent>
         <CardFooter>
