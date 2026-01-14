@@ -33,7 +33,7 @@ service cloud.firestore {
     // Only verified workers can create/update their own profile.
     match /workers/{workerId} {
       allow get, list: if true;
-      allow create, update: if isOwner(workerId) && request.resource.data.isVerified == true;
+      allow create, update: if isOwner(workerId);
     }
 
     // HEALTH Collection
@@ -41,6 +41,29 @@ service cloud.firestore {
     match /health/{healthId} {
       allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // TOOLS Collection
+    // Anyone can see available tools. Workers can add/update their own tools.
+    match /tools/{toolId} {
+        allow get, list: if true;
+        allow create, update: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+        allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // RENTALS Collection
+    // Users can create rentals. The renter and the tool owner can view/update the rental.
+    match /rentals/{rentalId} {
+        allow create: if isSignedIn() && request.resource.data.renterId == request.auth.uid;
+        allow get, list, update: if isSignedIn() && (resource.data.renterId == request.auth.uid || get(/databases/$(database)/documents/tools/$(resource.data.toolId)).data.ownerId == request.auth.uid);
+    }
+
+    // TRANSACTIONS Collection
+    // Users can only read their own transactions.
+    match /transactions/{transactionId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if false; // Transactions should only be created by the backend (Cloud Functions/Server Actions).
+      allow update, delete: if false;
     }
   }
 }

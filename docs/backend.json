@@ -149,28 +149,78 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Health",
       "type": "object",
-      "description": "Stores health and medicine related information for a user.",
+      "description": "Stores appliance health and AMC data for a user.",
       "properties": {
         "userId": {
           "type": "string",
-          "description": "ID of the user this health record belongs to."
+          "description": "ID of the user this record belongs to."
         },
-        "medicine_name": {
+        "appliance_name": {
           "type": "string",
-          "description": "Name of the medicine."
+          "description": "Name of the appliance (e.g., AC, Fridge)."
         },
-        "expiry_date": {
+        "last_service_date": {
           "type": "string",
           "format": "date",
-          "description": "Expiry date of the medicine."
+          "description": "Last service date of the appliance."
         },
-        "dosage_reminder": {
+        "next_service_due_date": {
           "type": "string",
           "format": "date-time",
-          "description": "Reminder time for the dosage."
+          "description": "Next scheduled service date."
+        },
+        "amc_status": {
+            "type": "string",
+            "enum": ["active", "inactive"],
+            "description": "Status of the Annual Maintenance Contract."
         }
       },
-      "required": ["userId", "medicine_name"]
+      "required": ["userId", "appliance_name"]
+    },
+    "Tool": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Tool",
+      "type": "object",
+      "description": "Represents a tool available for rent.",
+      "properties": {
+        "toolId": { "type": "string" },
+        "ownerId": { "type": "string", "description": "The worker ID of the tool owner." },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "rental_price_per_day": { "type": "number" },
+        "is_available": { "type": "boolean" }
+      },
+      "required": ["toolId", "ownerId", "name", "rental_price_per_day"]
+    },
+    "Rental": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Rental",
+      "type": "object",
+      "description": "Represents a tool rental transaction.",
+      "properties": {
+        "rentalId": { "type": "string" },
+        "toolId": { "type": "string" },
+        "renterId": { "type": "string", "description": "The user ID of the person renting the tool." },
+        "startDate": { "type": "string", "format": "date" },
+        "endDate": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["requested", "active", "completed", "cancelled"] }
+      },
+      "required": ["rentalId", "toolId", "renterId", "startDate"]
+    },
+    "Transaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Transaction",
+      "type": "object",
+      "description": "Represents a single financial transaction in a user's or worker's wallet.",
+      "properties": {
+        "transactionId": { "type": "string" },
+        "userId": { "type": "string", "description": "The ID of the user/worker who this transaction belongs to." },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["referral_commission", "payout", "refund"] },
+        "sourceJobId": { "type": "string", "description": "The job ID that triggered this transaction." },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["transactionId", "userId", "amount", "type"]
     }
   },
   "auth": {
@@ -211,7 +261,31 @@
         "definition": {
           "entityName": "Health",
           "schema": { "$ref": "#/backend/entities/Health" },
-          "description": "Stores health and medicine data for users."
+          "description": "Stores appliance health and AMC data for users."
+        }
+      },
+      {
+        "path": "/tools/{toolId}",
+        "definition": {
+          "entityName": "Tool",
+          "schema": { "$ref": "#/backend/entities/Tool" },
+          "description": "Stores tools available for rent by workers."
+        }
+      },
+      {
+        "path": "/rentals/{rentalId}",
+        "definition": {
+          "entityName": "Rental",
+          "schema": { "$ref": "#/backend/entities/Rental" },
+          "description": "Stores tool rental transactions."
+        }
+      },
+      {
+        "path": "/transactions/{transactionId}",
+        "definition": {
+          "entityName": "Transaction",
+          "schema": { "$ref": "#/backend/entities/Transaction" },
+          "description": "Stores wallet transactions like referral commissions."
         }
       }
     ]
