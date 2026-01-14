@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview An AI agent that analyzes an image of a home defect.
+ * @fileOverview An AI agent that analyzes an image or video of a home defect.
  *
  * - analyzeDefect - A function that handles the defect analysis process.
  * - AnalyzeDefectInput - The input type for the analyzeDefect function.
@@ -23,7 +23,6 @@ export type AnalyzeDefectInput = z.infer<typeof AnalyzeDefectInputSchema>;
 const AnalyzeDefectOutputSchema = z.object({
   defect: z.string().describe('The identified defect (e.g., "Leaky faucet washer").'),
   estimatedCost: z.string().describe('The estimated repair cost in Hindi (e.g., "₹500 - ₹800").'),
-  // Add a new field for DIY steps
   diySteps: z.array(z.string()).describe('A list of simple, step-by-step instructions for a user to potentially fix the issue themselves. This should be empty if the repair is complex or dangerous.'),
 });
 export type AnalyzeDefectOutput = z.infer<typeof AnalyzeDefectOutputSchema>;
@@ -36,13 +35,16 @@ const prompt = ai.definePrompt({
   name: 'analyzeDefectPrompt',
   input: {schema: AnalyzeDefectInputSchema},
   output: {schema: AnalyzeDefectOutputSchema},
-  prompt: `You are an expert home repair technician. You will be provided with an image or video of a defect in a home, and an optional text description.
+  prompt: `You are an expert home repair technician. You will be provided with media (an image or a short video) of a defect in a home, and an optional text description.
 
 Your tasks are:
-1. Identify the specific defect (e.g., 'Leaky faucet washer', 'Broken switchboard'). Use both the visual media and the text description for your analysis.
+1. Identify the specific defect. Use all available information:
+    - Visuals from the image or video.
+    - **If it's a video, listen carefully to any sounds (e.g., a strange noise from a washing machine, a rattling AC unit) as they are crucial clues.**
+    - The user's text description.
 2. Provide a transparent estimated repair cost range in simple Hindi (e.g., "₹500 - ₹800"). This ensures the user is not overcharged.
-3. If the repair is simple and safe for a user to do themselves, provide a list of clear, step-by-step DIY instructions. For example, for a leaky faucet, you might suggest tightening a nut.
-4. If the repair is complex or dangerous (e.g., anything involving high-voltage electricity, gas lines, or major plumbing), do NOT provide DIY steps. The diySteps array should be empty.
+3. If the repair is simple and safe for a user to do themselves, provide a list of clear, step-by-step DIY instructions.
+4. If the repair is complex or dangerous (e.g., involving high-voltage electricity, gas lines, or major plumbing), do NOT provide DIY steps. The diySteps array should be empty.
 
 Analyze the following:
 Media: {{media url=mediaDataUri}}

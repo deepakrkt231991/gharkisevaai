@@ -2,7 +2,7 @@
 
 import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer } from 'lucide-react';
+import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff } from 'lucide-react';
 
 import { analyzeDefect } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 
 type AnalysisData = {
   defect: string;
@@ -24,12 +26,23 @@ type Media = {
   type: 'image' | 'video';
 }
 
+// Add a global type for the SpeechRecognition
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
 export function DefectAnalyzer() {
   const [media, setMedia] = useState<Media | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AnalysisData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [description, setDescription] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -49,6 +62,7 @@ export function DefectAnalyzer() {
     setMedia(null);
     setResult(null);
     setError(null);
+    setDescription('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -63,6 +77,7 @@ export function DefectAnalyzer() {
     setError(null);
 
     const formData = new FormData(event.currentTarget);
+    formData.set('description', description);
     const actionResult = await analyzeDefect({ success: false, message: '', data: null }, formData);
 
     if (actionResult.success && actionResult.data) {
@@ -73,6 +88,46 @@ export function DefectAnalyzer() {
     setIsLoading(false);
   };
   
+  const handleVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Sorry, your browser doesn't support voice recognition.");
+      return;
+    }
+
+    if (!recognitionRef.current) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'hi-IN'; // You can change this to 'en-US' or other languages
+
+        recognition.onstart = () => {
+            setIsListening(true);
+        };
+
+        recognition.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            setDescription(prev => prev ? `${prev} ${transcript}` : transcript);
+        };
+
+        recognition.onerror = (event: any) => {
+            console.error("Speech recognition error", event.error);
+            setIsListening(false);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+        recognitionRef.current = recognition;
+    }
+
+    if (isListening) {
+        recognitionRef.current.stop();
+    } else {
+        recognitionRef.current.start();
+    }
+  };
+
   const AnalysisResult = () => {
     if (isLoading) {
       return (
@@ -167,12 +222,34 @@ export function DefectAnalyzer() {
               
               <div className="grid w-full max-w-md mx-auto items-center gap-1.5">
                   <Label htmlFor="description">Problem Description (Optional)</Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    placeholder="Describe the problem in detail (e.g., 'AC is not cooling', 'There is a leak under the sink')."
-                    className="bg-background"
-                  />
+                   <div className="relative">
+                    <Textarea
+                        id="description"
+                        name="description"
+                        placeholder="Describe the problem, or use the mic to speak."
+                        className="bg-background pr-10"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                    />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                            onClick={handleVoiceInput}
+                          >
+                            {isListening ? <MicOff className="text-destructive" /> : <Mic />}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{isListening ? 'Stop recording' : 'Start recording'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                   </div>
               </div>
 
               <div className="flex flex-col md:flex-row justify-center items-center gap-4">
