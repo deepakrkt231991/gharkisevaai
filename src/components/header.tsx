@@ -13,6 +13,7 @@ export function Header() {
         </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
           <Link href="/find-a-worker" className="transition-colors hover:text-primary">Find a Worker</Link>
+          <Link href="/worker-signup" className="transition-colors hover:text-primary">Become a Worker</Link>
           <Button asChild>
             <Link href="/analyze">Get a Quote</Link>
           </Button>
@@ -38,6 +39,7 @@ export function Header() {
                   <span>GrihSevaAI</span>
                 </Link>
                 <Link href="/find-a-worker" className="hover:text-primary">Find a Worker</Link>
+                <Link href="/worker-signup" className="hover:text-primary">Become a Worker</Link>
                  <Button asChild className="mt-4">
                     <Link href="/analyze">Get a Quote</Link>
                 </Button>
