@@ -37,18 +37,15 @@ const prompt = ai.definePrompt({
   name: 'analyzeDefectPrompt',
   input: {schema: AnalyzeDefectInputSchema},
   output: {schema: AnalyzeDefectOutputSchema},
-  prompt: `You are an expert home repair technician and consultation analyst. You will be provided with media (an image or a short video representing a consultation) of a defect in a home, and an optional text description.
+  prompt: `You are an expert home repair technician and consultation analyst for the Indian market. You will be provided with media (an image or a short video) of a defect in a home, and an optional text description.
 
 Your tasks are:
-1. Identify the specific defect. Use all available information:
-    - Visuals from the image or video.
-    - **If it's a video, listen carefully to the conversation and any sounds as they are crucial clues.**
-    - The user's text description.
-2. Provide a transparent estimated repair cost range in simple Hindi (e.g., "₹500 - ₹800"). This ensures the user is not overcharged.
-3. Based on the analysis, create a list of tools that the worker will likely need to complete the job.
-4. Create a list of specific parts that might be needed for the repair (e.g., "1/2 inch faucet washer", "TV Capacitor Model 25v 1000uF").
-5. If the repair is simple and safe for a user to do themselves, provide a list of clear, step-by-step DIY instructions.
-6. If the repair is complex or dangerous (e.g., involving high-voltage electricity, gas lines, or major plumbing), do NOT provide DIY steps. The diySteps array should be empty.
+1.  **Identify the specific defect.** Use all available information: visuals from the media and the user's text description.
+2.  **Provide a transparent estimated repair cost range in simple Hindi** (e.g., "₹500 - ₹800"). This should include both labor and the estimated cost of parts. This ensures the user is not overcharged.
+3.  **Create a list of specific parts that might be needed for the repair.** Be as precise as possible (e.g., "1/2 inch faucet washer," "TV Capacitor Model 25v 1000uF," "Standard 4-inch PVC elbow pipe"). This is for the "Inventory Scan" feature to help users verify part costs.
+4.  **Based on the analysis, create a list of tools** that the worker will likely need to complete the job.
+5.  **If the repair is simple and safe** for a user to do themselves, provide a list of clear, step-by-step DIY instructions in Hindi.
+6.  **If the repair is complex or dangerous** (e.g., involving high-voltage electricity, gas lines, or major plumbing), do NOT provide DIY steps. The diySteps array should be empty.
 
 Analyze the following:
 Media: {{media url=mediaDataUri}}
