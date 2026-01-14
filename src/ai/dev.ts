@@ -7,5 +7,7 @@ import '@/ai/flows/verification-agent.ts';
 import '@/ai/flows/matching-agent.ts';
 import '@/ai/flows/content-creator-agent.ts';
 import '@/ai/flows/sos-audio-agent.ts';
+import '@/ai/flows/interior-design-agent.ts';
+import '@/ai/flows/fraud-detection-agent.ts';
 
     
