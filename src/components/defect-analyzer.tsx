@@ -2,7 +2,7 @@
 
 import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, HardHat, IndianRupee } from 'lucide-react';
+import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee } from 'lucide-react';
 
 import { analyzeDefect } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
