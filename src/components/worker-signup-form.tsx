@@ -4,7 +4,7 @@
 import { useFormStatus } from 'react-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
-import { AlertCircle, Loader2, UploadCloud, Banknote, User, Building, Bot, Mic } from 'lucide-react';
+import { AlertCircle, Loader2, UploadCloud, Banknote, User, Building, Bot, Mic, CheckCircle } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
 import { Button } from '@/components/ui/button';
@@ -137,21 +137,50 @@ export function WorkerSignupForm() {
     });
   };
 
+  const benefits = [
+      { text: "Zero Joining Fee: फ्री रजिस्ट्रेशन।", icon: <CheckCircle className="text-green-500" /> },
+      { text: "AI Support: मशीन खराब है? फोटो खींचें, AI आपको ठीक करना सिखाएगा।", icon: <Bot className="text-blue-500" /> },
+      { text: "Passive Income: अपने साथी वर्कर्स को जोड़ें और उनकी हर कमाई का 0.05% हिस्सा पाएं।", icon: <Banknote className="text-orange-500" /> },
+      { text: "Direct Payout: सीधे आपके बैंक अकाउंट में पैसा।", icon: <Building className="text-purple-500" /> },
+  ];
+
 
   return (
     <Card className="max-w-2xl mx-auto shadow-lg">
       <form action={dispatch}>
         <CardHeader>
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="text-2xl font-bold">Worker Onboarding</CardTitle>
-              <CardDescription>Fill out the details below to join our network of professionals.</CardDescription>
-            </div>
+            <CardTitle className="text-2xl font-bold font-headline">"GrihSevaAI Partner बनें – सिर्फ काम न करें, अपना नेटवर्क बनाएं!"</CardTitle>
+            <CardDescription>Fill out the details below to join our network of professionals.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+
+           <Card className="bg-secondary border-primary/20">
+              <CardContent className="p-6">
+                <ul className="space-y-3">
+                  {benefits.map((benefit, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="mt-1">{benefit.icon}</span>
+                      <span className="text-muted-foreground">{benefit.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+           {state.message && !state.success && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{state.message}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex justify-end">
              <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
                   <Bot className="mr-2 h-4 w-4" />
-                  AI Assistant
+                  AI Assistant से फॉर्म भरें
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
@@ -189,15 +218,6 @@ export function WorkerSignupForm() {
               </DialogContent>
             </Dialog>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-           {state.message && !state.success && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{state.message}</AlertDescription>
-            </Alert>
-          )}
           
           <div className="space-y-4">
               <h3 className="font-semibold text-lg">Personal Details</h3>
@@ -292,5 +312,3 @@ export function WorkerSignupForm() {
     </Card>
   );
 }
-
-    
