@@ -16,14 +16,19 @@ const VerifyWorkerInputSchema = z.object({
     .describe(
       "A photo of the worker's ID card (e.g., Aadhaar, PAN), as a data URI that must include a MIME type and use Base64 encoding."
     ),
-  workerProvidedName: z.string().describe("The name the worker provided in the signup form."),
-  workerProvidedIdNumber: z.string().optional().describe("The ID number the worker provided, if any."),
+  selfieDataUri: z
+    .string()
+    .describe(
+      "A selfie photo of the worker, as a data URI that must include a MIME type and use Base64 encoding."
+    ),
 });
 export type VerifyWorkerInput = z.infer<typeof VerifyWorkerInputSchema>;
 
 const VerifyWorkerOutputSchema = z.object({
-  status: z.enum(['Verified', 'Rejected']).describe("The final verification status."),
-  verificationNotes: z.string().describe("Notes from the AI about the verification process, e.g., 'ID photo is blurry' or 'Name and ID number match.'"),
+  verified: z.boolean().describe("True if the verification is successful, otherwise false."),
+  confidence: z.number().describe("A confidence score for the verification from 0 to 100."),
+  extractedName: z.string().describe("The name extracted from the ID card."),
+  reasoning: z.string().describe("A brief explanation of the verification decision."),
 });
 export type VerifyWorkerOutput = z.infer<typeof VerifyWorkerOutputSchema>;
 
@@ -36,10 +41,14 @@ const verificationPrompt = ai.definePrompt({
   name: 'verificationPrompt',
   input: {schema: VerifyWorkerInputSchema},
   output: {schema: VerifyWorkerOutputSchema},
-  prompt: `तुम GrihSevaAI के सिक्योरिटी ऑफिसर हो। इस अपलोड की गई ID फोटो से नाम, जन्म तिथि और ID नंबर निकालो। इसे वर्कर द्वारा दिए गए डेटा (workerProvidedName: {{{workerProvidedName}}}) से मैच करो। यदि फोटो धुंधली है या ID जाली लगती है, तो 'Status: Rejected' लौटाओ, वरना 'Status: Verified'।
+  prompt: `तुम GrihSevaAI के सुरक्षा एजेंट हो। 
+1. ID कार्ड से 'Name' और 'ID Number' निकालो।
+2. ID कार्ड की फोटो को वर्कर की सेल्फी से मैच करो।
+3. क्या यह ID असली लग रही है?
+4. अपने निर्णय के लिए एक संक्षिप्त कारण प्रदान करो।
 
-Analyze the following ID card image:
-Media: {{media url=idCardDataUri}}
+ID Card: {{media url=idCardDataUri}}
+Selfie: {{media url=selfieDataUri}}
 `,
 });
 
