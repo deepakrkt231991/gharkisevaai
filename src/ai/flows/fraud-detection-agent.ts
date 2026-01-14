@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview The Fraud Buster - An AI agent for detecting fraudulent user accounts.
+ * @fileOverview The Fraud Buster - An AI agent for detecting fraudulent user accounts and behavior.
  *
  * - detectFraudulentActivity - A function to analyze user data for signs of fraud.
  * - FraudDetectionInput - The input type for the fraud detection function.
@@ -11,19 +11,20 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const FraudDetectionInputSchema = z.object({
-  userId: z.string().describe("The ID of the new user to check."),
-  ipAddress: z.string().describe("The IP address used for registration."),
-  deviceId: z.string().describe("A unique identifier for the user's device."),
+  userId: z.string().describe("The ID of the user/worker to check."),
+  ipAddress: z.string().optional().describe("The IP address used for registration or recent activity."),
+  deviceId: z.string().optional().describe("A unique identifier for the user's device."),
   address: z.string().optional().describe("The user's physical address."),
-  // In a real implementation, a tool would be used to fetch existing users
-  // with the same IP, deviceId, or address for comparison.
-  // For now, the AI will use this description to understand the task.
+  workerRating: z.number().optional().describe("The current average rating of the worker."),
+  recentReviews: z.array(z.string()).optional().describe("A list of recent text reviews for the worker."),
+  chatTranscript: z.string().optional().describe("A transcript of a recent conversation between the user and a worker."),
 });
 export type FraudDetectionInput = z.infer<typeof FraudDetectionInputSchema>;
 
 const FraudDetectionOutputSchema = z.object({
   isPotentialFraud: z.boolean().describe("True if the activity is flagged as potential fraud, otherwise false."),
-  reasoning: z.string().describe("Explanation for why the activity is or is not considered fraudulent."),
+  reasoning: z.string().describe("Explanation for why the activity is or is not considered fraudulent. Be specific."),
+  suggestedAction: z.enum(["monitor", "warn", "auto_ban", "none"]).describe("The suggested action to take."),
   confidence: z.number().describe("Confidence score (0-100) for the fraud assessment."),
 });
 export type FraudDetectionOutput = z.infer<typeof FraudDetectionOutputSchema>;
@@ -37,26 +38,34 @@ const fraudDetectionPrompt = ai.definePrompt({
   name: 'fraudDetectionPrompt',
   input: {schema: FraudDetectionInputSchema},
   output: {schema: FraudDetectionOutputSchema},
-  prompt: `You are a fraud detection agent for the GrihSevaAI app. Your task is to analyze new user sign-ups to prevent abuse of the referral system.
+  prompt: `You are a fraud and risk detection super agent for the GrihSevaAI app. Your task is to analyze user/worker data to prevent system abuse and ensure safety.
 
-You need to check for signs of a single person creating multiple accounts. Analyze the provided data for the new user.
+Analyze the provided data based on these rules and suggest an action:
 
-Your analysis should be based on these rules:
-1.  **Duplicate Device ID:** If another account already exists with the same deviceId, it's high-risk fraud.
-2.  **Duplicate IP Address:** If multiple accounts are created from the same ipAddress in a short period, it's medium-risk, but could be a shared network (like a college campus). Consider this in your reasoning.
-3.  **Similar Addresses:** If the physical address is very similar to an existing user's address, it could be a sign of fraud.
+1.  **Duplicate Account Fraud (High Risk -> auto_ban):**
+    -   Check for multiple accounts from the same \`deviceId\` or \`ipAddress\`.
+    -   Check for very similar physical \`address\` submissions.
 
-Based on your analysis, determine if this is a potential fraud case. Provide a confidence score and a clear reason for your decision.
+2.  **Poor Performance (Medium Risk -> warn/monitor):**
+    -   Check if the \`workerRating\` has dropped below a threshold (e.g., 3.0) based on \`recentReviews\`.
+    -   If the rating is consistently low over 3+ reviews, suggest 'warn'.
 
-**User Data to Analyze:**
+3.  **Off-Platform Payment Solicitation (High Risk -> auto_ban):**
+    -   Analyze the \`chatTranscript\` for keywords suggesting payment outside the app.
+    -   Look for phrases like "pay me directly", "Google Pay", "Paytm", "GPay", "cash de dena", "UPI kar do".
+
+Based on your analysis, determine if this is a potential fraud case. Provide a confidence score, a clear reason for your decision, and a suggested action.
+
+**Data to Analyze:**
 - User ID: {{{userId}}}
-- IP Address: {{{ipAddress}}}
-- Device ID: {{{deviceId}}}
-{{#if address}}
-- Address: {{{address}}}
-{{/if}}
+{{#if ipAddress}}- IP Address: {{{ipAddress}}}{{/if}}
+{{#if deviceId}}- Device ID: {{{deviceId}}}{{/if}}
+{{#if address}}- Address: {{{address}}}{{/if}}
+{{#if workerRating}}- Worker Rating: {{{workerRating}}}{{/if}}
+{{#if recentReviews}}- Recent Reviews: {{{recentReviews}}}{{/if}}
+{{#if chatTranscript}}- Chat Transcript: \`\`\`{{{chatTranscript}}}\`\`\`{{/if}}
 
-**Note:** In a real system, you would have access to a tool to check for existing users with this data. For this simulation, assume you have that knowledge and make a logical determination. For example, you can invent a scenario like "Found 3 other accounts with the same Device ID".
+**Note:** In a real system, you would have access to tools to check against the database. For this simulation, assume you have that knowledge and make a logical determination based on the provided data. Invent a scenario if needed to justify your output (e.g., "Found 3 other accounts with the same Device ID.").
 `,
 });
 
