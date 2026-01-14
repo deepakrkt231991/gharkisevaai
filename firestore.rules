@@ -1,0 +1,172 @@
+/**
+ * @fileoverview Firestore Security Rules for the GrihSevaAI application.
+ *
+ * @description
+ * This ruleset establishes a secure data access model for the GrihSevaAI app,
+ * which connects users with service workers for home repairs and tasks. The
+ * rules are designed to be secure by default, ensuring users can only access
+
+ * and manage their own information and bookings.
+ *
+ * @philosophy Core Philosophy
+ * The security model is user-centric and enforces strict data ownership.
+ * - User data is private and accessible only to the authenticated owner.
+ * - Bookings are treated as shared resources, accessible only to the user who
+ *   created the booking and the worker assigned to it.
+ * - Worker profiles are publicly viewable to allow users to browse services,
+ *   but are only editable by the worker themselves.
+ *
+ * @structure Data Structure
+ * The data is organized into three primary collections to ensure clear and
+ * secure access patterns:
+ * - `/users/{userId}`: Stores private user profile information. All user-specific
+ *   data, like bookings, is nested under this path.
+ * - `/workers/{workerId}`: A top-level collection for public worker profiles.
+ * - `/users/{userId}/bookings/{bookingId}`: Stores booking details. This path
+ *   nesting allows users to easily list their own bookings, while the document
+ *   data itself contains denormalized IDs for shared access control.
+ *
+ * @decisions Key Security Decisions
+ * - User & Worker Isolation: Users and Workers cannot list or view each other's
+ *   root profile collections. This prevents enumeration attacks.
+ * - Denormalization for Authorization: Booking documents must contain `userId`
+ *   and `workerId` fields. This is critical for granting access to both parties
+ *   without performing slow, costly, or impossible cross-collection queries in rules.
+ * - Path-Based Security: Access to a user's booking subcollection (`/users/{userId}/bookings`)
+ *   is granted based on the `userId` in the path, ensuring users can only query
+ *   for their own bookings.
+ * - Immutable Ownership: Critical identifiers like a user's ID within their
+ *   profile (`User.id`) or the `userId` in a booking are enforced as immutable
+ *   after creation to maintain relational integrity.
+ *
+ * @prototyping Prototyping Mode
+ * These rules are in "Prototyping Mode." They strictly enforce authorization (who
+ * can access what) but are flexible on data shapes. Validation of specific
+ * fields like `name` or `status` is omitted to allow for rapid iteration on the
+ * client-side application. Only fields critical for authorization and relational
+ * integrity (e.g., `userId`, `workerId`) are validated.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns true if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Returns true if the requesting user's UID matches the provided userId.
+     * This is the primary function for establishing document ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Returns true if the document being accessed already exists in Firestore.
+     * Crucial for protecting against writes to non-existent documents.
+     */
+    function isExistingDoc() {
+      return resource != null;
+    }
+
+    /**
+     * Returns true if the requesting user is either the customer (`userId`)
+     * or the assigned service provider (`workerId`) for a given booking.
+     * @param booking The resource.data of the booking document.
+     */
+    function isBookingParticipant(booking) {
+      return isSignedIn() && (request.auth.uid == booking.userId || request.auth.uid == booking.workerId);
+    }
+
+
+    // -------------------------------------------------------------------------
+    // User Profiles (/users/{userId})
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description
+     *   Manages user profile documents. Enforces that only the authenticated
+     *   user can create, view, or modify their own profile.
+     * @path
+     *   /users/{userId}
+     * @allow
+     *   A signed-in user (auth.uid: 'user_abc') can (get) their own document at `/users/user_abc`.
+     * @deny
+     *   A signed-in user (auth.uid: 'user_xyz') cannot (get) another user's document at `/users/user_abc`.
+     * @principle
+     *   Restricts access to a user's own data tree, preventing unauthorized access to personal information.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Disallow listing all users for privacy.
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId) && isExistingDoc() && request.resource.data.id == resource.data.id;
+      allow delete: if isOwner(userId) && isExistingDoc();
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Worker Profiles (/workers/{workerId})
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description
+     *   Manages worker profile documents. Allows anyone to read worker profiles
+     *   (for browsing services), but write operations are restricted to the
+     *   worker who owns the profile.
+     * @path
+     *   /workers/{workerId}
+     * @allow
+     *   Any user (even unauthenticated) can (get) a document at `/workers/worker_123`.
+     * @deny
+     *   A user (auth.uid: 'user_abc') cannot (update) a worker's profile at `/workers/worker_123`.
+     * @principle
+     *   Implements a public-read, owner-only-write model suitable for directory-style data.
+     */
+    match /workers/{workerId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isOwner(workerId) && request.resource.data.id == workerId;
+      allow update: if isOwner(workerId) && isExistingDoc() && request.resource.data.id == resource.data.id;
+      allow delete: if isOwner(workerId) && isExistingDoc();
+    }
+
+
+    // -------------------------------------------------------------------------
+    // User Bookings (/users/{userId}/bookings/{bookingId})
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description
+     *   Secures booking documents, which are shared between a user and a worker.
+     *   Creation is restricted to the user who owns the subcollection. Read,
+     *   update, and delete are allowed only for the two participants.
+     * @path
+     *   /users/{userId}/bookings/{bookingId}
+     * @allow
+     *   The assigned worker (auth.uid: 'worker_123') can (get) a booking at
+     *   `/users/user_abc/bookings/booking_xyz` if the document data contains `workerId: 'worker_123'`.
+     * @deny
+     *   An unrelated user (auth.uid: 'user_other') cannot (get) the booking at
+     *   `/users/user_abc/bookings/booking_xyz`.
+     * @principle
+     *   Enforces shared access for collaborators (user and worker) by checking
+     *   denormalized IDs within the document itself.
+     */
+    match /users/{userId}/bookings/{bookingId} {
+      allow get: if isExistingDoc() && isBookingParticipant(resource.data);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingDoc() && isBookingParticipant(resource.data) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingDoc() && isBookingParticipant(resource.data);
+    }
+  }
+}
