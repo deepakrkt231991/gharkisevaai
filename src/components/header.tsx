@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Wrench, Bell } from 'lucide-react';
+import { Menu, Wrench, Bell, LayoutDashboard } from 'lucide-react';
 
 export function Header() {
   return (
@@ -12,6 +12,7 @@ export function Header() {
           <span>GrihSevaAI</span>
         </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
+          <Link href="/dashboard/earnings" className="transition-colors hover:text-primary">Dashboard</Link>
           <Link href="/find-a-worker" className="transition-colors hover:text-primary">Find a Worker</Link>
           <Link href="/worker-signup" className="transition-colors hover:text-primary">Become a Worker</Link>
           <Button asChild>
@@ -38,6 +39,7 @@ export function Header() {
                   <Wrench className="h-6 w-6 text-primary" />
                   <span>GrihSevaAI</span>
                 </Link>
+                <Link href="/dashboard/earnings" className="flex items-center gap-2 hover:text-primary"><LayoutDashboard />Dashboard</Link>
                 <Link href="/find-a-worker" className="hover:text-primary">Find a Worker</Link>
                 <Link href="/worker-signup" className="hover:text-primary">Become a Worker</Link>
                  <Button asChild className="mt-4">
