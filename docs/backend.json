@@ -90,6 +90,10 @@
           "type": "string",
           "description": "Current status of the job.",
           "enum": ["pending_diagnosis", "awaiting_payment", "worker_assigned", "in_progress", "pending_confirmation", "completed", "disputed", "cancelled"]
+        },
+        "otp": {
+          "type": "string",
+          "description": "A one-time password sent to the user to verify the start of the job."
         }
       },
       "required": ["jobId", "customerId", "status"]

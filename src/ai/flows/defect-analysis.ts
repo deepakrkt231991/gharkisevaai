@@ -25,6 +25,7 @@ const AnalyzeDefectOutputSchema = z.object({
   estimatedCost: z.string().describe('The estimated repair cost in Hindi (e.g., "₹500 - ₹800").'),
   diySteps: z.array(z.string()).describe('A list of simple, step-by-step instructions for a user to potentially fix the issue themselves. This should be empty if the repair is complex or dangerous.'),
   requiredTools: z.array(z.string()).describe('A list of tools the worker might need to bring for the repair.'),
+  requiredParts: z.array(z.string()).describe('A list of specific parts that might be needed for the repair (e.g., "1/2 inch faucet washer", "TV Capacitor Model 25v 1000uF").'),
 });
 export type AnalyzeDefectOutput = z.infer<typeof AnalyzeDefectOutputSchema>;
 
@@ -45,8 +46,9 @@ Your tasks are:
     - The user's text description.
 2. Provide a transparent estimated repair cost range in simple Hindi (e.g., "₹500 - ₹800"). This ensures the user is not overcharged.
 3. Based on the analysis, create a list of tools that the worker will likely need to complete the job.
-4. If the repair is simple and safe for a user to do themselves, provide a list of clear, step-by-step DIY instructions.
-5. If the repair is complex or dangerous (e.g., involving high-voltage electricity, gas lines, or major plumbing), do NOT provide DIY steps. The diySteps array should be empty.
+4. Create a list of specific parts that might be needed for the repair (e.g., "1/2 inch faucet washer", "TV Capacitor Model 25v 1000uF").
+5. If the repair is simple and safe for a user to do themselves, provide a list of clear, step-by-step DIY instructions.
+6. If the repair is complex or dangerous (e.g., involving high-voltage electricity, gas lines, or major plumbing), do NOT provide DIY steps. The diySteps array should be empty.
 
 Analyze the following:
 Media: {{media url=mediaDataUri}}
