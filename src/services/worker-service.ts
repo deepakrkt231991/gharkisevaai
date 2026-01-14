@@ -1,0 +1,45 @@
+'use server';
+/**
+ * @fileOverview A service for interacting with worker data in Firestore.
+ */
+
+import {ai} from '@/ai/genkit';
+import {z} from 'genkit';
+import {collection, getDocs, query, where} from 'firebase/firestore';
+import {initializeFirebase} from '@/firebase';
+
+// This is the tool the AI agent will use.
+export const findVerifiedWorkers = ai.defineTool(
+  {
+    name: 'findVerifiedWorkers',
+    description: 'Finds verified workers based on their skills and general location.',
+    inputSchema: z.object({
+      skills: z.array(z.string()).optional().describe("A list of skills to filter by (e.g., ['plumber', 'electrician'])."),
+      location: z.string().optional().describe("The general location to search within (e.g., 'Delhi')."),
+    }),
+    outputSchema: z.array(z.object({
+        workerId: z.string(),
+        name: z.string(),
+        skills: z.array(z.string()),
+    })),
+  },
+  async (input) => {
+    console.log('Finding workers with input:', input);
+    const {firestore} = initializeFirebase();
+    
+    // In a real app, you'd use a more complex geospatial query.
+    // For now, we query for all verified workers and let the AI filter.
+    const workersRef = collection(firestore, 'workers');
+    const q = query(workersRef, where('isVerified', '==', true));
+
+    const querySnapshot = await getDocs(q);
+    const workers = querySnapshot.docs.map(doc => ({
+      workerId: doc.id,
+      ...doc.data(),
+    })) as any[];
+
+    console.log('Found workers:', workers);
+    // The AI will perform the final filtering based on skills and location from the prompt.
+    return workers.map(w => ({ workerId: w.workerId, name: w.name, skills: w.skills }));
+  }
+);
