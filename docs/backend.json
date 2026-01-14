@@ -27,6 +27,14 @@
           "type": "string",
           "description": "Type of user.",
           "enum": ["customer", "worker", "doctor"]
+        },
+        "referredBy": {
+          "type": "string",
+          "description": "The ID of the user or worker who referred this user."
+        },
+        "walletBalance": {
+            "type": "number",
+            "description": "The balance of referral earnings for the user."
         }
       },
       "required": ["id", "userType"]
@@ -125,6 +133,14 @@
                 "ifscCode": { "type": "string" },
                 "accountHolderName": { "type": "string"}
             }
+        },
+        "referredBy": {
+            "type": "string",
+            "description": "The ID of the user or worker who referred this worker."
+        },
+        "walletBalance": {
+            "type": "number",
+            "description": "The balance of referral earnings for the worker."
         }
       },
       "required": ["workerId", "isVerified"]
@@ -160,7 +176,8 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "anonymous",
+      "phone"
     ]
   },
   "firestore": {
