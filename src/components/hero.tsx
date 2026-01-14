@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Camera, Wind, Tv, Refrigerator, WashingMachine, Zap, Construction } from 'lucide-react';
+import { Camera, Wind, Tv, Refrigerator, WashingMachine, Zap, Construction, Wrench, FileText } from 'lucide-react';
 import { ServiceCard, type Service } from '@/components/service-card';
 
 const services: Service[] = [
@@ -11,6 +11,8 @@ const services: Service[] = [
   { icon: WashingMachine, label: 'Washing', color: 'text-purple-500', bgColor: 'bg-purple-100' },
   { icon: Zap, label: 'Electrician', color: 'text-yellow-500', bgColor: 'bg-yellow-100' },
   { icon: Construction, label: 'Plumber', color: 'text-green-500', bgColor: 'bg-green-100' },
+  { icon: Wrench, label: 'Home Repair', color: 'text-red-500', bgColor: 'bg-red-100' },
+  { icon: FileText, label: 'Get Quote', color: 'text-indigo-500', bgColor: 'bg-indigo-100' },
 ];
 
 export function Hero() {
@@ -46,7 +48,7 @@ export function Hero() {
           <h2 className="font-headline text-2xl md:text-3xl font-bold text-center">
             Our Services
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-4 md:gap-6">
             {services.map((service) => (
               <ServiceCard key={service.label} {...service} />
             ))}
