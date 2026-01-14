@@ -1,23 +1,26 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Pill } from 'lucide-react';
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Menu, Wrench, Bell } from 'lucide-react';
 
 export function Header() {
   return (
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-40 w-full border-b">
       <div className="container flex h-16 items-center">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg font-headline">
-          <Pill className="h-6 w-6 text-primary" />
-          <span>DawaAI</span>
+          <Wrench className="h-6 w-6 text-primary" />
+          <span>GrihSevaAI</span>
         </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
-          <Link href="/#how-it-works" className="transition-colors hover:text-primary">How it Works</Link>
-          <Link href="/get-advice" className="transition-colors hover:text-primary">Get Advice</Link>
-        </nav>
-        <div className="flex items-center gap-4 ml-auto md:ml-4">
+          <Link href="/find-a-worker" className="transition-colors hover:text-primary">Find a Worker</Link>
           <Button asChild>
-            <Link href="/analyze">Analyze Medicine</Link>
+            <Link href="/analyze">Smart Diagnosis</Link>
+          </Button>
+        </nav>
+        <div className="flex items-center gap-4 md:ml-4">
+          <Button variant="ghost" size="icon">
+            <Bell className="h-5 w-5" />
+            <span className="sr-only">Notifications</span>
           </Button>
           <Sheet>
             <SheetTrigger asChild>
@@ -27,15 +30,16 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+               <SheetTitle className="sr-only">Menu</SheetTitle>
+               <SheetDescription className="sr-only">Main navigation menu.</SheetDescription>
               <nav className="grid gap-6 text-lg font-medium mt-8">
                 <Link href="/" className="flex items-center gap-2 text-lg font-bold font-headline">
-                  <Pill className="h-6 w-6 text-primary" />
-                  <span>DawaAI</span>
+                  <Wrench className="h-6 w-6 text-primary" />
+                  <span>GrihSevaAI</span>
                 </Link>
-                <Link href="/#how-it-works" className="hover:text-primary">How it Works</Link>
-                <Link href="/get-advice" className="hover:text-primary">Get Advice</Link>
+                <Link href="/find-a-worker" className="hover:text-primary">Find a Worker</Link>
                  <Button asChild className="mt-4">
-                    <Link href="/analyze">Analyze Medicine</Link>
+                    <Link href="/analyze">Smart Diagnosis</Link>
                 </Button>
               </nav>
             </SheetContent>

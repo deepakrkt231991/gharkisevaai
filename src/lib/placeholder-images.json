@@ -1,56 +1,32 @@
 {
   "placeholderImages": [
     {
-      "id": "hero-image-1",
-      "description": "A person holding a strip of pills with a blurred background of a pharmacy.",
-      "imageUrl": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtZWRpY2luZXxlbnwwfHx8fDE3Njg2NTQwMDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "medicine pills"
-    },
-    {
-      "id": "how-it-works-upload",
-      "description": "A person taking a photo of a medicine strip with their smartphone.",
-      "imageUrl": "https://images.unsplash.com/photo-1607524584052-b0e56c42c017?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwaG9uZSUyMHdhbGx8ZW58MHx8fHwxNzY4MjE2MTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "phone medicine"
-    },
-    {
-      "id": "how-it-works-analyze",
-      "description": "An abstract representation of AI analyzing a medicine strip.",
-      "imageUrl": "https://images.unsplash.com/photo-1762330467572-5199bc772a20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxBSSUyMGFuYWx5c2lzfGVufDB8fHx8MTc2ODIxNjEyMnww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "AI analysis"
-    },
-    {
-      "id": "how-it-works-connect",
-      "description": "A doctor providing online consultation to a patient.",
-      "imageUrl": "https://images.unsplash.com/photo-1584515933487-779824d29309?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxkb2N0b3IlMjBvbmxpbmV8ZW58MHx8fHwxNzY4NjU0MTQyfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "doctor online"
-    },
-    {
       "id": "worker-1",
-      "description": "Portrait of a friendly male pharmacist.",
-      "imageUrl": "https://images.unsplash.com/photo-1596798229862-432242190885?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWxlJTIwcGhhcm1hY2lzdCUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODY1NDU3NXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "pharmacist portrait",
-      "name": "डॉ. रमेश गुप्ता",
-      "specialty": "फार्मासिस्ट",
+      "description": "Portrait of a friendly male plumber.",
+      "imageUrl": "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWxlJTIwcGx1bWJlciUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODc0NjAwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plumber portrait",
+      "name": "राजेश कुमार",
+      "specialty": "प्लंबर",
       "rating": 4.9,
       "reviews": 210
     },
     {
       "id": "worker-2",
-      "description": "Portrait of a confident female doctor.",
-      "imageUrl": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmZW1hbGUlMjBkb2N0b3IlMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njg2NTQ2MTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "doctor portrait",
-      "name": "डॉ. अनीता शर्मा",
-      "specialty": "जनरल फिजीशियन",
+      "description": "Portrait of a confident female electrician.",
+      "imageUrl": "https://images.unsplash.com/photo-1596249964205-6f1e36c7a022?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmZW1hbGUlMjBlbGVjdHJpY2lhbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODc0NjA0NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "electrician portrait",
+      "name": "सुनीता देवी",
+      "specialty": "इलेक्ट्रीशियन",
       "rating": 4.8,
       "reviews": 155
     },
     {
       "id": "worker-3",
-      "description": "Portrait of a skilled male pediatrician.",
-      "imageUrl": "https://images.unsplash.com/photo-1629425733761-caae3b5f2e50?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWxlJTIwcGVkaWF0cmljaWFuJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzY4NjU0NjQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "pediatrician portrait",
-      "name": "डॉ. मोहन वर्मा",
-      "specialty": "बाल रोग विशेषज्ञ",
+      "description": "Portrait of a skilled male carpenter.",
+      "imageUrl": "https://images.unsplash.com/photo-1593704986793-3528731f50a8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWxlJTIwY2FycGVudGVyJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzY4NzQ2MDc3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "carpenter portrait",
+      "name": "मोहन लाल",
+      "specialty": "बढ़ई",
       "rating": 4.9,
       "reviews": 180
     }

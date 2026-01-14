@@ -1,15 +1,13 @@
 import { Header } from '@/components/header';
-import { Hero } from '@/components/hero';
-import { HowItWorks } from '@/components/how-it-works';
 import { Footer } from '@/components/footer';
+import { Hero } from '@/components/hero';
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
         <Hero />
-        <HowItWorks />
       </main>
       <Footer />
     </div>

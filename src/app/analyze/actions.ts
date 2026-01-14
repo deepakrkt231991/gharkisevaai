@@ -1,6 +1,6 @@
 "use server";
 
-import { analyzeMedicine, AnalyzeMedicineOutput } from '@/ai/flows/medicine-analysis';
+import { analyzeDefect as analyzeDefectFlow, AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -12,7 +12,7 @@ const schema = z.object({
 type State = {
   success: boolean;
   message: string;
-  data: AnalyzeMedicineOutput | null;
+  data: AnalyzeDefectOutput | null;
 }
 
 export async function analyzeDefect(
@@ -33,14 +33,14 @@ export async function analyzeDefect(
   }
 
   try {
-    const result = await analyzeMedicine(validatedFields.data);
+    const result = await analyzeDefectFlow({photoDataUri: validatedFields.data.photoDataUri});
     return {
       success: true,
       message: 'Analysis complete.',
       data: result,
     };
   } catch (error) {
-    console.error('Error during medicine analysis:', error);
+    console.error('Error during defect analysis:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return {
       success: false,
