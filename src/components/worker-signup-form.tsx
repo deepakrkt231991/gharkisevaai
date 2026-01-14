@@ -2,9 +2,9 @@
 "use client";
 
 import { useFormStatus } from 'react-dom';
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
-import { AlertCircle, Loader2, UploadCloud, Banknote, User, Building } from 'lucide-react';
+import { AlertCircle, Loader2, UploadCloud, Banknote, User, Building, Bot, Mic } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,9 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from '@/components/ui/textarea';
+
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -32,10 +35,27 @@ function SubmitButton() {
   );
 }
 
+// Add a global type for the SpeechRecognition
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
+
 export function WorkerSignupForm() {
   const initialState = { message: '', success: false, errors: [] };
   const [state, dispatch] = useActionState(createWorkerProfile, initialState);
   const { toast } = useToast();
+
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const recognitionRef = useRef<any>(null);
+
 
   useEffect(() => {
     if (state.success) {
@@ -49,12 +69,126 @@ export function WorkerSignupForm() {
 
   const getError = (path: string) => state.errors?.find(e => e.path.includes(path))?.message;
 
+  const handleVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Sorry, your browser doesn't support voice recognition.");
+      return;
+    }
+
+    if (!recognitionRef.current) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'hi-IN';
+
+        recognition.onstart = () => {
+            setIsListening(true);
+            setTranscript('');
+        };
+
+        recognition.onresult = (event: any) => {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                }
+            }
+            if (finalTranscript) {
+              setTranscript(prev => prev + finalTranscript + ' ');
+            }
+        };
+
+        recognition.onerror = (event: any) => {
+            console.error("Speech recognition error", event.error);
+            setIsListening(false);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+        recognitionRef.current = recognition;
+    }
+
+    if (isListening) {
+        recognitionRef.current.stop();
+    } else {
+        recognitionRef.current.start();
+    }
+  };
+
+  const fillFormFields = () => {
+    // A simple heuristic to parse the transcript
+    const nameRegex = /(?:नाम|name is|मेरा नाम)\s*([^.,]+)/i;
+    const phoneRegex = /(?:नंबर|number is)\s*([0-9\s-]+)/i;
+    const addressRegex = /(?:पता|address is)\s*(.+)/i;
+
+    const nameMatch = transcript.match(nameRegex);
+    const phoneMatch = transcript.match(phoneRegex);
+    const addressMatch = transcript.match(addressRegex);
+    
+    if (nameMatch) setName(nameMatch[1].trim());
+    if (phoneMatch) setPhone(phoneMatch[1].replace(/\s|-/g, '').trim());
+    if (addressMatch) setAddress(addressMatch[1].trim());
+
+    toast({
+      title: "Fields Filled",
+      description: "Information has been filled from your speech. Please review and correct if needed.",
+    });
+  };
+
+
   return (
     <Card className="max-w-2xl mx-auto shadow-lg">
       <form action={dispatch}>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Worker Onboarding</CardTitle>
-          <CardDescription>Fill out the details below to join our network of professionals.</CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-2xl font-bold">Worker Onboarding</CardTitle>
+              <CardDescription>Fill out the details below to join our network of professionals.</CardDescription>
+            </div>
+             <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                  <Bot className="mr-2 h-4 w-4" />
+                  AI Assistant
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>AI Voice Assistant</DialogTitle>
+                  <DialogDescription>
+                    बोलकर अपनी जानकारी भरें। कहें "मेरा नाम [आपका नाम] है, मेरा नंबर [आपका नंबर] है, मेरा पता [आपका पता] है"।
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="relative">
+                     <Textarea
+                        id="voice-transcript"
+                        value={transcript}
+                        onChange={(e) => setTranscript(e.target.value)}
+                        placeholder="Start speaking, your words will appear here..."
+                        className="min-h-[100px] pr-12"
+                    />
+                    <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                        onClick={handleVoiceInput}
+                      >
+                        <Mic className={isListening ? 'text-destructive' : ''} />
+                    </Button>
+                  </div>
+                </div>
+                <DialogFooter>
+                   <DialogTrigger asChild>
+                    <Button type="button" onClick={fillFormFields}>Use this information</Button>
+                  </DialogTrigger>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
            {state.message && !state.success && (
@@ -70,14 +204,19 @@ export function WorkerSignupForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name (As per Aadhaar)</Label>
-                  <Input id="name" name="name" placeholder="Rajesh Kumar" required />
+                  <Input id="name" name="name" placeholder="Rajesh Kumar" required value={name} onChange={e => setName(e.target.value)} />
                   {getError('name') && <p className="text-sm text-destructive">{getError('name')}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Mobile Number (WhatsApp)</Label>
-                  <Input id="phone" name="phone" placeholder="9876543210" required />
+                  <Input id="phone" name="phone" placeholder="9876543210" required value={phone} onChange={e => setPhone(e.target.value)}/>
                   {getError('phone') && <p className="text-sm text-destructive">{getError('phone')}</p>}
                 </div>
+              </div>
+              <div className="space-y-2">
+                  <Label htmlFor="address">Full Address</Label>
+                  <Textarea id="address" name="address" placeholder="Your full address" required value={address} onChange={e => setAddress(e.target.value)} />
+                  {getError('address') && <p className="text-sm text-destructive">{getError('address')}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
@@ -100,7 +239,7 @@ export function WorkerSignupForm() {
                   <UploadCloud size={16} />
                   Take/Upload Photo of ID
                 </Label>
-                <Input id="document" name="document" type="file" className="hidden" accept="image/*,application/pdf" />
+                <Input id="document" name="document" type="file" className="hidden" accept="image/*" />
              </div>
           </div>
 
@@ -153,3 +292,5 @@ export function WorkerSignupForm() {
     </Card>
   );
 }
+
+    
