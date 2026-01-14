@@ -2,7 +2,7 @@
 
 import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff } from 'lucide-react';
+import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2 } from 'lucide-react';
 
 import { analyzeDefect } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ type AnalysisData = {
   defect: string;
   estimatedCost: string;
   diySteps: string[];
+  requiredTools: string[];
 };
 
 type Media = {
@@ -131,9 +132,12 @@ export function DefectAnalyzer() {
   const AnalysisResult = () => {
     if (isLoading) {
       return (
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><Wrench /> Defect Identified</h3><Skeleton className="h-4 w-4/5" /></CardContent></Card>
-          <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><IndianRupee /> Estimated Cost (Hindi)</h3><Skeleton className="h-4 w-3/5" /></CardContent></Card>
+        <div className="space-y-8">
+            <div className="grid md:grid-cols-2 gap-8">
+              <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><Wrench /> Defect Identified</h3><Skeleton className="h-4 w-4/5" /></CardContent></Card>
+              <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><IndianRupee /> Estimated Cost (Hindi)</h3><Skeleton className="h-4 w-3/5" /></CardContent></Card>
+            </div>
+            <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><Settings2 /> Required Tools</h3><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3" /></CardContent></Card>
         </div>
       )
     }
@@ -165,6 +169,22 @@ export function DefectAnalyzer() {
               </CardContent>
             </Card>
           </div>
+
+          {result.requiredTools && result.requiredTools.length > 0 && (
+             <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-headline text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Settings2 /> Suggested Tools for the Worker
+                  </h3>
+                  <ul className="list-disc list-inside space-y-2 text-left text-foreground">
+                    {result.requiredTools.map((tool, index) => (
+                      <li key={index}>{tool}</li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+          )}
+
           {result.diySteps && result.diySteps.length > 0 && (
              <Card className="bg-background">
                 <CardContent className="p-6">
