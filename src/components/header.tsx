@@ -14,7 +14,7 @@ export function Header() {
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
           <Link href="/find-a-worker" className="transition-colors hover:text-primary">Find a Worker</Link>
           <Button asChild>
-            <Link href="/analyze">Smart Diagnosis</Link>
+            <Link href="/analyze">Get a Quote</Link>
           </Button>
         </nav>
         <div className="flex items-center gap-4 md:ml-4">
@@ -39,7 +39,7 @@ export function Header() {
                 </Link>
                 <Link href="/find-a-worker" className="hover:text-primary">Find a Worker</Link>
                  <Button asChild className="mt-4">
-                    <Link href="/analyze">Smart Diagnosis</Link>
+                    <Link href="/analyze">Get a Quote</Link>
                 </Button>
               </nav>
             </SheetContent>

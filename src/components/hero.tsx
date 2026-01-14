@@ -21,10 +21,10 @@ export function Hero() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="space-y-2 text-center md:text-left">
                 <h2 className="font-headline text-2xl md:text-3xl font-bold">
-                  Problem samajh nahi aa rahi?
+                  Need a repair? Get a quote now.
                 </h2>
                 <p className="text-primary-foreground/80 text-lg">
-                  Appliance ki photo click karein, AI turant check karega.
+                  Just upload a photo of the problem, and our AI will give you an instant price estimate.
                 </p>
               </div>
               <Button
@@ -34,7 +34,7 @@ export function Hero() {
               >
                 <Link href="/analyze">
                   <Camera className="mr-2" />
-                  Smart Diagnosis Scan
+                  Get an Instant Quote
                 </Link>
               </Button>
             </div>
@@ -43,7 +43,7 @@ export function Hero() {
 
         <div className="space-y-6">
           <h2 className="font-headline text-2xl md:text-3xl font-bold text-center">
-            Hamari Services
+            Our Services
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 md:gap-6">
             {services.map((service) => (

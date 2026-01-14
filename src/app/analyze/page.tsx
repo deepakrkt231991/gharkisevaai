@@ -9,9 +9,9 @@ export default function AnalyzePage() {
       <main className="flex-1 py-12 md:py-16">
         <div className="container">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">AI Defect Analyzer</h1>
+            <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Get an Instant Quote</h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              Upload an image of the home defect, and our AI will identify the issue and estimate repair costs in Hindi.
+              Upload a photo or video of the problem. Our AI will diagnose the issue and provide an instant repair estimate.
             </p>
           </div>
           <DefectAnalyzer />
