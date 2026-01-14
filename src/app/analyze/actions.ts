@@ -4,9 +4,10 @@ import { analyzeDefect as analyzeDefectFlow, AnalyzeDefectOutput } from '@/ai/fl
 import { z } from 'zod';
 
 const schema = z.object({
-  photoDataUri: z.string().refine(val => val.startsWith('data:image/'), {
-    message: 'Invalid image data URI',
+  mediaDataUri: z.string().refine(val => val.startsWith('data:'), {
+    message: 'Invalid data URI',
   }),
+  description: z.string().optional(),
 });
 
 type State = {
@@ -21,19 +22,23 @@ export async function analyzeDefect(
 ): Promise<State> {
   
   const validatedFields = schema.safeParse({
-    photoDataUri: formData.get('photoDataUri'),
+    mediaDataUri: formData.get('mediaDataUri'),
+    description: formData.get('description'),
   });
 
   if (!validatedFields.success) {
     return {
       success: false,
-      message: 'Invalid input. Please provide a valid image.',
+      message: 'Invalid input. Please provide a valid image or video.',
       data: null,
     };
   }
 
   try {
-    const result = await analyzeDefectFlow({photoDataUri: validatedFields.data.photoDataUri});
+    const result = await analyzeDefectFlow({
+      mediaDataUri: validatedFields.data.mediaDataUri,
+      description: validatedFields.data.description,
+    });
     return {
       success: true,
       message: 'Analysis complete.',
