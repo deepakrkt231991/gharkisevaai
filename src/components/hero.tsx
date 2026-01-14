@@ -1,21 +1,22 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Camera, Wrench, Wind, Tv, Refrigerator, WashingMachine, Zap, Construction } from 'lucide-react';
+import { Camera, Wind, Tv, Refrigerator, WashingMachine, Zap, Construction } from 'lucide-react';
+import { ServiceCard, type Service } from '@/components/service-card';
 
-const services = [
-  { icon: Wind, label: 'AC Repair' },
-  { icon: Tv, label: 'TV Repair' },
-  { icon: Refrigerator, label: 'Fridge' },
-  { icon: WashingMachine, label: 'Washing' },
-  { icon: Zap, label: 'Electrician' },
-  { icon: Construction, label: 'Plumber' },
+const services: Service[] = [
+  { icon: Wind, label: 'AC Repair', color: 'text-blue-500', bgColor: 'bg-blue-100' },
+  { icon: Tv, label: 'TV Repair', color: 'text-orange-500', bgColor: 'bg-orange-100' },
+  { icon: Refrigerator, label: 'Fridge', color: 'text-cyan-500', bgColor: 'bg-cyan-100' },
+  { icon: WashingMachine, label: 'Washing', color: 'text-purple-500', bgColor: 'bg-purple-100' },
+  { icon: Zap, label: 'Electrician', color: 'text-yellow-500', bgColor: 'bg-yellow-100' },
+  { icon: Construction, label: 'Plumber', color: 'text-green-500', bgColor: 'bg-green-100' },
 ];
 
 export function Hero() {
   return (
     <section className="container py-8 md:py-12">
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-12">
         <Card className="bg-gradient-to-r from-primary/80 to-primary text-primary-foreground shadow-lg">
           <CardContent className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -47,12 +48,7 @@ export function Hero() {
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 md:gap-6">
             {services.map((service) => (
-              <div key={service.label} className="flex flex-col items-center gap-2">
-                <div className="bg-card p-4 rounded-lg shadow-md w-full aspect-square flex items-center justify-center hover:shadow-xl transition-shadow">
-                  <service.icon className="h-8 w-8 text-primary" />
-                </div>
-                <p className="font-semibold text-center text-sm">{service.label}</p>
-              </div>
+              <ServiceCard key={service.label} {...service} />
             ))}
           </div>
         </div>
