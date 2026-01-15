@@ -24,9 +24,18 @@ export function DynamicBanner() {
     if (!bannerData?.content) return { hindi: '', english: '' };
 
     // Split the content by newline to separate Hindi and English parts
-    const parts = bannerData.content.split('\n');
-    const hindi = parts.find(p => /[\u0900-\u097F]/.test(p)) || parts[0] || ''; // Simple heuristic for Hindi
-    const english = parts.find(p => !/[\u0900-\u097F]/.test(p)) || parts[1] || '';
+    const parts = bannerData.content.split('\n').filter(p => p.trim() !== '');
+    const hindi = parts.find(p => /[\u0900-\u097F]/.test(p)) || ''; 
+    const english = parts.find(p => !/[\u0900-\u097F]/.test(p)) || '';
+    
+    // Fallback logic if one is missing or not detected
+    if(parts.length === 1) {
+        return { hindi: parts[0], english: '' };
+    }
+    if (parts.length > 1 && (!hindi || !english)) {
+        return { hindi: parts[0], english: parts.slice(1).join(' ') };
+    }
+
 
     return { hindi, english };
   }, [bannerData]);
@@ -34,7 +43,7 @@ export function DynamicBanner() {
 
   if (isLoading) {
     return (
-        <Card>
+        <Card className="bg-secondary/50">
             <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                     <Skeleton className="h-8 w-8 rounded-full" />
@@ -52,23 +61,25 @@ export function DynamicBanner() {
     // Don't render anything if there's no banner content
     return null;
   }
+  
+  const baseColor = bannerData.backgroundColor || 'hsl(var(--primary))';
 
   return (
     <Card 
-      className="border-2 border-dashed"
+      className="border-2 border-dashed shadow-lg"
       style={{
-        borderColor: bannerData.backgroundColor || 'hsl(var(--primary))',
-        backgroundColor: bannerData.backgroundColor ? `${bannerData.backgroundColor}20` : 'hsl(var(--primary) / 0.1)',
+        borderColor: baseColor,
+        backgroundColor: `${baseColor}20`, // Adding ~12% opacity to the hex color
       }}
     >
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
-          <div className="p-2 rounded-full" style={{ backgroundColor: bannerData.backgroundColor || 'hsl(var(--primary))' }}>
+          <div className="p-2 rounded-full" style={{ backgroundColor: baseColor }}>
             <PartyPopper className="h-6 w-6 text-primary-foreground" />
           </div>
           <div className="flex-1">
-            <p className="font-bold text-lg">{parsedContent.hindi}</p>
-            <p className="text-sm text-muted-foreground">{parsedContent.english}</p>
+            {parsedContent.hindi && <p className="font-bold text-lg" style={{color: baseColor}}>{parsedContent.hindi}</p>}
+            {parsedContent.english && <p className="text-sm text-muted-foreground">{parsedContent.english}</p>}
           </div>
         </div>
       </CardContent>
