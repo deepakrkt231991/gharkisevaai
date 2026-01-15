@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Tooltip, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 
 type AnalysisData = {
@@ -267,10 +267,10 @@ export function DefectAnalyzer() {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     />
-                    <TooltipProvider>
+                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button 
+                           <Button 
                             type="button" 
                             variant="ghost" 
                             size="icon" 

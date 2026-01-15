@@ -45,8 +45,8 @@ Your tasks are:
     -   If it's a defect, provide a transparent estimated repair cost range in simple Hindi (e.g., "₹500 - ₹800"). This should include labor and parts.
     -   If it's an item for sale, suggest a reasonable resale market value based on its condition.
 3.  **Create a list of specific parts.**
-    -   For repairs: List parts needed (e.g., "1/2 inch faucet washer," "TV Capacitor Model 25v 1000uF").
-    -   For items for sale: List key components or specifications.
+    -   For repairs: List specific parts needed (e.g., "1/2 inch faucet washer," "TV Capacitor Model 25v 1000uF").
+    -   For items for sale: Use the \`requiredParts\` field to list key components or specifications.
 4.  **Create a list of tools** needed for a repair. This should be empty for items for sale.
 5.  **Provide DIY steps if the repair is simple and safe.** If the repair is complex, dangerous, or it's an item for sale, the diySteps array should be empty.
 
