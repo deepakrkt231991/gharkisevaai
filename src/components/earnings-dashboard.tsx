@@ -1,22 +1,34 @@
 
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Banknote, Briefcase, Group, IndianRupee, Landmark } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Banknote, Briefcase, Group, IndianRupee, Landmark, Trophy, ShieldCheck, Gem, Star } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 
 // Mock data based on the UI concept
 const totalBalance = "12,450.50";
 const directEarnings = "11,200";
 const referralEarnings = "1,250.50";
+const referralsCount = 8;
+const referralsNeededForSilver = 10;
 
 const activityItems = [
   { name: "Amit Singh", action: "TV Repair done", income: "+₹0.75", avatar: "AS" },
   { name: "Rahul Verma", action: "AC Service done", income: "+₹1.20", avatar: "RV" },
   { name: "Suresh K.", action: "New Worker Added", income: "Bonus Active", avatar: "SK" },
   { name: "Priya Sharma", action: "Fridge Repair done", income: "+₹0.90", avatar: "PS" },
+];
+
+const topEarners = [
+    { name: "Vikas Gupta", earnings: "₹5,800", avatar: "VG" },
+    { name: "Anjali Sharma", earnings: "₹4,250", avatar: "AS" },
+    { name: "Sanjay Patel", earnings: "₹3,100", avatar: "SP" },
+    { name: "Meera Singh", earnings: "₹2,500", avatar: "MS" },
+    { name: "Rohit Kumar", earnings: "₹1,900", avatar: "RK" },
 ];
 
 export function EarningsDashboard() {
@@ -60,6 +72,55 @@ export function EarningsDashboard() {
             color="text-green-500"
           />
         </div>
+
+        {/* Gamification: Leaderboard and Badges */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Trophy className="text-yellow-500" />Top 5 Partners</CardTitle>
+                    <CardDescription>See who is leading the referral race!</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {topEarners.map((earner, index) => (
+                           <div key={index} className="flex items-center space-x-4">
+                               <Avatar>
+                                   <AvatarFallback className="font-bold">{earner.avatar}</AvatarFallback>
+                               </Avatar>
+                               <div className="flex-1">
+                                   <p className="font-semibold">{earner.name}</p>
+                               </div>
+                               <p className="font-bold text-green-600">₹{earner.earnings}</p>
+                           </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Star className="text-blue-500" />My Partner Level</CardTitle>
+                    <CardDescription>Unlock new badges by growing your team.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="text-center space-y-2">
+                        <Badge className="bg-orange-200 text-orange-800 text-sm">Bronze Partner</Badge>
+                        <p className="text-muted-foreground">You have referred {referralsCount} people.</p>
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-end">
+                            <h4 className="font-semibold flex items-center gap-1"><ShieldCheck className="text-gray-400" />Next Level: Silver Partner</h4>
+                            <p className="text-sm text-muted-foreground">{referralsCount}/{referralsNeededForSilver}</p>
+                        </div>
+                        <Progress value={(referralsCount / referralsNeededForSilver) * 100} />
+                        <p className="text-xs text-muted-foreground text-center">Refer {referralsNeededForSilver - referralsCount} more people to become a Silver Partner!</p>
+                    </div>
+                    <div className="text-center text-muted-foreground pt-4">
+                        <p className="font-bold flex items-center justify-center gap-2"><Gem className="text-yellow-600" />Gold Partner <span className="text-xs">(100 Referrals)</span></p>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
 
         {/* Referral Activity */}
         <Card>
