@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Wrench, Bell, LayoutDashboard, Share2 } from 'lucide-react';
+import { Menu, Wrench, Bell, LayoutDashboard, Share2, Users, Handshake } from 'lucide-react';
 
 export function Header() {
   return (
@@ -14,13 +14,13 @@ export function Header() {
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
           <Link href="/dashboard/earnings" className="transition-colors hover:text-primary">Dashboard</Link>
           <Link href="/find-a-worker" className="transition-colors hover:text-primary">Find a Worker</Link>
-          <Link href="/promote" className="transition-colors hover:text-primary">Promote</Link>
+          <Link href="/promote" className="transition-colors hover:text-primary">Promote & Earn</Link>
           <Link href="/worker-signup" className="transition-colors hover:text-primary">Become a Worker</Link>
           <Button asChild>
             <Link href="/analyze">Get a Quote</Link>
           </Button>
         </nav>
-        <div className="flex items-center gap-4 md:ml-4">
+        <div className="flex items-center gap-2 md:ml-4">
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>
@@ -40,10 +40,10 @@ export function Header() {
                   <Wrench className="h-6 w-6 text-primary" />
                   <span>GHAR KI SEVA AI</span>
                 </Link>
-                <Link href="/dashboard/earnings" className="flex items-center gap-2 hover:text-primary"><LayoutDashboard />Dashboard</Link>
-                <Link href="/promote" className="flex items-center gap-2 hover:text-primary"><Share2 />Promote</Link>
-                <Link href="/find-a-worker" className="hover:text-primary">Find a Worker</Link>
-                <Link href="/worker-signup" className="hover:text-primary">Become a Worker</Link>
+                <Link href="/dashboard/earnings" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><LayoutDashboard />Dashboard</Link>
+                <Link href="/promote" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Share2 />Promote & Earn</Link>
+                <Link href="/find-a-worker" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Users />Find a Worker</Link>
+                <Link href="/worker-signup" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Handshake />Become a Worker</Link>
                  <Button asChild className="mt-4">
                     <Link href="/analyze">Get a Quote</Link>
                 </Button>
