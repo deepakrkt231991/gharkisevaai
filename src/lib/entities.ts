@@ -1,7 +1,7 @@
 // This file is auto-generated, do not edit.
 
 export interface User {
-    id: string; // Unique identifier for the user.
+    uid: string; // Firebase Authentication user ID.
     name?: string; // User's full name.
     phone?: string; // User's phone number.
     address?: string; // User's address.
@@ -26,7 +26,8 @@ export interface Job {
 }
 
 export interface Worker {
-    workerId: string; // Unique identifier for the worker (same as their userId).
+    uid: string; // Firebase Authentication user ID.
+    workerId: string; // Unique identifier for the worker (same as their uid).
     skills?: string[]; // List of worker's skills (e.g., plumber, electrician).
     rating?: number; // Average rating of the worker.
     location?: {
@@ -89,3 +90,5 @@ export interface SOSAlert {
     status: "active" | "resolved";
     audio_url?: string; // URL of the background audio recording.
 }
+
+    

@@ -2,8 +2,11 @@
 "use server";
 
 import { z } from 'zod';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
+import { getAuth } from 'firebase/auth';
+import { headers } from 'next/headers';
+
 
 // Updated schema to include new fields for bank details
 const WorkerProfileSchema = z.object({
@@ -50,15 +53,28 @@ export async function createWorkerProfile(
   }
   
   try {
-    const { accountHolderName, accountNumber, ifscCode, ...workerData } = validatedFields.data;
-
-    const { firestore } = initializeFirebase();
-    const workersCollection = collection(firestore, 'workers');
+    const { firestore, auth } = initializeFirebase();
+    const currentUser = auth.currentUser;
     
-    // Here, you would associate this with the Firebase Auth user ID.
-    // For now, we are creating a new document.
-    await addDoc(workersCollection, {
+    // In a real app with server-side auth, you'd get the user from the session/token.
+    // Since this is a client-driven action, we rely on the client's auth state.
+    // For a more secure version, you'd pass an ID token and verify it.
+    if (!currentUser) {
+        return {
+            success: false,
+            message: 'You must be logged in to create a worker profile.',
+        };
+    }
+
+    const { accountHolderName, accountNumber, ifscCode, ...workerData } = validatedFields.data;
+    
+    const workerId = currentUser.uid;
+    const workerDocRef = doc(firestore, 'workers', workerId);
+    
+    await setDoc(workerDocRef, {
       ...workerData,
+      workerId: workerId,
+      uid: workerId,
       skills: [workerData.skills], // save skills as an array
       bankDetails: {
         accountHolderName,
@@ -68,7 +84,7 @@ export async function createWorkerProfile(
       isVerified: true, // Assuming verification was passed on the client
       rating: 0,
       createdAt: new Date(),
-    });
+    }, { merge: true });
 
     return {
       success: true,
@@ -83,3 +99,5 @@ export async function createWorkerProfile(
     };
   }
 }
+
+    

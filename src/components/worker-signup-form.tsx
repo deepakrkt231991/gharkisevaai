@@ -4,7 +4,7 @@
 import { useFormStatus } from 'react-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
-import { AlertCircle, Loader2, UploadCloud, Banknote, User, Building, Bot, Mic, CheckCircle, Webcam } from 'lucide-react';
+import { AlertCircle, Loader2, UploadCloud, Banknote, User, Building, Bot, Mic, CheckCircle, Webcam, AlertTriangle } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
 import { verifyWorker } from '@/ai/flows/verification-agent';
@@ -63,8 +63,15 @@ export function WorkerSignupForm() {
   const [verificationResult, setVerificationResult] = useState<{ verified: boolean; reasoning: string; name: string } | null>(null);
   
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (isCameraOpen) {
+      startCamera();
+    }
+  }, [isCameraOpen]);
 
 
   useEffect(() => {
@@ -195,18 +202,26 @@ export function WorkerSignupForm() {
   };
 
   const startCamera = async () => {
-    setIsCameraOpen(true);
     if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setHasCameraPermission(true);
         if(videoRef.current) {
           videoRef.current.srcObject = stream;
         }
       } catch (error) {
         console.error("Error accessing camera:", error);
-        toast({variant: 'destructive', title: 'Camera Error', description: 'Could not access the camera.'});
-        setIsCameraOpen(false);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive', 
+          title: 'Camera Error', 
+          description: 'Could not access the camera. Please check your browser permissions.'
+        });
+        setIsCameraOpen(false); // Close dialog if permission is denied
       }
+    } else {
+      setHasCameraPermission(false);
+      toast({variant: 'destructive', title: 'Camera Not Supported', description: 'Your browser does not support camera access.'});
     }
   };
   
@@ -223,7 +238,7 @@ export function WorkerSignupForm() {
       }
       const stream = video.srcObject as MediaStream;
       stream.getTracks().forEach(track => track.stop());
-      setIsCameraOpen(false);
+      setIsCameraOpen(false); // Close dialog after taking picture
     }
   };
 
@@ -277,15 +292,24 @@ export function WorkerSignupForm() {
                         <Label htmlFor="selfie-upload">2. Take/Upload Selfie</Label>
                         <div className="flex gap-2 mt-1">
                           <Input id="selfie-upload" type="file" accept="image/*" capture="user" onChange={(e) => handleFileChange(e, 'selfie')} className="flex-grow" />
-                          <Dialog onOpenChange={setIsCameraOpen}>
+                          <Dialog open={isCameraOpen} onOpenChange={setIsCameraOpen}>
                             <DialogTrigger asChild>
-                              <Button variant="outline" type="button" onClick={startCamera}><Webcam size={16} /></Button>
+                              <Button variant="outline" type="button"><Webcam size={16} /></Button>
                             </DialogTrigger>
                             <DialogContent>
                               <DialogHeader><DialogTitle>Take a Selfie</DialogTitle></DialogHeader>
-                              <video ref={videoRef} autoPlay muted playsInline className="w-full h-auto rounded-md"></video>
+                                <video ref={videoRef} autoPlay muted playsInline className="w-full h-auto rounded-md"></video>
+                                {hasCameraPermission === false && (
+                                  <Alert variant="destructive">
+                                    <AlertTriangle className="h-4 w-4" />
+                                    <AlertTitle>Camera Access Denied</AlertTitle>
+                                    <AlertDescription>
+                                      Please enable camera access in your browser settings to take a selfie.
+                                    </AlertDescription>
+                                  </Alert>
+                                )}
                               <DialogFooter>
-                                <Button onClick={takeSelfie} type="button">Take Picture</Button>
+                                <Button onClick={takeSelfie} type="button" disabled={hasCameraPermission === false}>Take Picture</Button>
                               </DialogFooter>
                             </DialogContent>
                           </Dialog>
@@ -435,3 +459,5 @@ export function WorkerSignupForm() {
     </Card>
   );
 }
+
+    

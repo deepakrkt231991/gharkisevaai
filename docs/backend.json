@@ -7,9 +7,9 @@
       "type": "object",
       "description": "Represents a user of the GHAR KI SEVA AI app.",
       "properties": {
-        "id": {
+        "uid": {
           "type": "string",
-          "description": "Unique identifier for the user."
+          "description": "Firebase Authentication user ID."
         },
         "name": {
           "type": "string",
@@ -37,7 +37,7 @@
             "description": "The balance of referral earnings for the user."
         }
       },
-      "required": ["id", "userType"]
+      "required": ["uid", "userType"]
     },
     "Job": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -104,9 +104,13 @@
       "type": "object",
       "description": "Represents a service worker.",
       "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Authentication user ID."
+        },
         "workerId": {
           "type": "string",
-          "description": "Unique identifier for the worker (same as their userId)."
+          "description": "Unique identifier for the worker (same as their uid)."
         },
         "skills": {
           "type": "array",
@@ -147,7 +151,7 @@
             "description": "The balance of referral earnings for the worker."
         }
       },
-      "required": ["workerId", "isVerified"]
+      "required": ["uid", "workerId", "isVerified"]
     },
     "Health": {
       "$schema": "http://json-schema.org/draft-07/schema#",
