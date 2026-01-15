@@ -2,7 +2,7 @@
 
 import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2 } from 'lucide-react';
+import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package } from 'lucide-react';
 
 import { analyzeDefect } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 
 type AnalysisData = {
@@ -20,6 +20,7 @@ type AnalysisData = {
   estimatedCost: string;
   diySteps: string[];
   requiredTools: string[];
+  requiredParts: string[];
 };
 
 type Media = {
@@ -82,7 +83,7 @@ export function DefectAnalyzer() {
     const actionResult = await analyzeDefect({ success: false, message: '', data: null }, formData);
 
     if (actionResult.success && actionResult.data) {
-      setResult(actionResult.data);
+      setResult(actionResult.data as AnalysisData);
     } else {
       setError(actionResult.message);
     }
@@ -135,9 +136,9 @@ export function DefectAnalyzer() {
         <div className="space-y-8">
             <div className="grid md:grid-cols-2 gap-8">
               <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><Wrench /> Defect Identified</h3><Skeleton className="h-4 w-4/5" /></CardContent></Card>
-              <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><IndianRupee /> Estimated Cost (Hindi)</h3><Skeleton className="h-4 w-3/5" /></CardContent></Card>
+              <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><IndianRupee /> Estimated Cost / Value</h3><Skeleton className="h-4 w-3/5" /></CardContent></Card>
             </div>
-            <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><Settings2 /> Required Tools</h3><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3" /></CardContent></Card>
+             <Card><CardContent className="p-6 space-y-4"><h3 className="font-headline text-lg font-semibold flex items-center gap-2"><Package /> Required Parts</h3><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3" /></CardContent></Card>
         </div>
       )
     }
@@ -158,17 +159,32 @@ export function DefectAnalyzer() {
           <div className="grid md:grid-cols-2 gap-8 text-center">
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><Wrench /> Defect Identified</h3>
+                <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><Wrench /> Problem / Item</h3>
                 <p className="text-foreground text-xl">{result.defect}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><IndianRupee /> Estimated Cost (Hindi)</h3>
+                <h3 className="font-headline text-lg font-semibold mb-2 flex items-center justify-center gap-2"><IndianRupee /> Estimated Cost / Value</h3>
                 <p className="text-foreground text-xl">{result.estimatedCost}</p>
               </CardContent>
             </Card>
           </div>
+          
+           {result.requiredParts && result.requiredParts.length > 0 && (
+             <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-headline text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Package /> Required Parts / Components
+                  </h3>
+                  <ul className="list-disc list-inside space-y-2 text-left text-foreground">
+                    {result.requiredParts.map((part, index) => (
+                      <li key={index}>{part}</li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+          )}
 
           {result.requiredTools && result.requiredTools.length > 0 && (
              <Card>
@@ -241,7 +257,7 @@ export function DefectAnalyzer() {
               </div>
               
               <div className="grid w-full max-w-md mx-auto items-center gap-1.5">
-                  <Label htmlFor="description">Problem Description (Optional)</Label>
+                  <Label htmlFor="description">Description (Optional)</Label>
                    <div className="relative">
                     <Textarea
                         id="description"
@@ -282,7 +298,7 @@ export function DefectAnalyzer() {
                     ) : (
                       <>
                         <Sparkles className="mr-2 h-4 w-4" />
-                        Analyze Defect
+                        Analyze
                       </>
                     )}
                   </Button>
