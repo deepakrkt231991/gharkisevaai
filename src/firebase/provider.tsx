@@ -74,19 +74,22 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       return;
     }
 
-    setUserAuthState({ user: null, isUserLoading: true, userError: null }); // Reset on auth instance change
+    // This check ensures we have a valid auth object before proceeding.
+    if (auth.app) {
+        setUserAuthState({ user: null, isUserLoading: true, userError: null }); // Reset on auth instance change
 
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (firebaseUser) => { // Auth state determined
-        setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
-      },
-      (error) => { // Auth listener error
-        console.error("FirebaseProvider: onAuthStateChanged error:", error);
-        setUserAuthState({ user: null, isUserLoading: false, userError: error });
-      }
-    );
-    return () => unsubscribe(); // Cleanup
+        const unsubscribe = onAuthStateChanged(
+        auth,
+        (firebaseUser) => { // Auth state determined
+            setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
+        },
+        (error) => { // Auth listener error
+            console.error("FirebaseProvider: onAuthStateChanged error:", error);
+            setUserAuthState({ user: null, isUserLoading: false, userError: error });
+        }
+        );
+        return () => unsubscribe(); // Cleanup
+    }
   }, [auth]); // Depends on the auth instance
 
   // Memoize the context value
