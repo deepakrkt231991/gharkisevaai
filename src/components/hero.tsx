@@ -79,7 +79,7 @@ export function Hero() {
                 </div>
                 <h3 className="font-bold text-lg font-headline">पुराना सामान बेचें</h3>
                 <p className="text-muted-foreground text-sm">Sell your used furniture and appliances to verified buyers.</p>
-                <Button variant="outline">सामान बेचें</Button>
+                <Button variant="outline" asChild><Link href="/analyze">सामान बेचें</Link></Button>
               </div>
                <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                  <div className="bg-blue-100 p-4 rounded-full">

@@ -25,8 +25,8 @@ export function DynamicBanner() {
 
     // Split the content by newline to separate Hindi and English parts
     const parts = bannerData.content.split('\n');
-    const hindi = parts.find(p => p.includes('!')) || ''; // Simple heuristic
-    const english = parts.find(p => !p.includes('!')) || '';
+    const hindi = parts.find(p => /[\u0900-\u097F]/.test(p)) || parts[0] || ''; // Simple heuristic for Hindi
+    const english = parts.find(p => !/[\u0900-\u097F]/.test(p)) || parts[1] || '';
 
     return { hindi, english };
   }, [bannerData]);
@@ -58,7 +58,7 @@ export function DynamicBanner() {
       className="border-2 border-dashed"
       style={{
         borderColor: bannerData.backgroundColor || 'hsl(var(--primary))',
-        backgroundColor: `${bannerData.backgroundColor}1A` || 'hsl(var(--primary) / 0.1)',
+        backgroundColor: bannerData.backgroundColor ? `${bannerData.backgroundColor}20` : 'hsl(var(--primary) / 0.1)',
       }}
     >
       <CardContent className="p-4">
