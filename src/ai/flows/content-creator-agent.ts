@@ -48,9 +48,6 @@ const contentCreatorFlow = ai.defineFlow(
       The design should be clean, modern, and trustworthy. Use a color palette that aligns with home services (e.g., blues, greens, oranges). The overall tone should be professional and inviting.
 
       Incorporate the provided worker's photo seamlessly into the design. The worker should look friendly and competent.
-
-      Here is the worker's photo:
-      {{media url=workerPhotoUri}}
       `,
       config: {
         // You can add more configuration here if needed, like aspectRatio
