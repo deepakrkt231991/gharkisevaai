@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -7,7 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin } from "lucide-react";
-import Image from "next/image";
+import { useCollection, useMemoFirebase } from "@/firebase";
+import { collection, query, where } from "firebase/firestore";
+import { useFirestore } from "@/firebase/provider";
+import type { SOSAlert, Worker } from "@/lib/entities";
 
 // Mock Data
 const metrics = {
@@ -17,17 +21,40 @@ const metrics = {
   aiTrend: "AC Repair is the most requested service this week."
 };
 
-const sosAlerts = [
-  { id: "SOS001", user: "Rina Devi", level: "High", time: "2 mins ago", location: "Sector 15, Noida" },
-  { id: "SOS002", user: "Worker: Sunil P.", level: "Low", time: "1 hour ago", location: "Malviya Nagar, Delhi" },
-];
-
-const pendingVerifications = [
-  { id: "KYC021", name: "Ramesh Singh", avatar: "/placeholder.svg", suggestion: "Approve", confidence: 95 },
-  { id: "KYC022", name: "Geeta Kumari", avatar: "/placeholder.svg", suggestion: "Reject", confidence: 70, reason: "Face does not match ID photo." },
-];
-
 export function AdminDashboard() {
+  const firestore = useFirestore();
+
+  const sosAlertsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'sos_alerts'), where('status', '==', 'active'));
+  }, [firestore]);
+  
+  const pendingVerificationsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'workers'), where('isVerified', '==', false));
+  }, [firestore]);
+
+  const { data: sosAlerts, isLoading: sosLoading } = useCollection<SOSAlert>(sosAlertsQuery);
+  const { data: pendingVerifications, isLoading: pendingLoading } = useCollection<Worker>(pendingVerificationsQuery);
+  
+  const getTimeAgo = (timestamp: any) => {
+    if (!timestamp) return 'N/A';
+    const date = timestamp.toDate();
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " minutes ago";
+    return Math.floor(seconds) + " seconds ago";
+  };
+
+
   return (
     <div className="space-y-6">
       <div>
@@ -92,28 +119,33 @@ export function AdminDashboard() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>User/Worker</TableHead>
-                    <TableHead>AI Level</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Time</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sosAlerts.map((alert) => (
-                    <TableRow key={alert.id}>
-                      <TableCell className="font-medium">{alert.user}</TableCell>
-                      <TableCell>
-                        <Badge variant={alert.level === 'High' ? 'destructive' : 'secondary'}>
-                          {alert.level}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="flex items-center gap-2"><MapPin size={14}/> {alert.location}</TableCell>
-                      <TableCell>{alert.time}</TableCell>
-                      <TableCell>
-                        <Button variant="outline" size="sm">View Details</Button>
-                      </TableCell>
+                  {sosLoading && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center">Loading alerts...</TableCell>
                     </TableRow>
-                  ))}
+                  )}
+                  {sosAlerts && sosAlerts.length > 0 ? (
+                    sosAlerts.map((alert) => (
+                      <TableRow key={alert.id}>
+                        <TableCell className="font-medium">{alert.userId}</TableCell>
+                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location.latitude}, ${alert.location.longitude}`}</TableCell>
+                        <TableCell>{getTimeAgo(alert.timestamp)}</TableCell>
+                        <TableCell>
+                          <Button variant="outline" size="sm">View Details</Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : !sosLoading && (
+                     <TableRow>
+                      <TableCell colSpan={4} className="text-center">No active SOS alerts.</TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -125,36 +157,34 @@ export function AdminDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Pending Worker Verifications</CardTitle>
-              <CardDescription>Approve or reject new worker applications based on AI suggestions.</CardDescription>
+              <CardDescription>Approve or reject new worker applications.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {pendingVerifications.map((p) => (
-                  <Card key={p.id} className="flex flex-col md:flex-row items-center justify-between p-4">
-                    <div className="flex items-center gap-4 mb-4 md:mb-0">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={`https://i.pravatar.cc/150?u=${p.id}`} alt={p.name} />
-                        <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-semibold">{p.name}</p>
-                        <p className="text-sm text-muted-foreground">ID: {p.id}</p>
-                      </div>
-                    </div>
-                    <div className="text-center md:text-left">
-                        <p className="font-medium">AI Suggestion:</p>
-                        <Badge variant={p.suggestion === 'Approve' ? 'default' : 'destructive'} className="bg-green-500">
-                            {p.suggestion} (Confidence: {p.confidence}%)
-                        </Badge>
-                        {p.reason && <p className="text-xs text-destructive mt-1">{p.reason}</p>}
-                    </div>
-                    <div className="flex gap-2 mt-4 md:mt-0">
-                      <Button variant="outline">View Documents</Button>
-                      <Button className="bg-green-600 hover:bg-green-700">Approve</Button>
-                      <Button variant="destructive">Reject</Button>
-                    </div>
-                  </Card>
-                ))}
+                 {pendingLoading && <p>Loading pending verifications...</p>}
+                 {pendingVerifications && pendingVerifications.length > 0 ? (
+                    pendingVerifications.map((p) => (
+                      <Card key={p.id} className="flex flex-col md:flex-row items-center justify-between p-4">
+                        <div className="flex items-center gap-4 mb-4 md:mb-0">
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage src={`https://i.pravatar.cc/150?u=${p.id}`} alt={(p as any).name} />
+                            <AvatarFallback>{(p as any).name?.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold">{(p as any).name}</p>
+                            <p className="text-sm text-muted-foreground">ID: {p.id}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-4 md:mt-0">
+                          <Button variant="outline">View Documents</Button>
+                          <Button className="bg-green-600 hover:bg-green-700">Approve</Button>
+                          <Button variant="destructive">Reject</Button>
+                        </div>
+                      </Card>
+                    ))
+                 ) : !pendingLoading && (
+                    <p className="text-center text-muted-foreground">No pending verifications.</p>
+                 )}
               </div>
             </CardContent>
           </Card>
@@ -163,3 +193,4 @@ export function AdminDashboard() {
     </div>
   );
 }
+    
