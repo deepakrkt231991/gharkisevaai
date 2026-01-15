@@ -23,7 +23,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased">
+      <body className="font-body antialiased" suppressHydrationWarning>
         <FirebaseClientProvider>
           {children}
           <Button asChild className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg bg-accent text-accent-foreground hover:bg-accent/90 z-50 animate-pulse">
