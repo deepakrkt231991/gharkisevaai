@@ -11,4 +11,5 @@ import '@/ai/flows/fraud-detection-agent.ts';
 import '@/ai/flows/content-creator-agent.ts';
 import '@/ai/flows/sale-poster-agent.ts';
 import '@/ai/flows/home-vastu-agent.ts';
+import '@/ai/flows/video-creator-agent.ts';
     
