@@ -75,7 +75,7 @@ export function Hero() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                       <span>
+                       <span tabIndex={0}>
                         <Button variant="outline" disabled>घर देखें</Button>
                       </span>
                     </TooltipTrigger>
@@ -99,18 +99,9 @@ export function Hero() {
                 </div>
                 <h3 className="font-bold text-lg font-headline">उपकरण किराए पर लें</h3>
                 <p className="text-muted-foreground text-sm">Workers can rent tools from other workers in the community.</p>
-                 <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                       <span tabIndex={0}>
-                         <Button variant="outline" disabled>उपकरण देखें</Button>
-                       </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Coming Soon!</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                 <Button variant="outline" asChild>
+                    <Link href="/rent-tools">उपकरण देखें</Link>
+                 </Button>
               </div>
             </CardContent>
           </Card>

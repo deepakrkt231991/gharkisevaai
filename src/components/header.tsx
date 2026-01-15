@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Wrench, Bell, LayoutDashboard, Share2, Users, Handshake, Bot, Languages, UserPlus } from 'lucide-react';
+import { Menu, Wrench, Bell, LayoutDashboard, Share2, Users, Handshake, Bot, Languages, UserPlus, Hammer } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ export function Header() {
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
           <Link href="/dashboard/earnings" className="transition-colors hover:text-primary">Dashboard</Link>
           <Link href="/find-a-worker" className="transition-colors hover:text-primary">Find a Worker</Link>
+          <Link href="/rent-tools" className="transition-colors hover:text-primary">Rent a Tool</Link>
           <Link href="/promote" className="transition-colors hover:text-primary">Promote & Earn</Link>
           <Link href="/worker-signup" className="transition-colors hover:text-primary">Become a Worker</Link>
           <Button asChild>
@@ -71,6 +72,7 @@ export function Header() {
                 <Link href="/dashboard/earnings" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><LayoutDashboard />Dashboard</Link>
                 <Link href="/promote" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Share2 />Promote & Earn</Link>
                 <Link href="/find-a-worker" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Users />Find a Worker</Link>
+                <Link href="/rent-tools" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Hammer />Rent a Tool</Link>
                 <Link href="/worker-signup" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Handshake />Become a Worker</Link>
                 <Link href="/worker-signup" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><UserPlus />Login / Register</Link>
                 <Link href="/analyze" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Bot />AI Help</Link>
