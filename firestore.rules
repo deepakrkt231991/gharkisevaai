@@ -74,5 +74,12 @@ service cloud.firestore {
         allow read, update: if isOwner(resource.data.userId); // Or an admin role
         allow delete: if false; // Deletes should be handled by an admin/backend process.
     }
+
+    // APP_SETTINGS Collection
+    // Anyone can read app settings. Only backend should write.
+    match /app_settings/{docId} {
+        allow get, list: if true;
+        allow write: if false; // Should only be written by a backend process/Cloud Function
+    }
   }
 }

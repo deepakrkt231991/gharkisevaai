@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Camera, Wind, Tv, Refrigerator, WashingMachine, Zap, Construction, Wrench, FileText, Home, ShoppingBasket } from 'lucide-react';
 import { ServiceCard, type Service } from '@/components/service-card';
+import { DynamicBanner } from './dynamic-banner';
 
 const services: Service[] = [
   { icon: Wind, label: 'AC Repair', color: 'text-blue-500', bgColor: 'bg-blue-100' },
@@ -19,6 +20,9 @@ export function Hero() {
   return (
     <section className="container py-8 md:py-12">
       <div className="flex flex-col gap-12">
+        
+        <DynamicBanner />
+
         <Card className="bg-gradient-to-r from-primary/80 to-primary text-primary-foreground shadow-lg">
           <CardContent className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">

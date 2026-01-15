@@ -251,6 +251,18 @@
         "audio_url": { "type": "string", "description": "URL of the background audio recording."}
       },
       "required": ["alertId", "userId", "location", "timestamp", "status"]
+    },
+    "AppSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "App Settings",
+      "type": "object",
+      "description": "Stores global app settings, like dynamic banner content.",
+      "properties": {
+        "content": { "type": "string", "description": "The AI-generated text for the banner, potentially containing multiple languages separated by a newline." },
+        "style": { "type": "string", "description": "A style hint for the UI (e.g., 'dynamic_card')." },
+        "backgroundColor": { "type": "string", "description": "A suggested hex color code for the banner background." },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
@@ -325,9 +337,15 @@
           "schema": { "$ref": "#/backend/entities/SOSAlert" },
           "description": "Stores emergency SOS alerts."
         }
+      },
+       {
+        "path": "/app_settings/{docId}",
+        "definition": {
+          "entityName": "AppSettings",
+          "schema": { "$ref": "#/backend/entities/AppSettings" },
+          "description": "Stores global app settings, like dynamic content for banners. The docId 'top_banner' is used for the main promotional banner."
+        }
       }
     ]
   }
 }
-
-    
