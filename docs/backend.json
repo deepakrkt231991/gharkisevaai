@@ -258,9 +258,9 @@
       "type": "object",
       "description": "Stores global app settings, like dynamic banner content.",
       "properties": {
-        "content": { "type": "string", "description": "The AI-generated text for the banner, potentially containing multiple languages separated by a newline." },
-        "style": { "type": "string", "description": "A style hint for the UI (e.g., 'dynamic_card')." },
-        "backgroundColor": { "type": "string", "description": "A suggested hex color code for the banner background." },
+        "content": { "type": "string", "description": "खजाना खोजें! अगले 2 घंटे में रेफर करने पर 0.10% कमीशन पाएं!\nFind the treasure! Refer in the next 2 hours & get 0.10% commission!" },
+        "style": { "type": "string", "description": "dynamic_card" },
+        "backgroundColor": { "type": "string", "description": "#FFD700" },
         "lastUpdated": { "type": "string", "format": "date-time" }
       }
     }
@@ -349,3 +349,5 @@
     ]
   }
 }
+
+    
