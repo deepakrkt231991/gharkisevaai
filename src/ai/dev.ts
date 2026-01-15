@@ -10,4 +10,5 @@ import '@/ai/flows/sos-audio-agent.ts';
 import '@/ai/flows/fraud-detection-agent.ts';
 import '@/ai/flows/content-creator-agent.ts';
 import '@/ai/flows/sale-poster-agent.ts';
+import '@/ai/flows/home-vastu-agent.ts';
     
