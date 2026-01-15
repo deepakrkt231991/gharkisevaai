@@ -46,6 +46,7 @@ export default function PrivacyPolicyPage() {
     {
       title: "5. Third-Party Services",
       icon: <Users className="h-6 w-6" />,
+      preamble: "We use trusted partners to enhance your experience:",
       points: [
         { text: "Google Gemini AI: For automated verification and chat translation." },
         { text: "Razorpay: For secure automated payments and referral payouts." },
@@ -80,6 +81,7 @@ export default function PrivacyPolicyPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {section.preamble && <p className="text-muted-foreground">{section.preamble}</p>}
                   {section.points.map((point, index) => (
                     <div key={index} className="flex items-start gap-4">
                       {point.icon && <div className="mt-1">{point.icon}</div>}
@@ -102,7 +104,7 @@ export default function PrivacyPolicyPage() {
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground">
-                        For any privacy concerns, contact us at: <a href="mailto:support@grihsevaai.com" className="text-primary hover:underline">support@grihsevaai.com</a>
+                        For any privacy concerns, help contact us at: <a href="mailto:gharkisevaai@gmail.com" className="text-primary hover:underline">gharkisevaai@gmail.com</a>
                     </p>
                 </CardContent>
             </Card>
