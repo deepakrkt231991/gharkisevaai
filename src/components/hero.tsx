@@ -74,8 +74,10 @@ export function Hero() {
                 <p className="text-muted-foreground text-sm">Find verified properties for rent without any brokerage.</p>
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger>
-                      <Button variant="outline" disabled>घर देखें</Button>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <Button variant="outline" disabled>घर देखें</Button>
+                      </span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Coming Soon!</p>
@@ -99,8 +101,10 @@ export function Hero() {
                 <p className="text-muted-foreground text-sm">Workers can rent tools from other workers in the community.</p>
                  <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
+                      <span>
                         <Button variant="outline" disabled>उपकरण देखें</Button>
+                      </span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Coming Soon!</p>
