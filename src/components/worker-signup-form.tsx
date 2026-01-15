@@ -149,7 +149,7 @@ export function WorkerSignupForm() {
     <Card className="max-w-2xl mx-auto shadow-lg">
       <form action={dispatch}>
         <CardHeader>
-            <CardTitle className="text-2xl font-bold font-headline">"GrihSevaAI Partner बनें – सिर्फ काम न करें, अपना नेटवर्क बनाएं!"</CardTitle>
+            <CardTitle className="text-2xl font-bold font-headline">"GHARSEVAAI Partner बनें – सिर्फ काम न करें, अपना नेटवर्क बनाएं!"</CardTitle>
             <CardDescription>Fill out the details below to join our network of professionals.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

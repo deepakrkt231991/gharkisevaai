@@ -38,7 +38,7 @@ const fraudDetectionPrompt = ai.definePrompt({
   name: 'fraudDetectionPrompt',
   input: {schema: FraudDetectionInputSchema},
   output: {schema: FraudDetectionOutputSchema},
-  prompt: `You are a fraud and risk detection super agent for the GrihSevaAI app. Your task is to analyze user/worker data to prevent system abuse and ensure safety.
+  prompt: `You are a fraud and risk detection super agent for the GHARSEVAAI app. Your task is to analyze user/worker data to prevent system abuse and ensure safety.
 
 Analyze the provided data based on these rules and suggest an action:
 
@@ -80,3 +80,5 @@ const fraudDetectionFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    

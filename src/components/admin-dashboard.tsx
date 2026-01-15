@@ -32,7 +32,7 @@ export function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold font-headline">Admin Command Center</h1>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening on GrihSevaAI.</p>
+        <p className="text-muted-foreground">Welcome back! Here's what's happening on GHARSEVAAI.</p>
       </div>
 
       <Tabs defaultValue="overview">
@@ -163,3 +163,5 @@ export function AdminDashboard() {
     </div>
   );
 }
+
+    

@@ -5,7 +5,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user of the GrihSevaAI app.",
+      "description": "Represents a user of the GHARSEVAAI app.",
       "properties": {
         "id": {
           "type": "string",
@@ -43,7 +43,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Job",
       "type": "object",
-      "description": "Represents a job booking in the GrihSevaAI app.",
+      "description": "Represents a job booking in the GHARSEVAAI app.",
       "properties": {
         "jobId": {
           "type": "string",
