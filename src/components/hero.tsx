@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Camera, Wind, Tv, Refrigerator, WashingMachine, Zap, Construction, Wrench, FileText, Home, ShoppingBasket } from 'lucide-react';
 import { ServiceCard, type Service } from '@/components/service-card';
 import { DynamicBanner } from './dynamic-banner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const services: Service[] = [
   { icon: Wind, label: 'AC Repair', color: 'text-blue-500', bgColor: 'bg-blue-100' },
@@ -71,7 +72,16 @@ export function Hero() {
                 </div>
                 <h3 className="font-bold text-lg font-headline">घर किराए पर लें</h3>
                 <p className="text-muted-foreground text-sm">Find verified properties for rent without any brokerage.</p>
-                <Button variant="outline">घर देखें</Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button variant="outline" disabled>घर देखें</Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Coming Soon!</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                  <div className="bg-red-100 p-4 rounded-full">
@@ -87,7 +97,16 @@ export function Hero() {
                 </div>
                 <h3 className="font-bold text-lg font-headline">उपकरण किराए पर लें</h3>
                 <p className="text-muted-foreground text-sm">Workers can rent tools from other workers in the community.</p>
-                <Button variant="outline">उपकरण देखें</Button>
+                 <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                        <Button variant="outline" disabled>उपकरण देखें</Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Coming Soon!</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </CardContent>
           </Card>
