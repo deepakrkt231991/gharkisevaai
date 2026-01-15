@@ -67,9 +67,39 @@ export function WorkerSignupForm() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const startCamera = async () => {
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setHasCameraPermission(true);
+        if(videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error("Error accessing camera:", error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive', 
+          title: 'Camera Error', 
+          description: 'Could not access the camera. Please check your browser permissions.'
+        });
+        setIsCameraOpen(false); // Close dialog if permission is denied
+      }
+    } else {
+      setHasCameraPermission(false);
+      toast({variant: 'destructive', title: 'Camera Not Supported', description: 'Your browser does not support camera access.'});
+    }
+  };
+
   useEffect(() => {
     if (isCameraOpen) {
       startCamera();
+    } else {
+      // Stop camera stream when dialog is closed
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
     }
   }, [isCameraOpen]);
 
@@ -200,30 +230,6 @@ export function WorkerSignupForm() {
           setIsVerifying(false);
       }
   };
-
-  const startCamera = async () => {
-    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setHasCameraPermission(true);
-        if(videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error("Error accessing camera:", error);
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive', 
-          title: 'Camera Error', 
-          description: 'Could not access the camera. Please check your browser permissions.'
-        });
-        setIsCameraOpen(false); // Close dialog if permission is denied
-      }
-    } else {
-      setHasCameraPermission(false);
-      toast({variant: 'destructive', title: 'Camera Not Supported', description: 'Your browser does not support camera access.'});
-    }
-  };
   
   const takeSelfie = () => {
     if(videoRef.current && canvasRef.current) {
@@ -236,8 +242,6 @@ export function WorkerSignupForm() {
         context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
         setSelfieUri(canvas.toDataURL('image/jpeg'));
       }
-      const stream = video.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
       setIsCameraOpen(false); // Close dialog after taking picture
     }
   };
@@ -459,5 +463,3 @@ export function WorkerSignupForm() {
     </Card>
   );
 }
-
-    

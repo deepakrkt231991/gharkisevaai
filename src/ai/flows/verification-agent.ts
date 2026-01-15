@@ -48,7 +48,7 @@ You are given two images:
 2. A selfie of the worker.
 
 Your tasks:
-1.  Extract the 'Name' and 'ID Number' from the ID card.
+1.  Extract the 'Name' from the ID card.
 2.  Compare the face in the ID card photo to the worker's selfie. Do they match?
 3.  Assess if the ID card looks authentic. Are there signs of tampering or it being a digital fake?
 4.  Based on your assessment, decide if the worker is verified.
