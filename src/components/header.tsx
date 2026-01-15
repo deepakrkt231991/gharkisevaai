@@ -1,7 +1,15 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Wrench, Bell, LayoutDashboard, Share2, Users, Handshake } from 'lucide-react';
+import { Menu, Wrench, Bell, LayoutDashboard, Share2, Users, Handshake, Bot, Languages, UserPlus } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Header() {
   return (
@@ -21,10 +29,30 @@ export function Header() {
           </Button>
         </nav>
         <div className="flex items-center gap-2 md:ml-4">
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Bell className="h-5 w-5" />
+                <span className="sr-only">Notifications</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <div className="flex flex-col">
+                  <p className="font-semibold">🎉 Congratulations!</p>
+                  <p className="text-sm text-muted-foreground">Rahul has joined your team.</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <div className="flex flex-col">
+                  <p className="font-semibold">💰 New Earning!</p>
+                  <p className="text-sm text-muted-foreground">+₹0.75 from Amit's AC repair.</p>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden">
@@ -44,6 +72,9 @@ export function Header() {
                 <Link href="/promote" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Share2 />Promote & Earn</Link>
                 <Link href="/find-a-worker" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Users />Find a Worker</Link>
                 <Link href="/worker-signup" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Handshake />Become a Worker</Link>
+                <Link href="/worker-signup" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><UserPlus />Login / Register</Link>
+                <Link href="/analyze" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Bot />AI Help</Link>
+                <Link href="#" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Languages />Change Language</Link>
                  <Button asChild className="mt-4">
                     <Link href="/analyze">Get a Quote</Link>
                 </Button>
