@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 
 export function Footer() {
@@ -10,6 +11,9 @@ export function Footer() {
         <nav className="flex gap-4">
             <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary">
                 Terms of Service
+            </Link>
+            <Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary">
+                Privacy Policy
             </Link>
         </nav>
       </div>
