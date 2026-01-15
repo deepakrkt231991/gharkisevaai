@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Camera, Wind, Tv, Refrigerator, WashingMachine, Zap, Construction, Wrench, FileText, Home, ShoppingBasket } from 'lucide-react';
 import { ServiceCard, type Service } from '@/components/service-card';
-import { DynamicBanner } from './dynamic-banner';
+import { TrendingNowCard } from './trending-now-card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const services: Service[] = [
@@ -22,7 +22,7 @@ export function Hero() {
     <section className="container py-8 md:py-12">
       <div className="flex flex-col gap-12">
         
-        <DynamicBanner />
+        <TrendingNowCard />
 
         <Card className="bg-gradient-to-r from-primary/80 to-primary text-primary-foreground shadow-lg">
           <CardContent className="p-6 md:p-8">
@@ -102,9 +102,9 @@ export function Hero() {
                  <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span>
-                        <Button variant="outline" disabled>उपकरण देखें</Button>
-                      </span>
+                       <span tabIndex={0}>
+                         <Button variant="outline" disabled>उपकरण देखें</Button>
+                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Coming Soon!</p>
