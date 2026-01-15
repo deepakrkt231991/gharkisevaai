@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <FirebaseClientProvider>
           {children}
-          <Button asChild className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg bg-accent text-accent-foreground hover:bg-accent/90 z-50">
+          <Button asChild className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg bg-accent text-accent-foreground hover:bg-accent/90 z-50 animate-pulse">
             <Link href="/promote">
               <Gift className="h-8 w-8" />
               <span className="sr-only">Refer and Earn</span>

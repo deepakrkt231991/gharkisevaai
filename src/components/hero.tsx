@@ -38,7 +38,7 @@ export function Hero() {
               <Button
                 asChild
                 size="lg"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 flex-shrink-0"
+                className="bg-accent text-accent-foreground hover:bg-accent/90 flex-shrink-0 transition-transform duration-200 hover:scale-105"
               >
                 <Link href="/analyze">
                   <Camera className="mr-2" />
@@ -65,8 +65,8 @@ export function Hero() {
             Marketplace: खरीदें, बेचें, किराए पर लें
           </h2>
           <Card className="bg-card shadow-sm">
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg hover:bg-secondary/50 transition-colors">
+             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg bg-white/30 backdrop-blur-sm border border-white/40 shadow-sm transition-all hover:scale-105 hover:shadow-lg">
                 <div className="bg-green-100 p-4 rounded-full">
                   <Home className="h-8 w-8 text-green-600" />
                 </div>
@@ -75,7 +75,7 @@ export function Hero() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span>
+                       <span>
                         <Button variant="outline" disabled>घर देखें</Button>
                       </span>
                     </TooltipTrigger>
@@ -85,7 +85,7 @@ export function Hero() {
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg hover:bg-secondary/50 transition-colors">
+              <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg bg-white/30 backdrop-blur-sm border border-white/40 shadow-sm transition-all hover:scale-105 hover:shadow-lg">
                  <div className="bg-red-100 p-4 rounded-full">
                   <ShoppingBasket className="h-8 w-8 text-red-600" />
                 </div>
@@ -93,7 +93,7 @@ export function Hero() {
                 <p className="text-muted-foreground text-sm">Sell your used furniture and appliances to verified buyers.</p>
                 <Button variant="outline" asChild><Link href="/analyze">सामान बेचें</Link></Button>
               </div>
-               <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg hover:bg-secondary/50 transition-colors">
+               <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg bg-white/30 backdrop-blur-sm border border-white/40 shadow-sm transition-all hover:scale-105 hover:shadow-lg">
                  <div className="bg-blue-100 p-4 rounded-full">
                   <Wrench className="h-8 w-8 text-blue-600" />
                 </div>
