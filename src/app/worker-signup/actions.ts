@@ -16,8 +16,6 @@ const WorkerProfileSchema = z.object({
   accountHolderName: z.string().min(2, { message: "Please enter the account holder's name." }),
   accountNumber: z.string().min(9, { message: "Please enter a valid bank account number." }),
   ifscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, { message: "Please enter a valid IFSC code." }),
-  // For now, we'll just validate that a file is selected, not handle the upload itself.
-  document: z.any().optional(), 
 });
 
 type State = {
@@ -41,7 +39,6 @@ export async function createWorkerProfile(
     accountHolderName: formData.get('accountHolderName'),
     accountNumber: formData.get('accountNumber'),
     ifscCode: formData.get('ifscCode'),
-    document: formData.get('document'),
   });
 
   if (!validatedFields.success) {
@@ -53,13 +50,13 @@ export async function createWorkerProfile(
   }
   
   try {
-    // In a real app, you would handle the file upload to a service like Firebase Storage here
-    // and get a URL to save in Firestore. For now, we are saving the text fields.
-    const { document, accountHolderName, accountNumber, ifscCode, ...workerData } = validatedFields.data;
+    const { accountHolderName, accountNumber, ifscCode, ...workerData } = validatedFields.data;
 
     const { firestore } = initializeFirebase();
     const workersCollection = collection(firestore, 'workers');
     
+    // Here, you would associate this with the Firebase Auth user ID.
+    // For now, we are creating a new document.
     await addDoc(workersCollection, {
       ...workerData,
       skills: [workerData.skills], // save skills as an array
@@ -68,15 +65,14 @@ export async function createWorkerProfile(
         accountNumber,
         ifscCode
       },
-      isVerified: false, // Default to not verified
+      isVerified: true, // Assuming verification was passed on the client
       rating: 0,
       createdAt: new Date(),
-      // documentUrl: "URL_from_storage_would_go_here" 
     });
 
     return {
       success: true,
-      message: 'Your profile has been created successfully! We will review it shortly.',
+      message: 'Your profile has been created successfully! You can now start getting jobs.',
     };
   } catch (error) {
     console.error('Error creating worker profile:', error);
@@ -87,5 +83,3 @@ export async function createWorkerProfile(
     };
   }
 }
-
-    

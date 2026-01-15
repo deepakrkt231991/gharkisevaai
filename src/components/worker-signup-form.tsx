@@ -4,9 +4,10 @@
 import { useFormStatus } from 'react-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
-import { AlertCircle, Loader2, UploadCloud, Banknote, User, Building, Bot, Mic, CheckCircle } from 'lucide-react';
+import { AlertCircle, Loader2, UploadCloud, Banknote, User, Building, Bot, Mic, CheckCircle, Webcam } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
+import { verifyWorker } from '@/ai/flows/verification-agent';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,18 +19,18 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from '@/components/ui/textarea';
 
 
-function SubmitButton() {
+function SubmitButton({ isVerified }: { isVerified: boolean }) {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" disabled={pending} className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+    <Button type="submit" disabled={pending || !isVerified} className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
       {pending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Verifying & Registering...
+          Registering...
         </>
       ) : (
-        "Verify & Register"
+        "Create My Profile"
       )}
     </Button>
   );
@@ -55,6 +56,15 @@ export function WorkerSignupForm() {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const recognitionRef = useRef<any>(null);
+
+  const [idCardUri, setIdCardUri] = useState<string | null>(null);
+  const [selfieUri, setSelfieUri] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationResult, setVerificationResult] = useState<{ verified: boolean; reasoning: string; name: string } | null>(null);
+  
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
 
   useEffect(() => {
@@ -118,7 +128,6 @@ export function WorkerSignupForm() {
   };
 
   const fillFormFields = () => {
-    // A simple heuristic to parse the transcript
     const nameRegex = /(?:नाम|name is|मेरा नाम)\s*([^.,]+)/i;
     const phoneRegex = /(?:नंबर|number is)\s*([0-9\s-]+)/i;
     const addressRegex = /(?:पता|address is)\s*(.+)/i;
@@ -135,6 +144,87 @@ export function WorkerSignupForm() {
       title: "Fields Filled",
       description: "Information has been filled from your speech. Please review and correct if needed.",
     });
+  };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'id' | 'selfie') => {
+      const file = e.target.files?.[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              if (fileType === 'id') {
+                  setIdCardUri(reader.result as string);
+              } else {
+                  setSelfieUri(reader.result as string);
+              }
+          };
+          reader.readAsDataURL(file);
+      }
+  };
+
+  const handleVerification = async () => {
+      if (!idCardUri || !selfieUri) {
+          toast({ variant: 'destructive', title: 'Missing Images', description: 'Please provide both an ID card photo and a selfie.' });
+          return;
+      }
+      setIsVerifying(true);
+      setVerificationResult(null);
+      try {
+          const result = await verifyWorker({ idCardDataUri: idCardUri, selfieDataUri: selfieUri });
+          setVerificationResult({ ...result, name: result.extractedName });
+          if(result.verified) {
+            setName(result.extractedName);
+             toast({
+                variant: 'default',
+                className: 'bg-green-100 text-green-900',
+                title: 'Verification Successful!',
+                description: result.reasoning,
+            });
+          } else {
+             toast({
+                variant: 'destructive',
+                title: 'Verification Failed',
+                description: result.reasoning,
+            });
+          }
+      } catch (error) {
+          console.error("Verification error:", error);
+          toast({ variant: 'destructive', title: 'Verification Error', description: 'An unexpected error occurred during verification.' });
+      } finally {
+          setIsVerifying(false);
+      }
+  };
+
+  const startCamera = async () => {
+    setIsCameraOpen(true);
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if(videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error("Error accessing camera:", error);
+        toast({variant: 'destructive', title: 'Camera Error', description: 'Could not access the camera.'});
+        setIsCameraOpen(false);
+      }
+    }
+  };
+  
+  const takeSelfie = () => {
+    if(videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      if(context){
+        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        setSelfieUri(canvas.toDataURL('image/jpeg'));
+      }
+      const stream = video.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      setIsCameraOpen(false);
+    }
   };
 
   const benefits = [
@@ -174,6 +264,52 @@ export function WorkerSignupForm() {
               <AlertDescription>{state.message}</AlertDescription>
             </Alert>
           )}
+          
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">AI ID Verification</h3>
+            <Card className="p-4 bg-background">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <div>
+                        <Label htmlFor="id-card-upload">1. Upload ID Card (Aadhaar)</Label>
+                        <Input id="id-card-upload" type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'id')} className="mt-1" />
+                    </div>
+                     <div>
+                        <Label htmlFor="selfie-upload">2. Take/Upload Selfie</Label>
+                        <div className="flex gap-2 mt-1">
+                          <Input id="selfie-upload" type="file" accept="image/*" capture="user" onChange={(e) => handleFileChange(e, 'selfie')} className="flex-grow" />
+                          <Dialog onOpenChange={setIsCameraOpen}>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" type="button" onClick={startCamera}><Webcam size={16} /></Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader><DialogTitle>Take a Selfie</DialogTitle></DialogHeader>
+                              <video ref={videoRef} autoPlay muted playsInline className="w-full h-auto rounded-md"></video>
+                              <DialogFooter>
+                                <Button onClick={takeSelfie} type="button">Take Picture</Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                          <canvas ref={canvasRef} className="hidden"></canvas>
+                        </div>
+                    </div>
+                </div>
+                 <div className="flex justify-center mt-4">
+                    <Button onClick={handleVerification} disabled={isVerifying || !idCardUri || !selfieUri} type="button">
+                        {isVerifying ? <Loader2 className="animate-spin mr-2" /> : <Bot className="mr-2" />}
+                        Run AI Verification
+                    </Button>
+                </div>
+                 {verificationResult && (
+                    <Alert variant={verificationResult.verified ? 'default' : 'destructive'} className={verificationResult.verified ? 'bg-green-50 border-green-200' : ''}>
+                        <AlertTitle className='font-bold flex items-center gap-2'>
+                          {verificationResult.verified ? <CheckCircle /> : <AlertCircle />}
+                          Verification {verificationResult.verified ? 'Successful' : 'Failed'}
+                        </AlertTitle>
+                        <AlertDescription>{verificationResult.reasoning}</AlertDescription>
+                    </Alert>
+                )}
+            </Card>
+          </div>
 
           <div className="flex justify-end">
              <Dialog>
@@ -250,19 +386,6 @@ export function WorkerSignupForm() {
               </div>
           </div>
 
-
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">AI ID Verification</h3>
-             <div className="border-2 border-dashed border-blue-400 p-4 rounded-lg text-center">
-                <p className="text-sm text-muted-foreground mb-2">Upload Aadhaar / ID Card for AI Verification</p>
-                <Label htmlFor="document" className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded inline-flex items-center gap-2">
-                  <UploadCloud size={16} />
-                  Take/Upload Photo of ID
-                </Label>
-                <Input id="document" name="document" type="file" className="hidden" accept="image/*" />
-             </div>
-          </div>
-
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Bank Details (For Direct Payouts)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -306,7 +429,7 @@ export function WorkerSignupForm() {
 
         </CardContent>
         <CardFooter>
-          <SubmitButton />
+          <SubmitButton isVerified={!!verificationResult?.verified} />
         </CardFooter>
       </form>
     </Card>
