@@ -89,5 +89,3 @@ export interface SOSAlert {
     status: "active" | "resolved";
     audio_url?: string; // URL of the background audio recording.
 }
-
-    

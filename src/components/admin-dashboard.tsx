@@ -132,7 +132,7 @@ export function AdminDashboard() {
                   )}
                   {sosAlerts && sosAlerts.length > 0 ? (
                     sosAlerts.map((alert) => (
-                      <TableRow key={alert.id}>
+                      <TableRow key={alert.alertId}>
                         <TableCell className="font-medium">{alert.userId}</TableCell>
                         <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location.latitude}, ${alert.location.longitude}`}</TableCell>
                         <TableCell>{getTimeAgo(alert.timestamp)}</TableCell>
@@ -164,15 +164,15 @@ export function AdminDashboard() {
                  {pendingLoading && <p>Loading pending verifications...</p>}
                  {pendingVerifications && pendingVerifications.length > 0 ? (
                     pendingVerifications.map((p) => (
-                      <Card key={p.id} className="flex flex-col md:flex-row items-center justify-between p-4">
+                      <Card key={p.workerId} className="flex flex-col md:flex-row items-center justify-between p-4">
                         <div className="flex items-center gap-4 mb-4 md:mb-0">
                           <Avatar className="h-12 w-12">
-                            <AvatarImage src={`https://i.pravatar.cc/150?u=${p.id}`} alt={(p as any).name} />
+                            <AvatarImage src={`https://i.pravatar.cc/150?u=${p.workerId}`} alt={(p as any).name} />
                             <AvatarFallback>{(p as any).name?.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="font-semibold">{(p as any).name}</p>
-                            <p className="text-sm text-muted-foreground">ID: {p.id}</p>
+                            <p className="text-sm text-muted-foreground">ID: {p.workerId}</p>
                           </div>
                         </div>
                         <div className="flex gap-2 mt-4 md:mt-0">
@@ -193,4 +193,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-    
