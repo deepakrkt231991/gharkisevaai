@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'GHARSEVAAI',
+  title: 'GHAR KI SEVA AI',
   description: 'AI-Powered Home Service Assistant',
 };
 
@@ -29,5 +29,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-    

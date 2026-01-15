@@ -9,7 +9,7 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg font-headline">
           <Wrench className="h-6 w-6 text-primary" />
-          <span>GHARSEVAAI</span>
+          <span>GHAR KI SEVA AI</span>
         </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
           <Link href="/dashboard/earnings" className="transition-colors hover:text-primary">Dashboard</Link>
@@ -38,7 +38,7 @@ export function Header() {
               <nav className="grid gap-6 text-lg font-medium mt-8">
                 <Link href="/" className="flex items-center gap-2 text-lg font-bold font-headline">
                   <Wrench className="h-6 w-6 text-primary" />
-                  <span>GHARSEVAAI</span>
+                  <span>GHAR KI SEVA AI</span>
                 </Link>
                 <Link href="/dashboard/earnings" className="flex items-center gap-2 hover:text-primary"><LayoutDashboard />Dashboard</Link>
                 <Link href="/promote" className="flex items-center gap-2 hover:text-primary"><Share2 />Promote</Link>
@@ -55,5 +55,3 @@ export function Header() {
     </header>
   );
 }
-
-    

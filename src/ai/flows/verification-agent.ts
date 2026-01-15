@@ -41,7 +41,7 @@ const verificationPrompt = ai.definePrompt({
   name: 'verificationPrompt',
   input: {schema: VerifyWorkerInputSchema},
   output: {schema: VerifyWorkerOutputSchema},
-  prompt: `You are a security agent for GHARSEVAAI. Your job is to verify a new worker's identity.
+  prompt: `You are a security agent for GHAR KI SEVA AI. Your job is to verify a new worker's identity.
 
 You are given two images:
 1. A photo of the worker's ID card.
@@ -71,5 +71,3 @@ const verificationFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    

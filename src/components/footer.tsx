@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="border-t bg-secondary mt-auto">
       <div className="container py-6 flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} GHARSEVAAI. All rights reserved.
+          © {new Date().getFullYear()} GHAR KI SEVA AI. All rights reserved.
         </p>
         <nav className="flex gap-4">
             <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary">
@@ -16,5 +16,3 @@ export function Footer() {
     </footer>
   );
 }
-
-    
