@@ -57,7 +57,7 @@ export function Hero() {
 
         <div className="space-y-6">
           <h2 className="font-headline text-2xl md:text-3xl font-bold text-center">
-            Home Deals, Rentals & Sales
+            Marketplace: खरीदें, बेचें, किराए पर लें
           </h2>
           <Card className="bg-card shadow-sm">
             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -65,25 +65,25 @@ export function Hero() {
                 <div className="bg-green-100 p-4 rounded-full">
                   <Home className="h-8 w-8 text-green-600" />
                 </div>
-                <h3 className="font-bold text-lg font-headline">Rent a Home</h3>
+                <h3 className="font-bold text-lg font-headline">घर किराए पर लें</h3>
                 <p className="text-muted-foreground text-sm">Find verified properties for rent without any brokerage.</p>
-                <Button variant="outline">Browse Rentals</Button>
+                <Button variant="outline">घर देखें</Button>
               </div>
               <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                  <div className="bg-red-100 p-4 rounded-full">
                   <ShoppingBasket className="h-8 w-8 text-red-600" />
                 </div>
-                <h3 className="font-bold text-lg font-headline">Sell Old Items</h3>
+                <h3 className="font-bold text-lg font-headline">पुराना सामान बेचें</h3>
                 <p className="text-muted-foreground text-sm">Sell your used furniture and appliances to verified buyers.</p>
-                <Button variant="outline">List an Item</Button>
+                <Button variant="outline">सामान बेचें</Button>
               </div>
                <div className="flex flex-col items-center text-center gap-3 p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                  <div className="bg-blue-100 p-4 rounded-full">
                   <Wrench className="h-8 w-8 text-blue-600" />
                 </div>
-                <h3 className="font-bold text-lg font-headline">Rent Tools</h3>
+                <h3 className="font-bold text-lg font-headline">उपकरण किराए पर लें</h3>
                 <p className="text-muted-foreground text-sm">Workers can rent tools from other workers in the community.</p>
-                <Button variant="outline">Rent a Tool</Button>
+                <Button variant="outline">उपकरण देखें</Button>
               </div>
             </CardContent>
           </Card>
