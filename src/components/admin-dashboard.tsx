@@ -31,7 +31,7 @@ export function AdminDashboard() {
   
   const pendingVerificationsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    return query(collection(firestore, 'workers'), where('isVerified', '==', false));
+    return query(collection(firestore, 'workers'), where('isVerified', '==', 'false'));
   }, [firestore]);
 
   const { data: sosAlerts, isLoading: sosLoading } = useCollection<SOSAlert>(sosAlertsQuery);
@@ -59,7 +59,7 @@ export function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold font-headline">Admin Command Center</h1>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening on GHAR KI SEVA AI.</p>
+        <p className="text-muted-foreground">Welcome back! Here's what's happening on GrihSeva AI.</p>
       </div>
 
       <Tabs defaultValue="overview">

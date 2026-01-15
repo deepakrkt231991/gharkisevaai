@@ -37,9 +37,9 @@ const salePosterFlow = ai.defineFlow(
   async ({ itemName, sellerName }) => {
     const { media } = await ai.generate({
       model: 'googleai/imagen-4.0-fast-generate-001',
-      prompt: `Create a fun, exciting, and celebratory poster image meant to be shared on WhatsApp Status. The poster should announce that a user has just sold an item on the "GHAR KI SEVA AI" app.
+      prompt: `Create a fun, exciting, and celebratory poster image meant to be shared on WhatsApp Status. The poster should announce that a user has just sold an item on the "GrihSeva AI" app.
 
-      It must include the following text in a prominent, stylish, and celebratory Hindi font: "Yesss! मैंने अभी-अभी GHAR KI SEVA AI पर अपना ${itemName} बेच दिया!"
+      It must include the following text in a prominent, stylish, and celebratory Hindi font: "Yesss! मैंने अभी-अभी GrihSeva AI पर अपना ${itemName} बेच दिया!"
 
       Also include the seller's name, "${sellerName}", somewhere on the poster in a smaller, clean font.
 

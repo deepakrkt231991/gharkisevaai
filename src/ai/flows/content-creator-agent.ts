@@ -41,9 +41,9 @@ const contentCreatorFlow = ai.defineFlow(
   async ({ workerName, workerPhotoUri }) => {
     const { media } = await ai.generate({
       model: 'googleai/imagen-4.0-fast-generate-001',
-      prompt: `Create a professional and eye-catching promotional poster for a verified home service worker named ${workerName} for the "GHAR KI SEVA AI" app. The poster is intended to be shared on WhatsApp Status.
+      prompt: `Create a professional and eye-catching promotional poster for a verified home service worker named ${workerName} for the "GrihSeva AI" app. The poster is intended to be shared on WhatsApp Status.
 
-      It must include the following text in a prominent, stylish Hindi font: "मैं GHAR KI SEVA AI पर वेरिफाइड वर्कर हूँ, मुझे जॉइन करें!"
+      It must include the following text in a prominent, stylish Hindi font: "मैं GrihSeva AI पर वेरिफाइड वर्कर हूँ, मुझे जॉइन करें!"
 
       The design should be clean, modern, and trustworthy. Use a color palette that aligns with home services (e.g., blues, greens, oranges). The overall tone should be professional and inviting.
 

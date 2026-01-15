@@ -93,7 +93,7 @@ export function PromoGenerator() {
             </Button>
           ) : (
              <Button asChild size="lg">
-                <a href={state.data.posterDataUri} download="grihsevaai-promo.png">
+                <a href={state.data.posterDataUri} download="grihseva-ai-promo.png">
                     <Download className="mr-2 h-5 w-5" />
                     Download Poster
                 </a>

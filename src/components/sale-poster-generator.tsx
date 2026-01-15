@@ -81,7 +81,7 @@ export function SalePosterGenerator() {
             </Button>
           ) : (
              <Button asChild size="lg">
-                <a href={state.data.posterDataUri} download="grihsevai-sold-poster.png">
+                <a href={state.data.posterDataUri} download="grihseva-ai-sold-poster.png">
                     <Download className="mr-2 h-5 w-5" />
                     Download Poster
                 </a>

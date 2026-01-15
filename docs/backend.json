@@ -5,7 +5,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user of the GHAR KI SEVA AI app.",
+      "description": "Represents a user of the GrihSeva AI app.",
       "properties": {
         "uid": {
           "type": "string",
@@ -43,7 +43,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Job",
       "type": "object",
-      "description": "Represents a job booking in the GHAR KI SEVA AI app.",
+      "description": "Represents a job booking in the GrihSeva AI app.",
       "properties": {
         "jobId": {
           "type": "string",

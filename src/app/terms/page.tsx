@@ -35,7 +35,7 @@ export default function TermsPage() {
         <div className="container">
           <div className="max-w-4xl mx-auto">
             <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl text-center mb-12">
-              सेवा की शर्तें और लाभ
+              GrihSeva AI - सेवा की शर्तें और लाभ
             </h1>
 
             <Card className="mb-12">
@@ -70,7 +70,7 @@ export default function TermsPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="font-headline text-2xl">नियम और शर्तें (Terms & Conditions)</CardTitle>
+                <CardTitle className="font-headline text-2xl">नियम और शर्तें (Terms &amp; Conditions)</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 {terms.map((term, index) => (

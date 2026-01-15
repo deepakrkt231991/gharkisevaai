@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Gift } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'GHAR KI SEVA AI',
-  description: 'AI-Powered Home Service Assistant',
+  title: 'GrihSeva AI',
+  description: 'Smartest way to Repair, Rent & Sell with AI.',
 };
 
 export default function RootLayout({
