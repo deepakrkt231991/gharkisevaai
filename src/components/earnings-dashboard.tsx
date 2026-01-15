@@ -4,7 +4,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Banknote, Briefcase, Group, IndianRupee, Landmark, Trophy, ShieldCheck, Gem, Star } from "lucide-react";
+import { Banknote, Briefcase, Group, IndianRupee, Landmark, Trophy, ShieldCheck, Gem, Star, Languages } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -35,9 +35,17 @@ export function EarningsDashboard() {
   return (
     <div className="container py-8">
       <div className="space-y-8">
-        <div>
-            <h1 className="text-3xl font-bold font-headline">Meri Kamayi (My Earnings)</h1>
-            <p className="text-muted-foreground">Track your direct and referral earnings.</p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 className="text-3xl font-bold font-headline">Meri Kamayi (My Earnings)</h1>
+                <p className="text-muted-foreground">Track your direct and referral earnings.</p>
+            </div>
+            <Card className="p-2">
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm">English</Button>
+                    <Button variant="secondary" size="sm">हिंदी</Button>
+                </div>
+            </Card>
         </div>
         
         {/* Total Balance Card */}
