@@ -3,7 +3,7 @@
 
 import { useState, useRef, ChangeEvent, useActionState } from 'react';
 import Image from 'next/image';
-import { ArrowLeft, Share, Heart, Sparkles, Compass, PaintBrush, Lightbulb, CheckCircle, Loader2, UploadCloud, ScanSearch } from 'lucide-react';
+import { ArrowLeft, Share, Heart, Sparkles, Compass, Paintbrush, Lightbulb, CheckCircle, Loader2, UploadCloud, ScanSearch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -52,7 +52,7 @@ export function InteriorAnalyzer() {
             <CardContent className="p-4 space-y-2">
                 <div className="flex items-center gap-2">
                     {title.toLowerCase().includes('direction') && <Compass className="text-primary" />}
-                    {title.toLowerCase().includes('contrast') && <PaintBrush className="text-primary" />}
+                    {title.toLowerCase().includes('contrast') && <Paintbrush className="text-primary" />}
                     <h4 className="font-bold text-white">{title}</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">{description}</p>
