@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { confirmDelivery, requestRefund } from '@/app/chat/[chatId]/actions';
 
 const partner = {
     name: 'Ramesh Patel',
@@ -84,14 +85,40 @@ export function ChatInterface({ chatId }: { chatId: string }) {
         }, 2500);
     };
 
-    const handleConfirmDelivery = () => {
-         toast({
-            title: "Deal Successful!",
-            description: "Your 0.05% referral commission has been credited.",
-            className: "bg-green-600 text-white border-green-600"
-        });
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 4000); 
+    const handleConfirmDelivery = async () => {
+        const result = await confirmDelivery(chatId);
+        if (result.success) {
+            toast({
+                title: "Deal Successful!",
+                description: result.message,
+                className: "bg-green-600 text-white border-green-600"
+            });
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 4000); 
+        } else {
+             toast({
+                variant: 'destructive',
+                title: "Error Completing Deal",
+                description: result.message,
+            });
+        }
+    }
+
+    const handleRequestRefund = async () => {
+        const result = await requestRefund(chatId);
+        if (result.success) {
+            toast({
+                title: "Refund Processed",
+                description: "The job status has been updated to refunded.",
+                className: "bg-primary text-white"
+            });
+        } else {
+             toast({
+                variant: 'destructive',
+                title: "Error Processing Refund",
+                description: result.message,
+            });
+        }
     }
 
     return (
@@ -123,7 +150,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
                         </div>
                     </div>
                     {timeLeft <=0 && (
-                        <Button variant="destructive" size="sm">
+                        <Button variant="destructive" size="sm" onClick={handleRequestRefund}>
                              <AlertTriangle className="mr-2 h-4 w-4"/>
                             Instant Refund
                         </Button>

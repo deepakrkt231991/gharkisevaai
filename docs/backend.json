@@ -280,9 +280,9 @@
         "itemCondition": { "type": "string" },
         "finalPrice": { "type": "number" },
         "status": { "type": "string", "enum": ["active", "completed"] },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "createdAt": { "type": "string", "format": "date-time", "description": "Firestore Timestamp of when the agreement was created." }
       },
-      "required": ["agreementId", "dealId", "buyerId", "sellerId", "itemName", "finalPrice", "status"]
+      "required": ["agreementId", "dealId", "buyerId", "sellerId", "itemName", "finalPrice", "status", "createdAt"]
     }
   },
   "auth": {
