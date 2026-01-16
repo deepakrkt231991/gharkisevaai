@@ -1,3 +1,4 @@
+
 "use server";
 
 import { analyzeDefect as analyzeDefectFlow, AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
@@ -17,10 +18,18 @@ type State = {
 }
 
 export async function analyzeDefect(
-  prevState: State,
+  prevState: State | undefined,
   formData: FormData,
 ): Promise<State> {
-  
+  // Allow resetting state
+  if (!formData.get('mediaDataUri')) {
+    return {
+      success: false,
+      message: '',
+      data: null,
+    };
+  }
+
   const validatedFields = schema.safeParse({
     mediaDataUri: formData.get('mediaDataUri'),
     description: formData.get('description'),

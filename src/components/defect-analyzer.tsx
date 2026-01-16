@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useState, useRef, ChangeEvent } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormState } from 'react-dom';
 import Image from 'next/image';
-import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package, ArrowLeft, History, CheckCircle, Download, UserCheck } from 'lucide-react';
+import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package, ArrowLeft, History, CheckCircle, Download, UserCheck, ScanSearch } from 'lucide-react';
 
 import { analyzeDefect } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
@@ -12,8 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+import { useActionState } from 'react';
 
 type AnalysisData = {
   defect: string;
@@ -28,14 +29,12 @@ type Media = {
   type: 'image' | 'video';
 }
 
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
+const initialState: {
+  success: boolean;
+  message: string;
+  data: AnalysisData | null;
+} = { success: false, message: '', data: null };
 
-const initialState = { success: false, message: '', data: null };
 
 function SubmitButton({ hasMedia }: { hasMedia: boolean }) {
   const { pending } = useFormStatus();
@@ -58,15 +57,12 @@ function SubmitButton({ hasMedia }: { hasMedia: boolean }) {
 }
 
 export function DefectAnalyzer() {
-  const [state, formAction] = useFormState(analyzeDefect, initialState);
-  const { pending } = useFormStatus();
-
+  const [state, formAction, isPending] = useActionState(analyzeDefect, initialState);
+  
   const [media, setMedia] = useState<Media | null>(null);
-  const [isListening, setIsListening] = useState(false);
   const [description, setDescription] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const recognitionRef = useRef<any>(null);
-
+  
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -87,15 +83,12 @@ export function DefectAnalyzer() {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    // Reset form state if needed, though useFormState doesn't have a built-in reset
-  };
-
-  const handleVoiceInput = () => {
-    // Voice input logic remains the same
+    // A bit of a hack to reset the form state since useActionState doesn't have a built-in reset
+    (formAction as any)();
   };
 
   const AnalysisResult = () => {
-    if (state.message && !state.success && !pending) {
+    if (state.message && !state.success && !isPending) {
       return (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -180,7 +173,7 @@ export function DefectAnalyzer() {
 
   return (
     <>
-      <div className="sticky top-0 z-10 flex items-center justify-between bg-background-dark/80 p-4 backdrop-blur-md">
+      <div className="sticky top-0 z-10 flex items-center justify-between bg-background/80 p-4 backdrop-blur-md">
         <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
           <ArrowLeft />
         </Button>
@@ -197,7 +190,7 @@ export function DefectAnalyzer() {
         <form action={formAction}>
            <div className="space-y-4">
               <div
-                className="relative group w-full aspect-video rounded-xl overflow-hidden border-2 border-dashed border-border-dark bg-input/5 flex items-center justify-center cursor-pointer hover:border-accent"
+                className="relative group w-full aspect-video rounded-xl overflow-hidden border-2 border-dashed border-border bg-input/5 flex flex-col items-center justify-center cursor-pointer hover:border-accent scan-glow"
                 onClick={() => fileInputRef.current?.click()}
               >
                 {media ? (
@@ -210,8 +203,8 @@ export function DefectAnalyzer() {
                      <input type="hidden" name="mediaDataUri" value={media.dataUrl} />
                   </>
                 ) : (
-                  <div className="text-center">
-                     <UploadCloud className="w-12 h-12 text-muted-foreground mx-auto" />
+                  <div className="text-center p-4">
+                     <ScanSearch className="w-12 h-12 text-muted-foreground mx-auto" />
                      <p className="mt-4 text-lg font-semibold font-headline">Upload Photo/Video</p>
                      <p className="text-sm text-muted-foreground">Click to upload or drag and drop</p>
                   </div>
@@ -225,7 +218,7 @@ export function DefectAnalyzer() {
                     onChange={handleFileChange}
                  />
 
-                {pending && (
+                {isPending && (
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-white">
                          <div className="relative">
                             <Loader2 className="h-10 w-10 animate-spin text-accent" />
@@ -243,14 +236,14 @@ export function DefectAnalyzer() {
                       id="description"
                       name="description"
                       placeholder="e.g., 'There is a crack in the pipe under the sink and it's dripping water.'"
-                      className="bg-input border-border-dark text-white placeholder:text-muted-foreground/50"
+                      className="bg-input border-border text-white placeholder:text-muted-foreground/50"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                   />
               </div>
 
               {!state.success && (
-                <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background-dark to-transparent">
+                <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent">
                   <SubmitButton hasMedia={!!media} />
                 </div>
               )}
@@ -262,7 +255,7 @@ export function DefectAnalyzer() {
         </div>
         
         {state.success && (
-             <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background-dark to-transparent">
+             <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent">
                 <Button onClick={handleReset} variant="outline" className="w-full h-14 rounded-xl">
                     <RotateCw className="mr-2 h-4 w-4" />
                     Scan Another Item
