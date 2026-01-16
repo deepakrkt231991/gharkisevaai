@@ -1,31 +1,57 @@
-import Image from 'next/image';
-import Link from 'next/link';
+'use client';
+
+import { useDoc, useMemoFirebase } from '@/firebase';
+import { useFirestore } from '@/firebase/provider';
+import type { AppSettings } from '@/lib/entities';
+import { doc } from 'firebase/firestore';
+import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
-import { ArrowRight, Zap } from 'lucide-react';
+import { Skeleton } from './ui/skeleton';
+import { ArrowRight, Gift } from 'lucide-react';
+import Link from 'next/link';
 
 export function SeasonCheckCard() {
-    return (
-        <div className="relative h-48 w-full overflow-hidden rounded-xl">
-            <Image
-                src="https://picsum.photos/seed/monsoon/800/400"
-                alt="Monsoon roof checkup"
-                fill
-                className="object-cover"
-                data-ai-hint="rooftop terrace"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent p-4 flex flex-col justify-end">
-                <div className="mb-2 flex items-center gap-2 text-xs font-bold text-accent">
-                    <Zap className="h-4 w-4" />
-                    <span>AI SEASON CHECK</span>
-                </div>
-                <h2 className="text-2xl font-bold text-white font-headline">Monsoon Roof Checkup / मानसून सुरक्षा</h2>
-                <p className="text-sm text-white/80 mb-3">AI-verified structural health scanning.</p>
-                 <Button asChild size="sm" className="w-fit bg-primary/80 backdrop-blur-sm text-white hover:bg-primary">
-                    <Link href="/analyze">
-                        Scan Now <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
-            </div>
+  const firestore = useFirestore();
+
+  const settingsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    // The 'top_banner' doc holds the dynamic content
+    return doc(firestore, 'app_settings', 'top_banner');
+  }, [firestore]);
+
+  const { data: settings, isLoading } = useDoc<AppSettings>(settingsQuery);
+
+  if (isLoading) {
+    return <Skeleton className="h-24 w-full rounded-xl" />;
+  }
+
+  // Don't render anything if there's no setting, to avoid empty space
+  if (!settings?.content) {
+    return null;
+  }
+
+  // Split content by newline for multi-line display
+  const [line1, line2] = (settings.content || '').split('\\n');
+
+  return (
+    <Card
+      className="border-none text-white overflow-hidden shadow-lg"
+      style={{ backgroundColor: settings.backgroundColor || '#FF8C00' }}
+    >
+      <CardContent className="p-4 flex items-center gap-4">
+        <div className="bg-white/10 p-3 rounded-full border border-white/20">
+            <Gift className="h-6 w-6" />
         </div>
-    )
+        <div className="flex-1">
+          <h2 className="font-bold font-headline text-lg leading-tight">{line1 || "Special Offer"}</h2>
+          {line2 && <p className="text-sm opacity-90">{line2}</p>}
+        </div>
+        <Button asChild size="icon" variant="ghost" className="bg-white/10 hover:bg-white/20 rounded-full flex-shrink-0">
+            <Link href="/promote">
+                <ArrowRight />
+            </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
 }
