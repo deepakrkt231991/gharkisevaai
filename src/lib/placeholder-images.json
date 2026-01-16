@@ -2,33 +2,39 @@
   "placeholderImages": [
     {
       "id": "worker-1",
-      "description": "Portrait of a friendly male plumber.",
+      "description": "Portrait of a friendly male electrician.",
       "imageUrl": "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWxlJTIwcGx1bWJlciUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODc0NjAwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "plumber portrait",
-      "name": "राजेश कुमार",
-      "specialty": "प्लंबर",
+      "imageHint": "electrician portrait",
+      "name": "Rajesh Kumar",
+      "specialty": "Master Electrician",
+      "experience": "8 yrs exp",
       "rating": 4.9,
-      "reviews": 210
+      "reviews": 128,
+      "startingPrice": 299
     },
     {
       "id": "worker-2",
-      "description": "Portrait of a confident female electrician.",
+      "description": "Portrait of a specialist worker.",
       "imageUrl": "https://images.unsplash.com/photo-1596249964205-6f1e36c7a022?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmZW1hbGUlMjBlbGVjdHJpY2lhbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODc0NjA0NHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "electrician portrait",
-      "name": "सुनीता देवी",
-      "specialty": "इलेक्ट्रीशियन",
-      "rating": 4.8,
-      "reviews": 155
+      "imageHint": "worker portrait",
+      "name": "Amit Singh",
+      "specialty": "Pipe Leakage Specialist",
+      "experience": "5 yrs exp",
+      "rating": 4.7,
+      "reviews": 94,
+      "startingPrice": 199
     },
     {
       "id": "worker-3",
-      "description": "Portrait of a skilled male carpenter.",
-      "imageUrl": "https://images.unsplash.com/photo-1593704986793-3528731f50a8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWxlJTIwY2FycGVudGVyJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzY4NzQ2MDc3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "carpenter portrait",
-      "name": "मोहन लाल",
-      "specialty": "बढ़ई",
-      "rating": 4.9,
-      "reviews": 180
+      "description": "Portrait of a deep cleaning expert.",
+      "imageUrl": "https://plus.unsplash.com/premium_photo-1663099395298-33de29864222?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmZW1hbGUlMjBjbGVhbmluZyUyMHNlcnZpY2V8ZW58MHx8fHwxNzY4NzQ5MDk1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cleaning expert",
+      "name": "Priya Sharma",
+      "specialty": "Deep Cleaning Expert",
+      "experience": "3 yrs exp",
+      "rating": 5,
+      "reviews": 210,
+      "startingPrice": 499
     }
   ]
 }
