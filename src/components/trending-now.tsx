@@ -32,11 +32,11 @@ export function TrendingNow() {
         <div className="space-y-4">
             <div className="flex justify-between items-center">
                 <h3 className="text-xl font-bold font-headline">Trending Now / ट्रेंडिंग</h3>
-                <Link href="#" className="text-sm font-bold text-primary">VIEW ALL</Link>
+                <Link href="/find-a-worker" className="text-sm font-bold text-primary">VIEW ALL</Link>
             </div>
             <div className="grid grid-cols-2 gap-4">
                 {trendingItems.map((item) => (
-                    <Link href="#" key={item.id}>
+                    <Link href="/find-a-worker" key={item.id}>
                         <Card className={cn("relative h-48 w-full overflow-hidden rounded-xl group", item.bgColor)}>
                              <Image
                                 src={item.imageUrl}
