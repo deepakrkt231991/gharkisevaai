@@ -11,6 +11,7 @@ export type ImagePlaceholder = {
   rating?: number;
   reviews?: number;
   startingPrice?: number;
+  rental_price_per_day?: number;
 };
 
 export const PlaceHolderImages: ImagePlaceholder[] = data.placeholderImages;

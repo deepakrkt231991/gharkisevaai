@@ -1,24 +1,33 @@
 // src/app/list-tool/page.tsx
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
 import { ListToolForm } from '@/components/list-tool-form';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+
+function ListToolHeader() {
+    return (
+         <header className="sticky top-0 z-50 flex items-center justify-between bg-background/80 p-4 backdrop-blur-md">
+            <Button variant="ghost" size="icon" asChild>
+                <Link href="/rent-tools">
+                    <ArrowLeft className="h-6 w-6" />
+                </Link>
+            </Button>
+            <h1 className="text-xl font-bold font-headline text-center flex-1 pr-10">List Your Tool</h1>
+        </header>
+    );
+}
 
 export default function ListToolPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-secondary/30">
-      <Header />
-      <main className="flex-1 py-12 md:py-16">
-        <div className="container">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">List Your Tool for Rent</h1>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Earn extra income by renting out your tools to other professionals in the GrihSeva AI community.
-            </p>
-          </div>
-          <ListToolForm />
+    <div className="dark bg-background text-foreground">
+        <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
+            <ListToolHeader/>
+            <main className="flex-1 p-4">
+                <ListToolForm />
+            </main>
         </div>
-      </main>
-      <Footer />
     </div>
   );
 }
+
+// Dummy components to avoid breaking the build, will be replaced by actual components
+import { Button } from '@/components/ui/button';
