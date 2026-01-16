@@ -269,7 +269,8 @@
     "providers": [
       "password",
       "anonymous",
-      "phone"
+      "phone",
+      "google.com"
     ]
   },
   "firestore": {
