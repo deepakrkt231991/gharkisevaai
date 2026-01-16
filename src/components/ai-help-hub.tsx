@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ArrowUpRight, Camera, CheckShield, Copy, Share2, Sofa, Video } from 'lucide-react';
+import { ArrowUpRight, Camera, ShieldCheck, Copy, Share2, Sofa, Video } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -47,7 +47,7 @@ const IntelligenceSuite = () => (
 
         <div className="grid grid-cols-2 gap-4">
             <Card className="glass-card p-4 space-y-4">
-                 <div className="bg-primary/20 p-2 rounded-lg w-fit"><CheckShield className="text-primary"/></div>
+                 <div className="bg-primary/20 p-2 rounded-lg w-fit"><ShieldCheck className="text-primary"/></div>
                  <h4 className="font-bold text-white">Property Verifier</h4>
                  <p className="text-xs text-muted-foreground">AI Legal & Document check.</p>
                  <Button variant="outline" className="w-full bg-transparent">Scan Docs</Button>
