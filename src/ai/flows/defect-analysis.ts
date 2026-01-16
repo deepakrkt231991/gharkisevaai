@@ -22,8 +22,9 @@ export type AnalyzeDefectInput = z.infer<typeof AnalyzeDefectInputSchema>;
 
 const AnalyzeDefectOutputSchema = z.object({
   defect: z.string().describe('The identified defect (e.g., "Leaky faucet washer") or the item being listed (e.g., "Used 24-inch Television").'),
+  confidence: z.number().describe("A confidence score (from 0 to 100) for the accuracy of the defect identification."),
   estimatedCost: z.string().describe('The estimated repair cost in Hindi (e.g., "₹500 - ₹800") or the suggested resale market value if it\'s an item for sale.'),
-  diySteps: z.array(z.string()).describe('A list of simple, step-by-step instructions for a user to potentially fix the issue themselves. This should be empty if the repair is complex, dangerous, or if it is an item for sale.'),
+  diySteps: z.array(z.string()).describe('A list of simple, step-by-step DIY instructions for a user to potentially fix the issue themselves. Each step should be a clear action. This should be an empty array if the repair is complex, dangerous, or if it is an item for sale.'),
   requiredTools: z.array(z.string()).describe('A list of tools the worker might need to bring for the repair.'),
   requiredParts: z.array(z.string()).describe('A list of specific parts that might be needed for the repair (e.g., "1/2 inch faucet washer", "TV Capacitor Model 25v 1000uF"). This can also be used to list key components of an item for sale.'),
 });
@@ -41,14 +42,15 @@ const prompt = ai.definePrompt({
 
 Your tasks are:
 1.  **Identify the specific defect OR the item being listed.** Use all available information.
-2.  **Provide an estimated cost OR a market value.**
+2.  **Provide a confidence score (0-100)** representing your certainty in the diagnosis.
+3.  **Provide an estimated cost OR a market value.**
     -   If it's a defect, provide a transparent estimated repair cost range in simple Hindi (e.g., "₹500 - ₹800"). This should include labor and parts.
     -   If it's an item for sale, suggest a reasonable resale market value based on its condition.
-3.  **Create a list of specific parts.**
+4.  **Create a list of specific parts.**
     -   For repairs: List specific parts needed (e.g., "1/2 inch faucet washer," "TV Capacitor Model 25v 1000uF").
     -   For items for sale: Use the \`requiredParts\` field to list key components or specifications.
-4.  **Create a list of tools** needed for a repair. This should be empty for items for sale.
-5.  **Provide DIY steps if the repair is simple and safe.** If the repair is complex, dangerous, or it's an item for sale, the diySteps array should be empty.
+5.  **Create a list of tools** needed for a repair. This should be empty for items for sale.
+6.  **Provide Smart Suggestions (DIY):** If the repair is simple and safe (like tightening a screw or cleaning a filter), provide a list of step-by-step DIY (Do-It-Yourself) instructions in the \`diySteps\` field. Each step should be clear and concise. For complex or dangerous repairs (involving electricity, gas, or major disassembly), or for items for sale, the diySteps array **must** be empty.
 
 Analyze the following:
 Media: {{media url=mediaDataUri}}

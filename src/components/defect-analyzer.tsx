@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+import { Progress } from '@/components/ui/progress';
 import type { AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
 
 type Media = {
@@ -99,7 +100,13 @@ export function DefectAnalyzer() {
           <div className="flex items-center gap-3">
              <Sparkles className="text-primary"/>
              <h2 className="text-xl font-bold font-headline">AI Report</h2>
-             <div className="ml-auto bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold px-2 py-1 rounded-full">VERIFIED RESULT</div>
+             {result.confidence && (
+                <div className="ml-auto w-28 text-center">
+                    <p className="text-[10px] font-bold text-green-400/80 tracking-wider">AI CONFIDENCE</p>
+                    <Progress value={result.confidence} className="h-1.5 mt-1 [&>div]:bg-green-400" />
+                    <p className="text-xs font-bold text-green-400 mt-0.5">{result.confidence}%</p>
+                </div>
+             )}
           </div>
           
           <Card className="glass-card border-l-4 border-l-primary/80">
@@ -199,11 +206,14 @@ export function DefectAnalyzer() {
                      <input type="hidden" name="mediaDataUri" value={media.dataUrl} />
                   </>
                 ) : (
-                  <div className="text-center p-4">
-                     <ScanSearch className="w-12 h-12 text-muted-foreground mx-auto" />
-                     <p className="mt-4 text-lg font-semibold font-headline">Upload Photo/Video</p>
-                     <p className="text-sm text-muted-foreground">Click to upload or drag and drop</p>
-                  </div>
+                  <>
+                    <div className="absolute inset-6 border-2 border-dashed border-white/20 rounded-lg opacity-50 pointer-events-none"></div>
+                    <div className="text-center p-4">
+                        <ScanSearch className="w-12 h-12 text-muted-foreground mx-auto" />
+                        <p className="mt-4 text-lg font-semibold font-headline">Capture the Defect</p>
+                        <p className="text-sm text-muted-foreground">Align item inside the frame for best results.</p>
+                    </div>
+                  </>
                 )}
                  <Input
                     ref={fileInputRef}
