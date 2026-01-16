@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, MoreVertical, Star, Sun, Moon, MapPin, Sparkles, IndianRupee } from 'lucide-react';
+import { ArrowLeft, MoreVertical, Star, Sun, Moon, MapPin, Sparkles, IndianRupee, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Badge } from './ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const dates = [
   { day: 'TODAY', date: 12, dayOfWeek: 'THU' },
@@ -168,10 +169,22 @@ export function ServiceSlotBooking() {
                         <p className="text-muted-foreground">Visiting Charges</p>
                         <p className="text-white font-medium">₹99.00</p>
                     </div>
-                     <div className="flex justify-between items-center text-sm">
-                        <p className="text-muted-foreground">Taxes (GST 18%)</p>
-                        <p className="text-white font-medium">₹0.00 <span className="text-xs text-muted-foreground">INCLUDED</span></p>
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex justify-between items-center text-sm cursor-pointer">
+                            <p className="text-muted-foreground flex items-center gap-1.5">
+                                Taxes (GST 18%)
+                                <Info className="h-3 w-3" />
+                            </p>
+                            <p className="text-white font-medium">₹0.00 <span className="text-xs text-muted-foreground">INCLUDED</span></p>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                           <p>100% Transparency: Platform fees helps us keep your payment safe in the Waiting Timer.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <div className="border-t border-border my-2"></div>
                      <div className="flex justify-between items-center font-bold">
                         <p className="text-white text-lg">Total Amount</p>
