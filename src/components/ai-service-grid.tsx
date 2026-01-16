@@ -25,21 +25,21 @@ const serviceCategories = [
   {
     title: 'Appliance Repair',
     services: [
-      { name: 'AC', icon: AirVent, href: '#' },
-      { name: 'TV', icon: Tv, href: '#' },
-      { name: 'Fridge', icon: Refrigerator, href: '#' },
-      { name: 'Washing Machine', icon: WashingMachine, href: '#' },
-      { name: 'Geyser', icon: Thermometer, href: '#' },
-      { name: 'RO Purifier', icon: Droplets, href: '#' },
+      { name: 'AC', icon: AirVent, href: '/book-service' },
+      { name: 'TV', icon: Tv, href: '/book-service' },
+      { name: 'Fridge', icon: Refrigerator, href: '/book-service' },
+      { name: 'Washing Machine', icon: WashingMachine, href: '/book-service' },
+      { name: 'Geyser', icon: Thermometer, href: '/book-service' },
+      { name: 'RO Purifier', icon: Droplets, href: '/book-service' },
     ],
   },
   {
     title: 'Home Services',
     services: [
-      { name: 'Home Painting', icon: Paintbrush, href: '#' },
-      { name: 'Deep Cleaning', icon: Sparkles, href: '#' },
+      { name: 'Home Painting', icon: Paintbrush, href: '/book-service' },
+      { name: 'Deep Cleaning', icon: Sparkles, href: '/book-service' },
       { name: 'Plumbing', icon: Wrench, href: '/book-service' },
-      { name: 'Electrician', icon: Zap, href: '#' },
+      { name: 'Electrician', icon: Zap, href: '/book-service' },
     ],
   },
   {

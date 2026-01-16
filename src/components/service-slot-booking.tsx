@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, MoreVertical, Star, Sun, Moon, MapPin, Sparkles, IndianRupee, Info } from 'lucide-react';
+import { ArrowLeft, MoreVertical, Star, Sun, Moon, MapPin, Sparkles, IndianRupee, Info, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -196,10 +196,9 @@ export function ServiceSlotBooking() {
       </main>
 
       <footer className="sticky bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background to-transparent z-10">
-        <Button size="lg" className="w-full h-14 text-lg font-bold bg-accent text-accent-foreground hover:bg-accent/90">
-            Confirm & Pay 
-            <IndianRupee className="inline-block h-5 w-5 ml-1" />
-            598
+        <Button size="lg" className="w-full h-14 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90">
+            Confirm & Pay
+            <ArrowRight className="inline-block h-5 w-5 ml-2" />
         </Button>
       </footer>
     </div>
