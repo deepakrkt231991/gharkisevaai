@@ -2,7 +2,7 @@
 "use server";
 
 import { z } from 'zod';
-import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { getAuth } from 'firebase/auth';
 import { headers } from 'next/headers';
@@ -79,7 +79,7 @@ export async function createWorkerProfile(
       },
       isVerified: true, // Assuming verification was passed on the client
       rating: 0,
-      createdAt: new Date(),
+      createdAt: serverTimestamp(),
     }, { merge: true });
 
     return {
