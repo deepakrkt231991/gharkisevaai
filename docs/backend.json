@@ -258,7 +258,7 @@
       "type": "object",
       "description": "Stores global app settings, like dynamic banner content.",
       "properties": {
-        "content": { "type": "string", "description": "खजाना खोजें! अगले 2 घंटे में रेफर करने पर 0.10% कमीशन पाएं!\nFind the treasure! Refer in the next 2 hours & get 0.10% commission!" },
+        "content": { "type": "string", "description": "लाइफटाइम कमाई! हर रेफरल पर 0.05% कमीशन पाएं।\\nLifetime Earnings! Get 0.05% commission on every referral." },
         "style": { "type": "string", "description": "dynamic_card" },
         "backgroundColor": { "type": "string", "description": "#FFD700" },
         "lastUpdated": { "type": "string", "format": "date-time" }

@@ -10,6 +10,12 @@ import { Skeleton } from './ui/skeleton';
 import { ArrowRight, Gift } from 'lucide-react';
 import Link from 'next/link';
 
+const defaultOffer: AppSettings = {
+    content: "लाइफटाइम कमाई! हर रेफरल पर 0.05% कमीशन पाएं।\\nLifetime Earnings! Get 0.05% commission on every referral.",
+    backgroundColor: '#006970', // Using primary color as a fallback
+    style: 'dynamic_card'
+};
+
 export function SeasonCheckCard() {
   const firestore = useFirestore();
 
@@ -19,11 +25,14 @@ export function SeasonCheckCard() {
     return doc(firestore, 'app_settings', 'top_banner');
   }, [firestore]);
 
-  const { data: settings, isLoading } = useDoc<AppSettings>(settingsQuery);
+  const { data: settingsFromDb, isLoading } = useDoc<AppSettings>(settingsQuery);
 
   if (isLoading) {
     return <Skeleton className="h-24 w-full rounded-xl" />;
   }
+
+  // Use data from DB if available, otherwise use the default hardcoded offer.
+  const settings = settingsFromDb?.content ? settingsFromDb : defaultOffer;
 
   // Don't render anything if there's no setting, to avoid empty space
   if (!settings?.content) {
