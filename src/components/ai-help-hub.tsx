@@ -56,7 +56,9 @@ const IntelligenceSuite = () => (
                 <div className="bg-primary/20 p-2 rounded-lg w-fit"><Video className="text-primary"/></div>
                 <h4 className="font-bold text-white">Video Ad Maker</h4>
                 <p className="text-xs text-muted-foreground">Convert listings to viral ads.</p>
-                <Button variant="outline" className="w-full bg-transparent">Create Ad</Button>
+                <Button variant="outline" className="w-full bg-transparent" asChild>
+                    <Link href="/create-video">Create Ad</Link>
+                </Button>
             </Card>
         </div>
     </div>
