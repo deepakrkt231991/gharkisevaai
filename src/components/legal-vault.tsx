@@ -98,7 +98,7 @@ export function LegalVault() {
                 </div>
             </Card>
 
-            <SecurityGuide />
+            
 
             <div>
                 <div className="flex justify-between items-center mb-4">
@@ -120,7 +120,7 @@ export function LegalVault() {
                         <CardContent className="p-3 flex items-center gap-4">
                             <div className="bg-yellow-500/10 p-3 rounded-lg"><FileText className="text-yellow-400"/></div>
                             <div className="flex-1">
-                                <h4 className="font-semibold text-white">Property Tax Receipts</h4>
+                                <h4 className="font-semibold text-white">Property Docs</h4>
                                 <p className="text-xs text-yellow-400 font-bold flex items-center gap-1.5"><Loader2 className="animate-spin h-3 w-3"/>SCANNING 2023-24 FILINGS</p>
                             </div>
                             <Circle className="text-yellow-400"/>
@@ -131,7 +131,7 @@ export function LegalVault() {
                         <CardContent className="p-3 flex items-center gap-4">
                              <div className="bg-primary/10 p-3 rounded-lg"><FileText className="text-primary"/></div>
                              <div className="flex-1">
-                                <h4 className="font-semibold text-white">Draft Purchase Agreement</h4>
+                                <h4 className="font-semibold text-white">Executed Agreements</h4>
                                 <p className={`text-xs font-bold ${isGenerated ? 'text-green-400' : 'text-primary'}`}>
                                     {isGenerated ? 'DRAFT GENERATED' : 'AI GENERATION READY'}
                                 </p>
@@ -141,27 +141,18 @@ export function LegalVault() {
                                     {isGenerating ? <Loader2 className="animate-spin"/> : 'Generate'}
                                  </Button>
                              )}
+                              {isGenerated && (
+                                <CheckCircle className="text-green-400"/>
+                             )}
                         </CardContent>
                     </Card>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                 <Card className="glass-card">
-                    <CardContent className="p-4 flex flex-col items-center justify-center gap-2">
-                        <Fingerprint className="text-muted-foreground h-7 w-7"/>
-                        <p className="text-sm font-bold text-white">VERIFY IDENTITY</p>
-                    </CardContent>
-                </Card>
-                 <Card className="glass-card">
-                    <CardContent className="p-4 flex flex-col items-center justify-center gap-2">
-                        <PenSquare className="text-muted-foreground h-7 w-7"/>
-                        <p className="text-sm font-bold text-white">DIGITALSIGNATURE</p>
-                    </CardContent>
-                </Card>
-            </div>
+             <SecurityGuide />
 
-            <Button asChild size="lg" className="w-full h-14 bg-primary">
+
+            <Button asChild size="lg" className="w-full h-14 bg-primary" disabled={!isGenerated}>
                  <Link href="/legal-document">
                     <FileText className="mr-2"/>
                     Review AI Draft Agreement
