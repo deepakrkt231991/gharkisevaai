@@ -81,5 +81,20 @@ service cloud.firestore {
         allow get, list: if true;
         allow write: if false; // Should only be written by a backend process/Cloud Function
     }
+
+    // LEGAL_AGREEMENTS Collection
+    // The buyer or seller can read the agreement. Listing is open to signed in users.
+    match /legal_agreements/{agreementId} {
+        allow get: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid);
+        allow list: if isSignedIn();
+        allow write: if false; // Should only be written by a backend process/Cloud Function
+    }
+
+    // PROPERTIES Collection
+    // Any signed-in user can view property listings.
+    match /properties/{propertyId} {
+      allow get, list: if isSignedIn();
+      allow write: if false; // Should only be written by a backend process/Cloud Function
+    }
   }
 }
