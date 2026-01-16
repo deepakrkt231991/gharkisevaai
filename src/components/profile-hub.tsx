@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle, FileLock } from 'lucide-react';
+import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle, FileLock, Handshake, Languages } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 
@@ -102,6 +102,8 @@ export function ProfileHub() {
                         <ProfileMenuItem icon={Shield} label="Privacy & Security" href="/privacy" />
                         <ProfileMenuItem icon={FileLock} label="Legal Vault" href="/legal-document" />
                         <ProfileMenuItem icon={HelpCircle} label="Help & Support" href="#" />
+                        <ProfileMenuItem icon={Handshake} label="Become a Worker" href="/worker-signup" />
+                        <ProfileMenuItem icon={Languages} label="Change Language" href="#" />
                     </CardContent>
                 </Card>
 
