@@ -263,6 +263,26 @@
         "backgroundColor": { "type": "string", "description": "#FFD700" },
         "lastUpdated": { "type": "string", "format": "date-time" }
       }
+    },
+    "LegalAgreement": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Legal Agreement",
+      "type": "object",
+      "description": "Represents a legally binding digital agreement for a deal.",
+      "properties": {
+        "agreementId": { "type": "string", "description": "Unique ID for the agreement." },
+        "dealId": { "type": "string", "description": "The associated Deal ID." },
+        "buyerId": { "type": "string" },
+        "sellerId": { "type": "string" },
+        "buyerName": { "type": "string" },
+        "sellerName": { "type": "string" },
+        "itemName": { "type": "string" },
+        "itemCondition": { "type": "string" },
+        "finalPrice": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["agreementId", "dealId", "buyerId", "sellerId", "itemName", "finalPrice", "status"]
     }
   },
   "auth": {
@@ -345,6 +365,14 @@
           "entityName": "AppSettings",
           "schema": { "$ref": "#/backend/entities/AppSettings" },
           "description": "Stores global app settings, like dynamic content for banners. The docId 'top_banner' is used for the main promotional banner."
+        }
+      },
+      {
+        "path": "/legal_agreements/{agreementId}",
+        "definition": {
+          "entityName": "LegalAgreement",
+          "schema": { "$ref": "#/backend/entities/LegalAgreement" },
+          "description": "Stores all generated legal agreements for deals."
         }
       }
     ]

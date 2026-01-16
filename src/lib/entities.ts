@@ -97,3 +97,17 @@ export interface AppSettings {
     backgroundColor?: string; // A suggested hex color code for the banner background.
     lastUpdated?: string;
 }
+
+export interface LegalAgreement {
+    agreementId: string; // Unique ID for the agreement.
+    dealId: string; // The associated Deal ID.
+    buyerId: string;
+    sellerId: string;
+    buyerName?: string;
+    sellerName?: string;
+    itemName: string;
+    itemCondition?: string;
+    finalPrice: number;
+    status: "active" | "completed";
+    createdAt?: any; // Firestore Timestamp
+}
