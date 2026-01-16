@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from './ui/card';
 import Link from 'next/link';
 import { ArrowRight, Bot, Camera, Wrench } from 'lucide-react';
@@ -37,7 +38,7 @@ export function SmartHub() {
                             </CardContent>
                         </Card>
                     </Link>
-                     <Link href="/ai-help" className="block">
+                     <Link href="/interior-analysis" className="block">
                         <Card className={cn("bg-card/70 backdrop-blur-sm border-border text-center hover:border-primary transition-all")}>
                             <CardContent className="p-4 flex flex-col items-center justify-center gap-2 h-full">
                                  <Bot className="h-8 w-8 text-primary" />
