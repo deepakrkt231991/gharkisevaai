@@ -1,13 +1,47 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, FileText, Upload, Fingerprint, PenSquare, Loader2, CheckCircle, Circle } from 'lucide-react';
+import { ShieldCheck, FileText, Upload, Fingerprint, PenSquare, Loader2, CheckCircle, Circle, Bot, FileLock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+
+const SecurityGuide = () => (
+    <Card className="glass-card">
+        <CardHeader>
+            <CardTitle className="font-headline text-white text-lg flex items-center gap-2">
+                <ShieldCheck className="text-primary"/>
+                Your Security is Our Priority
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 text-sm">
+            <div className="flex items-start gap-3">
+                <ShieldCheck className="h-5 w-5 text-green-400 mt-1 flex-shrink-0" />
+                <div>
+                    <h4 className="font-bold text-white">100% Encryption</h4>
+                    <p className="text-muted-foreground">Aapke saare documents 'Bank-Grade Encryption' ke saath save hain, jise sirf aap aur aapka verified partner dekh sakte hain.</p>
+                </div>
+            </div>
+            <div className="flex items-start gap-3">
+                <Bot className="h-5 w-5 text-green-400 mt-1 flex-shrink-0" />
+                <div>
+                    <h4 className="font-bold text-white">AI Verification</h4>
+                    <p className="text-muted-foreground">Hamara AI turant documents ki asliyat check karta hai taaki koi fake property ya ID use na kar sake.</p>
+                </div>
+            </div>
+             <div className="flex items-start gap-3">
+                <FileLock className="h-5 w-5 text-green-400 mt-1 flex-shrink-0" />
+                <div>
+                    <h4 className="font-bold text-white">Instant Access</h4>
+                    <p className="text-muted-foreground">Ek baar agreement sign hone ke baad, ye hamesha ke liye aapke profile mein 'Legal Vault' section mein save ho jayega.</p>
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+);
 
 export function LegalVault() {
     const { toast } = useToast();
@@ -63,6 +97,8 @@ export function LegalVault() {
                     <span>{statusText}</span>
                 </div>
             </Card>
+
+            <SecurityGuide />
 
             <div>
                 <div className="flex justify-between items-center mb-4">
