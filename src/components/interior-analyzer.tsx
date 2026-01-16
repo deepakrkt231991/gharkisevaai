@@ -22,6 +22,7 @@ export function InteriorAnalyzer() {
   const [state, formAction, isPending] = useActionState(analyzeInterior, initialState);
   const [image, setImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -31,10 +32,11 @@ export function InteriorAnalyzer() {
         const dataUrl = reader.result as string;
         setImage(dataUrl);
 
-        // Automatically trigger form submission
-        const formData = new FormData();
-        formData.append('roomPhotoUri', dataUrl);
-        formAction(formData);
+        // Programmatically submit the form after setting the image
+        if (formRef.current) {
+          (formRef.current.elements.namedItem('roomPhotoUri') as HTMLInputElement).value = dataUrl;
+          formRef.current.requestSubmit();
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -117,7 +119,7 @@ export function InteriorAnalyzer() {
       </header>
 
       <main className="flex-1">
-        <form>
+        <form ref={formRef} action={formAction} className="hidden">
             <input
                 ref={fileInputRef}
                 type="file"
@@ -126,6 +128,7 @@ export function InteriorAnalyzer() {
                 accept="image/png, image/jpeg, image/webp"
                 onChange={handleFileChange}
              />
+             <input type="hidden" name="roomPhotoUri" />
         </form>
         <div className="relative w-full aspect-[9/10] bg-muted">
             {image && <Image src={image} alt="Room for analysis" fill className="object-cover" />}
