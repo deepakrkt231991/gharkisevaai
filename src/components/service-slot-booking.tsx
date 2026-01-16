@@ -74,12 +74,12 @@ export function ServiceSlotBooking() {
                         key={date}
                         onClick={() => setSelectedDate(date)}
                         className={cn("p-3 rounded-xl text-center transition-colors", 
-                            selectedDate === date ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-card/60'
+                            selectedDate === date ? 'bg-accent text-accent-foreground' : 'bg-card hover:bg-card/60'
                         )}
                     >
-                        <p className={cn("text-xs", selectedDate === date ? 'text-primary-foreground/80' : 'text-muted-foreground')}>{dayOfWeek}</p>
+                        <p className={cn("text-xs", selectedDate === date ? 'text-accent-foreground/80' : 'text-muted-foreground')}>{dayOfWeek}</p>
                         <p className="text-xl font-bold">{date}</p>
-                        <p className={cn("text-[10px] font-bold", selectedDate === date ? 'text-primary-foreground' : 'text-primary')}>{day === '14' || day === '15' || day === '16' ? '' : day}</p>
+                        <p className={cn("text-[10px] font-bold", selectedDate === date ? 'text-accent-foreground' : 'text-primary')}>{day === '14' || day === '15' || day === '16' ? '' : day}</p>
                     </button>
                 ))}
             </div>
@@ -98,7 +98,11 @@ export function ServiceSlotBooking() {
             <div className="flex items-center gap-2 text-muted-foreground"><Sun size={16}/> <span className="text-sm font-medium">Morning</span></div>
             <div className="grid grid-cols-3 gap-3">
                 {timeSlots.morning.map(time => (
-                    <Button key={time} variant={selectedTime === time ? 'default' : 'secondary'} onClick={() => setSelectedTime(time)} className={cn("h-12 text-base", selectedTime === time ? 'bg-primary' : 'bg-card hover:bg-card/70')}>
+                    <Button 
+                      key={time} 
+                      variant="secondary"
+                      onClick={() => setSelectedTime(time)} 
+                      className={cn("h-12 text-base", selectedTime === time ? 'bg-accent text-accent-foreground hover:bg-accent/90' : 'bg-card text-white hover:bg-card/70')}>
                         {time}
                     </Button>
                 ))}
@@ -108,7 +112,11 @@ export function ServiceSlotBooking() {
             <div className="flex items-center gap-2 text-muted-foreground"><Sun size={16}/> <span className="text-sm font-medium">Afternoon</span></div>
             <div className="grid grid-cols-3 gap-3">
                 {timeSlots.afternoon.map(time => (
-                    <Button key={time} variant={selectedTime === time ? 'default' : 'secondary'} onClick={() => setSelectedTime(time)} className={cn("h-12 text-base", selectedTime === time ? 'bg-primary' : 'bg-card hover:bg-card/70')}>
+                     <Button 
+                      key={time} 
+                      variant="secondary"
+                      onClick={() => setSelectedTime(time)} 
+                      className={cn("h-12 text-base", selectedTime === time ? 'bg-accent text-accent-foreground hover:bg-accent/90' : 'bg-card text-white hover:bg-card/70')}>
                         {time}
                     </Button>
                 ))}
@@ -118,7 +126,11 @@ export function ServiceSlotBooking() {
             <div className="flex items-center gap-2 text-muted-foreground"><Moon size={16}/> <span className="text-sm font-medium">Evening</span></div>
             <div className="grid grid-cols-3 gap-3">
                  {timeSlots.evening.map(time => (
-                    <Button key={time} variant={selectedTime === time ? 'default' : 'secondary'} onClick={() => setSelectedTime(time)} className={cn("h-12 text-base", selectedTime === time ? 'bg-primary' : 'bg-card hover:bg-card/70')}>
+                     <Button 
+                      key={time} 
+                      variant="secondary"
+                      onClick={() => setSelectedTime(time)} 
+                      className={cn("h-12 text-base", selectedTime === time ? 'bg-accent text-accent-foreground hover:bg-accent/90' : 'bg-card text-white hover:bg-card/70')}>
                         {time}
                     </Button>
                 ))}
@@ -171,7 +183,7 @@ export function ServiceSlotBooking() {
       </main>
 
       <footer className="sticky bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background to-transparent z-10">
-        <Button size="lg" className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90">
+        <Button size="lg" className="w-full h-14 text-lg font-bold bg-accent text-accent-foreground hover:bg-accent/90">
             Confirm & Pay 
             <IndianRupee className="inline-block h-5 w-5 ml-1" />
             598
