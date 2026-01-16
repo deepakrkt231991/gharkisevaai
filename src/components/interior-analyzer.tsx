@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef, ChangeEvent, useActionState } from 'react';
+import { useState, useRef, ChangeEvent, useActionState, startTransition } from 'react';
 import Image from 'next/image';
 import { ArrowLeft, Share, Heart, Sparkles, Compass, Paintbrush, Lightbulb, CheckCircle, Loader2, UploadCloud, ScanSearch, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -46,8 +46,11 @@ export function InteriorAnalyzer() {
         if (analysisFormRef.current) {
           // This is a workaround to reset the action states. A more robust solution might use a key on the component.
           analysisFormRef.current.reset();
-          const emptyRenderForm = new FormData();
-          renderAction(emptyRenderForm);
+
+          startTransition(() => {
+            const emptyRenderForm = new FormData();
+            renderAction(emptyRenderForm);
+          });
 
           (analysisFormRef.current.elements.namedItem('roomPhotoUri') as HTMLInputElement).value = dataUrl;
           analysisFormRef.current.requestSubmit();
