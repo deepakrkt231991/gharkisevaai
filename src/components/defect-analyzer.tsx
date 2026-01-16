@@ -219,13 +219,11 @@ export function DefectAnalyzer() {
                  />
 
                 {isPending && (
-                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-white">
-                         <div className="relative">
-                            <Loader2 className="h-10 w-10 animate-spin text-accent" />
-                            <div className="absolute inset-0 rounded-full border-2 border-accent/50 animate-ping"></div>
-                         </div>
-                         <p className="font-bold tracking-widest text-accent">SCANNING IN PROGRESS...</p>
-                         <p className="text-xs text-muted-foreground">AI is analyzing the issue...</p>
+                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden">
+                        <div className="scan-line"></div>
+                        <Loader2 className="h-8 w-8 animate-spin text-accent/80" />
+                        <p className="font-bold tracking-widest text-accent">LIVE SCAN IN PROGRESS...</p>
+                        <p className="text-xs text-muted-foreground">AI is analyzing the issue...</p>
                     </div>
                 )}
               </div>
