@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview The AI 3D Renderer - An agent for generating photorealistic interior renders.
@@ -52,7 +53,7 @@ const interiorRenderFlow = ai.defineFlow(
     const suggestionsText = formatSuggestions(suggestions);
 
     const { media } = await ai.generate({
-      model: 'googleai/gemini-2.5-flash-image-preview',
+      model: 'googleai/gemini-1.5-flash-latest',
       prompt: [
         { media: { url: roomPhotoUri } },
         { text: `Based on the provided image of a room and the following design suggestions, generate a new, photorealistic 3D render of the improved room. The render should look like a professionally designed space, incorporating the suggested changes.
