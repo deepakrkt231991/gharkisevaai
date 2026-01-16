@@ -9,7 +9,7 @@ export function ExploreHeader() {
                 <button onClick={() => window.history.back()} className="p-2">
                     <ArrowLeft className="h-6 w-6" />
                 </button>
-                <h1 className="text-xl font-bold font-headline">GrihSeva AI</h1>
+                <h1 className="text-xl font-bold font-headline">AI Services</h1>
                 <button className="p-2">
                     <SlidersHorizontal className="h-6 w-6" />
                 </button>
@@ -18,7 +18,7 @@ export function ExploreHeader() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                     type="search"
-                    placeholder="Search for Plumber, Electrician..."
+                    placeholder="Search for any service..."
                     className="w-full rounded-full bg-input pl-10 h-12"
                 />
             </div>
