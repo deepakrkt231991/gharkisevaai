@@ -1,15 +1,17 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardDescription, CardFooter } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, CheckCircle, ShieldCheck } from 'lucide-react';
+import { Download, Shield, User, Package, IndianRupee, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 export function LegalDocumentViewer() {
     const { toast } = useToast();
+    const dealId = `GS-2026-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const date = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
     const handleDownload = () => {
         toast({
@@ -17,39 +19,29 @@ export function LegalDocumentViewer() {
             description: "Your document is being prepared. In a real app, this would download a PDF.",
             className: "bg-primary text-white border-primary"
         });
-        // In a real app, you would trigger a PDF generation and download here.
-        // For example, window.print();
     };
-
-    const QrCodePlaceholder = () => (
-        <div className="w-24 h-24 bg-white p-1 rounded-md">
-            <div className="w-full h-full flex items-center justify-center">
-                 <svg width="100%" height="100%" viewBox="0 0 100 100" className="text-black">
-                    <path fill="currentColor" d="M0 0h30v30H0z M10 10h10v10H10z M40 0h30v30H40z M50 10h10v10H50z M80 0h20v20H80z M0 40h30v30H0z M10 50h10v10H10z M40 40h30v30H40z M50 50h10v10H50z M80 40h20v20H80z M0 80h20v20H0z M40 80h20v20H40z M80 80h20v20H80z M33 33h10v10H33z M73 33h10v10H73z M33 73h10v10H33z M73 73h10v10H73z M35 65h10v5H35z M45 75h5v10H45z M65 35h10v5H65z M75 45h5v10H75z" />
-                </svg>
-            </div>
-        </div>
-    );
 
     return (
         <div className="space-y-4">
             <Card className="glass-card overflow-hidden">
-                <CardHeader>
-                    <div className="flex items-center gap-3">
-                        <FileText className="text-primary h-8 w-8"/>
-                        <div>
-                            <CardTitle className="font-headline text-white">Digital Legal Agreement</CardTitle>
-                            <CardDescription>Deal ID: GSAI-DL-84B20-2024</CardDescription>
-                        </div>
+                <CardHeader className="bg-black/20 p-4">
+                    <p className="text-sm font-bold text-primary">GRIHSEVA AI - DIGITAL SECURITY AGREEMENT</p>
+                    <div className="flex justify-between items-center">
+                         <p className="text-xs text-muted-foreground font-mono">Deal ID: {dealId}</p>
+                         <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-900/30">
+                            <Shield className="mr-2 h-3 w-3"/>Legally Verified
+                         </Badge>
                     </div>
+                     <p className="text-xs text-muted-foreground">{date}</p>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                    {/* Parties Involved */}
+
+                <CardContent className="p-4 space-y-4">
+                    {/* 1. Parties */}
                     <div>
-                        <h4 className="font-bold text-lg mb-2 text-white">Parties Involved</h4>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <p className="text-xs font-bold uppercase text-muted-foreground">SELLER</p>
+                        <h4 className="font-bold text-lg mb-2 text-white flex items-center gap-2"><User size={20}/>Parties (पक्ष)</h4>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex items-center gap-3 bg-black/10 p-2 rounded-lg">
+                                <p className="text-xs font-bold uppercase text-muted-foreground w-16">SELLER</p>
                                 <div className="flex items-center gap-2">
                                     <Avatar className="h-8 w-8">
                                         <AvatarImage src="https://i.pravatar.cc/150?u=seller" />
@@ -58,8 +50,8 @@ export function LegalDocumentViewer() {
                                     <span className="font-semibold text-white">Ramesh Patel</span>
                                 </div>
                             </div>
-                             <div className="space-y-2">
-                                <p className="text-xs font-bold uppercase text-muted-foreground">BUYER</p>
+                             <div className="flex items-center gap-3 bg-black/10 p-2 rounded-lg">
+                                 <p className="text-xs font-bold uppercase text-muted-foreground w-16">BUYER</p>
                                 <div className="flex items-center gap-2">
                                     <Avatar className="h-8 w-8">
                                         <AvatarImage src="https://i.pravatar.cc/150?u=buyer" />
@@ -73,51 +65,51 @@ export function LegalDocumentViewer() {
 
                     <Separator />
 
-                    {/* Item Details */}
+                    {/* 2. Item/Service Details */}
                     <div>
-                        <h4 className="font-bold text-lg mb-3 text-white">Item Details & Condition</h4>
-                        <div className="flex gap-4">
-                            <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                                <Image src="https://picsum.photos/seed/used-ac/200" alt="Used AC" fill className="object-cover" />
-                            </div>
-                            <div className="space-y-1">
-                                <h5 className="font-bold text-white">Used Voltas 1.5 Ton AC</h5>
-                                <p className="text-sm text-muted-foreground">AI Condition Report:</p>
-                                <ul className="text-xs text-muted-foreground list-disc list-inside">
-                                    <li>Good working condition.</li>
-                                    <li>Minor scratches on the side panel.</li>
-                                    <li>Cooling efficiency at 85%.</li>
-                                </ul>
-                            </div>
+                        <h4 className="font-bold text-lg mb-2 text-white flex items-center gap-2"><Package size={20}/>Item/Service Details (विवरण)</h4>
+                        <div className="bg-black/10 p-3 rounded-lg space-y-1">
+                             <p className="text-sm text-muted-foreground">Object:</p>
+                             <p className="font-semibold text-white">Used Voltas 1.5 Ton AC</p>
+                             <p className="text-sm text-muted-foreground pt-2">AI Condition Report:</p>
+                             <p className="font-semibold text-white">90% Working (AI Verified Images Attached)</p>
                         </div>
                     </div>
 
                     <Separator />
 
-                     {/* Terms */}
+                     {/* 3. Payment Terms */}
                     <div>
-                        <h4 className="font-bold text-lg mb-2 text-white">Terms of Agreement</h4>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                            <p className="text-muted-foreground">Final Price:</p>
-                            <p className="font-bold text-white text-right">₹ 12,500.00</p>
-                            <p className="text-muted-foreground">Payment Status:</p>
-                            <p className="font-bold text-green-400 text-right">PAID & HELD IN ESCROW</p>
-                            <p className="text-muted-foreground">Refund Expiry (Waiting Time):</p>
-                            <p className="font-bold text-white text-right">72 Hours from delivery</p>
+                        <h4 className="font-bold text-lg mb-2 text-white flex items-center gap-2"><IndianRupee size={20}/>Payment Terms (भुगतान शर्तें)</h4>
+                        <div className="bg-black/10 p-3 rounded-lg space-y-3">
+                            <div className="flex justify-between items-center">
+                                <p className="text-sm text-muted-foreground">Final Price:</p>
+                                <p className="font-bold text-lg text-accent">₹ 12,500.00</p>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-sm text-muted-foreground">Refund Policy:</p>
+                                <p className="text-sm text-white">अगर सामान/रूम 24 घंटे के Waiting Time के अंदर नहीं मिला, तो बायर को Instant Refund मिलेगा।</p>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-sm text-muted-foreground">Security Logic:</p>
+                                <p className="text-sm text-white"> पैसा तब तक सेलर को नहीं मिलेगा जब तक बायर ऐप में 'Done' बटन न दबा दे।</p>
+                            </div>
                         </div>
                     </div>
 
-                </CardContent>
-                <CardFooter className="bg-black/20 p-4 flex justify-between items-end">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <ShieldCheck className="text-green-400 h-6 w-6"/>
-                            <h5 className="text-lg font-bold text-white">GrihSeva AI Verified</h5>
-                        </div>
-                        <p className="text-xs text-muted-foreground">This document is digitally signed and verified by AI.</p>
-                        <p className="text-xs text-muted-foreground">Date: October 26, 2024</p>
+                     <Separator />
+
+                     {/* 4. Commission Clause */}
+                    <div>
+                         <h4 className="font-bold text-lg mb-2 text-white flex items-center gap-2"><Info size={20}/>Commission Clause</h4>
+                         <p className="text-sm text-muted-foreground bg-black/10 p-3 rounded-lg">
+                            इस डील का 0.05% हिस्सा रेफरल पार्टनर को क्रेडिट किया गया है।
+                         </p>
                     </div>
-                    <QrCodePlaceholder />
+
+                </CardContent>
+                <CardFooter className="bg-black/20 p-4">
+                     <p className="text-xs text-center text-muted-foreground w-full">Digitally Signed via GrihSeva AI Security Vault</p>
                 </CardFooter>
             </Card>
 
