@@ -1,4 +1,5 @@
-import { Card, CardContent } from './ui/card'
+import Link from 'next/link';
+import { Card, CardContent } from './ui/card';
 
 export function UserStats() {
     return (
@@ -8,10 +9,10 @@ export function UserStats() {
                     <p className="text-xs text-muted-foreground font-bold">SAVINGS</p>
                     <p className="text-xl font-bold text-foreground">₹1,240</p>
                 </div>
-                <div className="text-center">
+                <Link href="/chat/123" className="text-center">
                     <p className="text-xs text-muted-foreground font-bold">ACTIVE TASKS</p>
                     <p className="text-xl font-bold text-foreground">3</p>
-                </div>
+                </Link>
                 <div className="text-center">
                     <p className="text-xs text-muted-foreground font-bold">SMART SCORE</p>
                     <p className="text-xl font-bold text-accent">92%</p>
