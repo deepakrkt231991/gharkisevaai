@@ -3,14 +3,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Book, History, User, Bot } from 'lucide-react';
+import { Home, Book, User, Bot, Scale } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 
 const navItems = [
   { href: '/', label: 'HOME', icon: Home },
-  { href: '/find-a-worker', label: 'BOOK', icon: Book },
-  { href: '/dashboard/earnings', label: 'HISTORY', icon: History },
+  { href: '/find-a-worker', label: 'BROWSE', icon: Book },
+  { href: '/legal-vault', label: 'LEGAL', icon: Scale },
   { href: '/profile', label: 'PROFILE', icon: User },
 ];
 
@@ -32,7 +32,7 @@ export function BottomNavBar() {
         {/* Nav bar */}
         <div className="absolute bottom-0 w-full grid h-20 grid-cols-4 items-center justify-around border-t border-border bg-card/80 backdrop-blur-sm">
           {navItems.map((item, index) => {
-            const isActive = pathname === item.href;
+            const isActive = pathname.startsWith(item.href) && (item.href !== '/' || pathname === '/');
             // Add margin to items to the left and right of the center
             const marginClass = index === 1 ? 'mr-16' : index === 2 ? 'ml-16' : '';
             
