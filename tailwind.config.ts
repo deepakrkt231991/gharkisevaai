@@ -17,7 +17,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['PT Sans', 'sans-serif'],
+        body: ['Manrope', 'sans-serif'],
         headline: ['Alegreya', 'serif'],
         code: ['monospace'],
       },
