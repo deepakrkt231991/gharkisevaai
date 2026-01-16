@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle } from 'lucide-react';
+import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle, FileLock } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 
@@ -100,6 +100,7 @@ export function ProfileHub() {
                         <ProfileMenuItem icon={UserIcon} label="Edit Profile" href="#" />
                         <ProfileMenuItem icon={Settings} label="App Settings" href="#" />
                         <ProfileMenuItem icon={Shield} label="Privacy & Security" href="/privacy" />
+                        <ProfileMenuItem icon={FileLock} label="Legal Vault" href="/legal-document" />
                         <ProfileMenuItem icon={HelpCircle} label="Help & Support" href="#" />
                     </CardContent>
                 </Card>
