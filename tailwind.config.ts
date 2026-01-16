@@ -18,7 +18,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Manrope', 'sans-serif'],
-        headline: ['Alegreya', 'serif'],
+        headline: ['Manrope', 'sans-serif'], // Changed to Manrope
         code: ['monospace'],
       },
       colors: {
@@ -74,9 +74,10 @@ export default {
         },
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: '1rem',
+        md: 'calc(1rem - 2px)',
+        sm: 'calc(1rem - 4px)',
+        xl: '1.5rem',
       },
       keyframes: {
         'accordion-down': {
