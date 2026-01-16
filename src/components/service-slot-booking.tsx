@@ -177,7 +177,7 @@ export function ServiceSlotBooking() {
                                 Taxes (GST 18%)
                                 <Info className="h-3 w-3" />
                             </p>
-                            <p className="text-white font-medium">₹0.00 <span className="text-xs text-muted-foreground">INCLUDED</span></p>
+                            <p className="text-white font-medium">₹0.00 <span className="text-xs text-accent">INCLUDED</span></p>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-xs">
@@ -188,7 +188,7 @@ export function ServiceSlotBooking() {
                     <div className="border-t border-border my-2"></div>
                      <div className="flex justify-between items-center font-bold">
                         <p className="text-white text-lg">Total Amount</p>
-                        <p className="text-accent text-xl">₹598.00</p>
+                        <p className="text-white text-xl">₹598.00</p>
                     </div>
                 </CardContent>
             </Card>
