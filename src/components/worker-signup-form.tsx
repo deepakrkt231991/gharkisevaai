@@ -220,13 +220,13 @@ export function WorkerSignupForm() {
                     </div>
                     <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Full Name</Label>
-                        <Input name="name" value={name} onChange={(e) => setName(e.target.value)} className="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-input bg-input h-14 placeholder:text-[#9ab9bc]/50 p-4 text-base" placeholder="As per Aadhar Card" />
+                        <Input name="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="As per Aadhar Card" />
                     </div>
                     <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Phone Number</Label>
                         <div className="flex gap-2">
-                            <div className="flex items-center justify-center bg-input border border-border rounded-lg px-3 text-sm text-[#9ab9bc]">+91</div>
-                            <Input name="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="form-input flex-1 rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-input bg-input h-14 placeholder:text-[#9ab9bc]/50 p-4 text-base" placeholder="00000 00000" type="tel" />
+                            <div className="flex items-center justify-center bg-input border border-border rounded-lg px-3 text-sm text-[#9ab9bc] h-14">+91</div>
+                            <Input name="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="flex-1" placeholder="00000 00000" type="tel" />
                         </div>
                     </div>
                 </div>
@@ -253,7 +253,7 @@ export function WorkerSignupForm() {
                             <div className="absolute -top-1 -right-1"><span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span></span></div>
                         </label>
                     </div>
-                    <Button onClick={handleVerification} disabled={isVerifying || !idCardUri || !selfieUri} type="button" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                    <Button onClick={handleVerification} disabled={isVerifying || !idCardUri || !selfieUri} type="button" className="w-full h-14 bg-accent text-accent-foreground hover:bg-accent/90">
                         {isVerifying ? <Loader2 className="animate-spin mr-2" /> : <Bot className="mr-2" />}
                         Verify with AI
                     </Button>
@@ -278,10 +278,10 @@ export function WorkerSignupForm() {
                      <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Primary Skill</Label>
                         <Select name="skills" onValueChange={setSkills}>
-                            <SelectTrigger className="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-input bg-input h-14 placeholder:text-[#9ab9bc]/50 p-4 text-base">
+                            <SelectTrigger>
                                 <SelectValue placeholder="Select your main skill" />
                             </SelectTrigger>
-                            <SelectContent className='dark'>
+                            <SelectContent>
                                 <SelectItem value="plumber">Plumber</SelectItem>
                                 <SelectItem value="electrician">Electrician</SelectItem>
                                 <SelectItem value="carpenter">Carpenter</SelectItem>
@@ -294,19 +294,19 @@ export function WorkerSignupForm() {
                     </div>
                      <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Emergency Contact</Label>
-                        <Input name="emergencyContact" value={emergencyContact} onChange={(e) => setEmergencyContact(e.target.value)} className="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-input bg-input h-14 placeholder:text-[#9ab9bc]/50 p-4 text-base" placeholder="A family member's number" type="tel" />
+                        <Input name="emergencyContact" value={emergencyContact} onChange={(e) => setEmergencyContact(e.target.value)} placeholder="A family member's number" type="tel" />
                     </div>
                     <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Bank Account Holder Name</Label>
-                        <Input name="accountHolderName" className="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-input bg-input h-14 placeholder:text-[#9ab9bc]/50 p-4 text-base" placeholder="Name as per bank records" />
+                        <Input name="accountHolderName" placeholder="Name as per bank records" />
                     </div>
                      <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Bank Account Number</Label>
-                        <Input name="accountNumber" className="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-input bg-input h-14 placeholder:text-[#9ab9bc]/50 p-4 text-base" />
+                        <Input name="accountNumber" />
                     </div>
                      <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">IFSC Code</Label>
-                        <Input name="ifscCode" className="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-input bg-input h-14 placeholder:text-[#9ab9bc]/50 p-4 text-base" />
+                        <Input name="ifscCode" />
                     </div>
                 </div>
                 {state.message && !state.success && (
@@ -314,19 +314,23 @@ export function WorkerSignupForm() {
                 )}
                 </>
             )}
+            <input type="hidden" name="name" value={name} />
+            <input type="hidden" name="phone" value={phone} />
         </form>
       </div>
 
       {/* Floating Voice Assistant */}
-      <div className="fixed bottom-24 right-6 z-[60] flex flex-col items-center gap-2">
-        <div className="bg-card border border-border px-3 py-1.5 rounded-full shadow-2xl mb-1">
-          <p className="text-[10px] text-accent font-bold tracking-widest whitespace-nowrap">बोलकर फॉर्म भरें</p>
+       {currentStep === 1 && (
+         <div className="fixed bottom-24 right-6 z-[60] flex flex-col items-center gap-2">
+            <div className="bg-card border border-border px-3 py-1.5 rounded-full shadow-2xl mb-1">
+            <p className="text-[10px] text-accent font-bold tracking-widest whitespace-nowrap">बोलकर फॉर्म भरें</p>
+            </div>
+            <Button onClick={handleVoiceInput} size="icon" className="size-16 rounded-full bg-primary border-4 border-background shadow-2xl flex items-center justify-center text-white active:scale-90 transition-transform relative">
+            <Mic className="text-3xl" />
+            {isListening && <div className="absolute inset-0 rounded-full border-2 border-primary animate-ping opacity-75"></div>}
+            </Button>
         </div>
-        <Button onClick={handleVoiceInput} size="icon" className="size-16 rounded-full bg-primary border-4 border-background shadow-2xl flex items-center justify-center text-white active:scale-90 transition-transform relative">
-          <Mic className="text-3xl" />
-          {isListening && <div className="absolute inset-0 rounded-full border-2 border-primary animate-ping opacity-75"></div>}
-        </Button>
-      </div>
+       )}
 
        {/* Sticky Bottom Actions */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] p-6 bg-gradient-to-t from-background via-background to-transparent pt-10">

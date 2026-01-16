@@ -47,8 +47,8 @@ body {
     --accent-foreground: 81 100% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 184 21% 28%; /* #395456 */
-    --input: 184 21% 28%;
+    --border: 185 11% 22%; /* #313a3b */
+    --input: 185 16% 13%;
     --ring: 81 100% 61%; /* Accent color for rings */
   }
 }
