@@ -1,9 +1,10 @@
 
 "use client";
 
-import { useState, useRef, ChangeEvent } from 'react';
+import { useState, useRef, ChangeEvent, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
+import Link from 'next/link';
 import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package, ArrowLeft, History, CheckCircle, Download, UserCheck, ScanSearch } from 'lucide-react';
 
 import { analyzeDefect } from '@/app/analyze/actions';
@@ -14,15 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import { useActionState } from 'react';
-
-type AnalysisData = {
-  defect: string;
-  estimatedCost: string;
-  diySteps: string[];
-  requiredTools: string[];
-  requiredParts: string[];
-};
+import type { AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
 
 type Media = {
   dataUrl: string;
@@ -32,7 +25,7 @@ type Media = {
 const initialState: {
   success: boolean;
   message: string;
-  data: AnalysisData | null;
+  data: AnalyzeDefectOutput | null;
 } = { success: false, message: '', data: null };
 
 
@@ -84,7 +77,8 @@ export function DefectAnalyzer() {
       fileInputRef.current.value = '';
     }
     // A bit of a hack to reset the form state since useActionState doesn't have a built-in reset
-    (formAction as any)();
+    const emptyFormData = new FormData();
+    formAction(emptyFormData);
   };
 
   const AnalysisResult = () => {
@@ -131,7 +125,7 @@ export function DefectAnalyzer() {
                            {result.requiredParts.map((part, index) => (
                                <li key={index} className="flex items-center gap-2 text-sm text-white">
                                    <CheckCircle size={16} className="text-accent"/>
-                                   <span>{part}</span>
+                                   <span className="truncate">{part}</span>
                                </li>
                            ))}
                        </ul>
@@ -143,8 +137,10 @@ export function DefectAnalyzer() {
               <Button variant="outline" className="h-12 bg-primary/10 border-primary/50 text-primary hover:bg-primary/20 hover:text-primary">
                   <Package className="mr-2"/> Buy Parts
               </Button>
-              <Button className="h-12 bg-primary text-white">
-                  <UserCheck className="mr-2"/> Book Pro
+               <Button asChild className="h-12 bg-primary text-white">
+                 <Link href="/book-service">
+                    <UserCheck className="mr-2"/> Book Pro
+                 </Link>
               </Button>
           </div>
 
@@ -155,7 +151,7 @@ export function DefectAnalyzer() {
               <Accordion type="single" collapsible className="w-full glass-card rounded-xl px-4">
                 {result.diySteps.map((step, index) => (
                   <AccordionItem key={index} value={`item-${index}`} className={index === result.diySteps.length -1 ? 'border-b-0' : ''}>
-                    <AccordionTrigger className="text-white hover:no-underline">{index+1}. {step.split(':')[0]}</AccordionTrigger>
+                    <AccordionTrigger className="text-white hover:no-underline text-left">{index+1}. {step.split(':')[0]}</AccordionTrigger>
                     <AccordionContent className="text-muted-foreground">
                       {step.split(': ')[1] || 'No further details.'}
                     </AccordionContent>
