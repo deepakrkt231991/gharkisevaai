@@ -1,24 +1,22 @@
-
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
-import { AiHelpHub } from '@/components/ai-help-hub';
+import { HomeHeader } from '@/components/home-header'; // Re-using for a consistent header feel
+import { AiAssistanceHub } from '@/components/ai-help-hub';
+import { BottomNavBar } from '@/components/bottom-nav-bar';
 
 export default function AiHelpPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-secondary/50">
-      <Header />
-      <main className="flex-1 py-12 md:py-16">
-        <div className="container">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">AI-Powered Assistance Hub</h1>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Unlock the power of AI for your home and business. Choose a task below and let our AI agents assist you.
-            </p>
-          </div>
-          <AiHelpHub />
-        </div>
-      </main>
-      <Footer />
+    <div className="dark bg-background text-foreground">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
+        {/* While the design shows a specific header, we can reuse and adapt for consistency */}
+        <HomeHeader /> 
+        <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-32">
+           <div className="text-left">
+                <p className="text-xs text-primary font-bold">GRIHSEVA AI</p>
+                <h1 className="font-headline text-2xl font-bold tracking-tight">AI Assistance Hub</h1>
+            </div>
+          <AiAssistanceHub />
+        </main>
+        <BottomNavBar />
+      </div>
     </div>
   );
 }
