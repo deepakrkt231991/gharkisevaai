@@ -67,6 +67,28 @@
       "imageHint": "telescopic ladder",
       "name": "Telescopic Ladder 12ft",
       "rental_price_per_day": 350
+    },
+    {
+      "id": "property-1",
+      "description": "A luxury 4 BHK suite in Mumbai.",
+      "imageUrl": "https://images.unsplash.com/photo-1638454795595-0a0abf68614d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxsdXh1cnklMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwwfHx8fDE3Njg1ODIzNDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "luxury apartment interior",
+      "name": "4 BHK Luxury Suite",
+      "specialty": "Worli, Mumbai",
+      "rating": 2,
+      "reviews": 3200,
+      "startingPrice": 4.2
+    },
+    {
+      "id": "property-2",
+      "description": "A modern 2 BHK in Bangalore.",
+      "imageUrl": "https://images.unsplash.com/photo-1635006459494-c9b9665a666e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb2Rlcm4lMjBob3VzZSUyMGV4dGVyaW9yfGVufDB8fHx8MTc2ODU4MjM0NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern house exterior",
+      "name": "2 BHK Modern",
+      "specialty": "Indiranagar, Bangalore",
+      "rating": 1,
+      "reviews": 1450,
+      "startingPrice": 1.85
     }
   ]
 }

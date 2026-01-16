@@ -283,6 +283,24 @@
         "createdAt": { "type": "string", "format": "date-time", "description": "Firestore Timestamp of when the agreement was created." }
       },
       "required": ["agreementId", "dealId", "buyerId", "sellerId", "itemName", "finalPrice", "status", "createdAt"]
+    },
+    "Property": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Property",
+      "type": "object",
+      "description": "Represents a property listing in the marketplace.",
+      "properties": {
+        "propertyId": { "type": "string", "description": "Unique ID for the property." },
+        "title": { "type": "string", "description": "Title of the listing, e.g., '4 BHK Luxury Suite'." },
+        "location": { "type": "string", "description": "City and area, e.g., 'Worli, Mumbai'." },
+        "price": { "type": "number", "description": "Price in a numerical format (e.g., 4.20 for crores)." },
+        "priceUnit": { "type": "string", "description": "Unit for the price, e.g., 'Cr'." },
+        "sqft": { "type": "number" },
+        "parking": { "type": "number" },
+        "imageUrl": { "type": "string" },
+        "isAiVerified": { "type": "boolean", "description": "Whether the property has been verified by AI." }
+      },
+      "required": ["propertyId", "title", "location", "price", "priceUnit", "sqft", "parking"]
     }
   },
   "auth": {
@@ -374,7 +392,17 @@
           "schema": { "$ref": "#/backend/entities/LegalAgreement" },
           "description": "Stores all generated legal agreements for deals."
         }
+      },
+      {
+        "path": "/properties/{propertyId}",
+        "definition": {
+          "entityName": "Property",
+          "schema": { "$ref": "#/backend/entities/Property" },
+          "description": "Stores property listings for the marketplace."
+        }
       }
     ]
   }
 }
+
+    

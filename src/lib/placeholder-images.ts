@@ -12,6 +12,14 @@ export type ImagePlaceholder = {
   reviews?: number;
   startingPrice?: number;
   rental_price_per_day?: number;
+  location?: string;
+  price?: number;
+  priceUnit?: string;
+  sqft?: number;
+  parking?: number;
+  isAiVerified?: boolean;
 };
 
 export const PlaceHolderImages: ImagePlaceholder[] = data.placeholderImages;
+
+    
