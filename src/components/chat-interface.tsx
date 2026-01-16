@@ -20,10 +20,37 @@ const messages = [
     { id: 3, sender: 'other', text: 'Perfect. I will deliver it by tomorrow evening.' },
 ];
 
+const Confetti = () => (
+    <div className="absolute inset-0 w-full h-full pointer-events-none z-[100] overflow-hidden">
+        {Array.from({ length: 150 }).map((_, index) => (
+            <div
+                key={index}
+                className="absolute w-2 h-4"
+                style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${-10 - Math.random() * 20}%`,
+                    backgroundColor: ['#AFFF37', '#006970', '#FFFFFF'][Math.floor(Math.random() * 3)],
+                    transform: `rotate(${Math.random() * 360}deg)`,
+                    animation: `fall ${2 + Math.random() * 2}s linear ${Math.random() * 2}s forwards`,
+                }}
+            />
+        ))}
+        <style>{`
+            @keyframes fall {
+                to {
+                    transform: translateY(100vh) rotate(720deg);
+                    opacity: 0;
+                }
+            }
+        `}</style>
+    </div>
+);
+
 
 export function ChatInterface({ chatId }: { chatId: string }) {
     const { toast } = useToast();
     const [timeLeft, setTimeLeft] = useState(24 * 60 * 60 - 300); // 23:55:00
+    const [showConfetti, setShowConfetti] = useState(false);
 
     useEffect(() => {
         if (timeLeft <= 0) return;
@@ -59,14 +86,17 @@ export function ChatInterface({ chatId }: { chatId: string }) {
 
     const handleConfirmDelivery = () => {
          toast({
-            title: "Confirming Delivery...",
-            description: "Releasing payment from escrow and triggering referral split.",
-            className: "bg-primary text-white"
+            title: "Deal Successful!",
+            description: "Your 0.05% referral commission has been credited.",
+            className: "bg-green-600 text-white border-green-600"
         });
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 4000); 
     }
 
     return (
         <div className="flex flex-col h-full bg-card">
+            {showConfetti && <Confetti />}
             {/* Header with Timer */}
             <header className="sticky top-0 z-10 flex flex-col gap-2 p-4 bg-background/80 backdrop-blur-md border-b border-border">
                 <div className="flex items-center justify-between">
@@ -99,6 +129,10 @@ export function ChatInterface({ chatId }: { chatId: string }) {
                         </Button>
                     )}
                  </div>
+                 <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-1">
+                    <Shield size={12} className="text-green-400" />
+                    <span>AI Guarded: Your payments and chats are 100% secure.</span>
+                </div>
             </header>
 
             {/* Chat Body */}
