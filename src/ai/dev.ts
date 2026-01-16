@@ -1,3 +1,4 @@
+'use server';
 
 import { config } from 'dotenv';
 config();
@@ -12,4 +13,5 @@ import '@/ai/flows/content-creator-agent.ts';
 import '@/ai/flows/sale-poster-agent.ts';
 import '@/ai/flows/home-vastu-agent.ts';
 import '@/ai/flows/video-creator-agent.ts';
+import '@/ai/flows/interior-render-agent.ts';
     

@@ -3,26 +3,37 @@
 
 import { useState, useRef, ChangeEvent, useActionState } from 'react';
 import Image from 'next/image';
-import { ArrowLeft, Share, Heart, Sparkles, Compass, Paintbrush, Lightbulb, CheckCircle, Loader2, UploadCloud, ScanSearch } from 'lucide-react';
+import { ArrowLeft, Share, Heart, Sparkles, Compass, Paintbrush, Lightbulb, CheckCircle, Loader2, UploadCloud, ScanSearch, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from './ui/badge';
-import { analyzeInterior } from '@/app/interior-analysis/actions';
+import { analyzeInterior, generate3dRender } from '@/app/interior-analysis/actions';
 import type { InteriorDesignOutput } from '@/ai/flows/interior-design-agent';
+import type { InteriorRenderOutput } from '@/ai/flows/interior-render-agent';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { AlertCircle } from 'lucide-react';
 
-const initialState: {
+const initialAnalysisState: {
   success: boolean;
   message: string;
   data: InteriorDesignOutput | null;
 } = { success: false, message: '', data: null };
 
+const initialRenderState: {
+  success: boolean;
+  message: string;
+  renderData: InteriorRenderOutput | null;
+} = { success: false, message: '', renderData: null };
+
 
 export function InteriorAnalyzer() {
-  const [state, formAction, isPending] = useActionState(analyzeInterior, initialState);
+  const [analysisState, analysisAction, isAnalysisPending] = useActionState(analyzeInterior, initialAnalysisState);
+  const [renderState, renderAction, isRenderPending] = useActionState(generate3dRender, initialRenderState);
+  
   const [image, setImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const analysisFormRef = useRef<HTMLFormElement>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,22 +43,31 @@ export function InteriorAnalyzer() {
         const dataUrl = reader.result as string;
         setImage(dataUrl);
 
-        // Programmatically submit the form after setting the image
-        if (formRef.current) {
-          (formRef.current.elements.namedItem('roomPhotoUri') as HTMLInputElement).value = dataUrl;
-          formRef.current.requestSubmit();
+        if (analysisFormRef.current) {
+          // This is a workaround to reset the action states. A more robust solution might use a key on the component.
+          analysisFormRef.current.reset();
+          const emptyRenderForm = new FormData();
+          renderAction(emptyRenderForm);
+
+          (analysisFormRef.current.elements.namedItem('roomPhotoUri') as HTMLInputElement).value = dataUrl;
+          analysisFormRef.current.requestSubmit();
         }
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const handleStartOver = () => {
+      // A simple way to reset everything is to reload the page.
+      window.location.reload();
+  };
+
   const AnalysisResults = () => {
-    if (!state.data) return null;
+    if (!analysisState.data) return null;
   
-    const vastuInsights = state.data.suggestions.filter(s => s.category === 'Vastu');
-    const aestheticUpgrades = state.data.suggestions.filter(s => s.category === 'Aesthetic');
-    const lightingInsights = state.data.suggestions.filter(s => s.category === 'Lighting');
+    const vastuInsights = analysisState.data.suggestions.filter(s => s.category === 'Vastu');
+    const aestheticUpgrades = analysisState.data.suggestions.filter(s => s.category === 'Aesthetic');
+    const lightingInsights = analysisState.data.suggestions.filter(s => s.category === 'Lighting');
 
     const InsightCard = ({ title, description, impact }: { title: string, description: string, impact: string }) => (
         <Card className="glass-card">
@@ -55,6 +75,7 @@ export function InteriorAnalyzer() {
                 <div className="flex items-center gap-2">
                     {title.toLowerCase().includes('direction') && <Compass className="text-primary" />}
                     {title.toLowerCase().includes('contrast') && <Paintbrush className="text-primary" />}
+                     {title.toLowerCase().includes('lighting') && <Lightbulb className="text-primary" />}
                     <h4 className="font-bold text-white">{title}</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">{description}</p>
@@ -72,15 +93,15 @@ export function InteriorAnalyzer() {
             <div className="flex justify-between items-center">
                 <div>
                     <h2 className="text-2xl font-bold font-headline">AI Analysis</h2>
-                    <p className="text-sm text-muted-foreground">{state.data.suggestions.length} Hotspots detected in your space</p>
+                    <p className="text-sm text-muted-foreground">{analysisState.data.suggestions.length} Hotspots detected</p>
                 </div>
                 <Badge className="bg-primary/20 text-primary border-primary/40">PREMIUM</Badge>
             </div>
 
              <Tabs defaultValue="vastu" className="w-full">
                 <TabsList className="grid w-full grid-cols-3 bg-card">
-                    <TabsTrigger value="vastu">Vastu Insights</TabsTrigger>
-                    <TabsTrigger value="aesthetic">Aesthetic Upgrades</TabsTrigger>
+                    <TabsTrigger value="vastu">Vastu</TabsTrigger>
+                    <TabsTrigger value="aesthetic">Aesthetics</TabsTrigger>
                     <TabsTrigger value="lighting">Lighting</TabsTrigger>
                 </TabsList>
                 <TabsContent value="vastu" className="space-y-4 pt-4">
@@ -94,13 +115,26 @@ export function InteriorAnalyzer() {
                 </TabsContent>
             </Tabs>
 
-            <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md p-4 z-20">
-                <Button size="lg" className="w-full h-14 bg-primary text-lg">
-                    <Sparkles className="mr-2"/>
-                    Generate 3D Render
-                    <Badge className="ml-2 bg-accent text-accent-foreground">AI</Badge>
-                </Button>
-            </div>
+            <form action={renderAction}>
+                <input type="hidden" name="roomPhotoUri" value={image!} />
+                <input type="hidden" name="suggestions" value={JSON.stringify(analysisState.data?.suggestions)} />
+                <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md p-4 z-20">
+                    <Button type="submit" size="lg" className="w-full h-14 bg-primary text-lg" disabled={isRenderPending}>
+                        {isRenderPending ? (
+                            <>
+                                <Loader2 className="mr-2 animate-spin"/>
+                                Generating...
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="mr-2"/>
+                                Generate 3D Render
+                            </>
+                        )}
+                        <Badge className="ml-2 bg-accent text-accent-foreground">AI</Badge>
+                    </Button>
+                </div>
+            </form>
         </div>
     )
   }
@@ -119,7 +153,7 @@ export function InteriorAnalyzer() {
       </header>
 
       <main className="flex-1">
-        <form ref={formRef} action={formAction} className="hidden">
+        <form ref={analysisFormRef} action={analysisAction} className="hidden">
             <input
                 ref={fileInputRef}
                 type="file"
@@ -131,8 +165,11 @@ export function InteriorAnalyzer() {
              <input type="hidden" name="roomPhotoUri" />
         </form>
         <div className="relative w-full aspect-[9/10] bg-muted">
-            {image && <Image src={image} alt="Room for analysis" fill className="object-cover" />}
-            {!image && (
+            {renderState.success && renderState.renderData?.renderDataUri ? (
+                <Image src={renderState.renderData.renderDataUri} alt="3D Render of improved room" fill className="object-cover" />
+            ) : image ? (
+                <Image src={image} alt="Room for analysis" fill className="object-cover" />
+            ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8 text-center">
                     <div className="p-4 bg-primary/10 rounded-full">
                         <ScanSearch className="w-16 h-16 text-primary" />
@@ -145,19 +182,45 @@ export function InteriorAnalyzer() {
                     </Button>
                 </div>
             )}
-             {isPending && (
+             {(isAnalysisPending || isRenderPending) && (
                 <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-white">
                     <div className="relative">
                         <Loader2 className="h-10 w-10 animate-spin text-accent" />
                         <div className="absolute inset-0 rounded-full border-2 border-accent/50 animate-ping"></div>
                     </div>
-                    <p className="font-bold tracking-widest text-accent">ANALYZING SPACE...</p>
-                    <p className="text-xs text-muted-foreground">AI is identifying hotspots...</p>
+                    <p className="font-bold tracking-widest text-accent">
+                        {isRenderPending ? 'GENERATING 3D RENDER...' : 'ANALYZING SPACE...'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        {isRenderPending ? 'AI is re-imagining your room...' : 'AI is identifying hotspots...'}
+                    </p>
                 </div>
             )}
         </div>
         
-        {state.success && <AnalysisResults />}
+        {analysisState.success && !renderState.success && <AnalysisResults />}
+        
+        {renderState.message && !renderState.success && (
+            <div className="p-4">
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Render Failed</AlertTitle>
+                    <AlertDescription>{renderState.message}</AlertDescription>
+                </Alert>
+            </div>
+        )}
+
+        {renderState.success && (
+            <div className="bg-background rounded-t-3xl p-4 -mt-8 relative z-10 space-y-4 pb-24">
+                <div className="w-12 h-1.5 bg-border rounded-full mx-auto" />
+                 <h2 className="text-2xl font-bold font-headline text-center">Your 3D Render is Ready!</h2>
+                 <p className="text-muted-foreground text-center">The AI has re-imagined your space based on the suggestions.</p>
+                 <Button onClick={handleStartOver} variant="outline" className="w-full h-12">
+                    <RotateCw className="mr-2" />
+                    Analyze Another Room
+                 </Button>
+            </div>
+        )}
       </main>
     </>
   );
