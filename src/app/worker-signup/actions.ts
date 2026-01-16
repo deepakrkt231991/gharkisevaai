@@ -12,8 +12,6 @@ import { headers } from 'next/headers';
 const WorkerProfileSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   phone: z.string().min(10, { message: "Please enter a valid 10-digit phone number." }),
-  address: z.string().min(10, { message: "Please enter a valid address." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
   skills: z.string().min(2, { message: "Please select a skill." }),
   emergencyContact: z.string().min(10, { message: "Please enter a valid 10-digit emergency contact number." }),
   accountHolderName: z.string().min(2, { message: "Please enter the account holder's name." }),
@@ -35,8 +33,6 @@ export async function createWorkerProfile(
   const validatedFields = WorkerProfileSchema.safeParse({
     name: formData.get('name'),
     phone: formData.get('phone'),
-    address: formData.get('address'),
-    email: formData.get('email'),
     skills: formData.get('skills'),
     emergencyContact: formData.get('emergencyContact'),
     accountHolderName: formData.get('accountHolderName'),

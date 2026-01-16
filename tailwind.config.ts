@@ -18,8 +18,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Manrope', 'sans-serif'],
-        headline: ['Manrope', 'sans-serif'], // Changed to Manrope
-        code: ['monospace'],
+        headline: ['Manrope', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
