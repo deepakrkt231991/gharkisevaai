@@ -31,7 +31,7 @@ body {
   }
  
   .dark {
-    --background: 195 27% 10%; /* #0f2223 */
+    --background: 195 38% 10%; /* #0f2223 */
     --foreground: 0 0% 98%;
     --card: 185 16% 13%; /* #1b2728 */
     --card-foreground: 0 0% 98%;
@@ -48,7 +48,7 @@ body {
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 184 21% 28%; /* #395456 */
-    --input: 184 21% 15%; /* Slightly darker than card */
+    --input: 184 21% 28%;
     --ring: 81 100% 61%; /* Accent color for rings */
   }
 }

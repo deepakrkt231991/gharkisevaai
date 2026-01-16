@@ -1,15 +1,23 @@
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
-import { Hero } from '@/components/hero';
+import { HomeHeader } from '@/components/home-header';
+import { BottomNavBar } from '@/components/bottom-nav-bar';
+import { SeasonCheckCard } from '@/components/season-check-card';
+import { TrendingNow } from '@/components/trending-now';
+import { SmartHub } from '@/components/smart-hub';
+import { UserStats } from '@/components/user-stats';
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1">
-        <Hero />
-      </main>
-      <Footer />
+    <div className="dark bg-background text-foreground">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
+        <HomeHeader />
+        <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-32">
+          <SeasonCheckCard />
+          <TrendingNow />
+          <SmartHub />
+          <UserStats />
+        </main>
+        <BottomNavBar />
+      </div>
     </div>
   );
 }

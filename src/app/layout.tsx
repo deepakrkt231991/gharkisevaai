@@ -1,10 +1,8 @@
 import type {Metadata} from 'next';
-import Link from 'next/link';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase/client-provider';
-import { Button } from '@/components/ui/button';
-import { Gift } from 'lucide-react';
+
 
 export const metadata: Metadata = {
   title: 'GrihSeva AI',
@@ -26,12 +24,6 @@ export default function RootLayout({
       <body className="font-body antialiased" suppressHydrationWarning>
         <FirebaseClientProvider>
           {children}
-          <Button asChild className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg bg-accent text-accent-foreground hover:bg-accent/90 z-50 animate-pulse">
-            <Link href="/promote">
-              <Gift className="h-8 w-8" />
-              <span className="sr-only">Refer and Earn</span>
-            </Link>
-          </Button>
           <Toaster />
         </FirebaseClientProvider>
       </body>
