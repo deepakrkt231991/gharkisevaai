@@ -85,7 +85,7 @@ export function Header() {
                     <Link href="/find-a-worker" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Users />Find a Worker</Link>
                     <Link href="/rent-tools" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Hammer />Rent a Tool</Link>
                     <Link href="/worker-signup" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Handshake />Become a Worker</Link>
-                    <Link href="/worker-signup" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><UserPlus />Login / Register</Link>
+                    <Link href="/login" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><UserPlus />Login / Register</Link>
                     <Link href="/ai-help" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Bot />AI Help</Link>
                     <Link href="#" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><Languages />Change Language</Link>
                     <Button asChild className="mt-4">

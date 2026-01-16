@@ -34,6 +34,7 @@ export function ProfileHub() {
     const router = useRouter();
 
     const handleLogout = async () => {
+        if (!auth) return;
         await auth.signOut();
         // Redirect to home page after logout
         router.push('/');
@@ -75,7 +76,7 @@ export function ProfileHub() {
                     <UserIcon className="h-16 w-16 text-muted-foreground mb-4"/>
                     <h2 className="text-xl font-bold font-headline mb-2">You are not logged in</h2>
                     <p className="text-muted-foreground mb-6">Log in or sign up to manage your profile and bookings.</p>
-                    <Button onClick={() => router.push('/worker-signup')}>Login / Sign Up</Button>
+                    <Button onClick={() => router.push('/login')}>Login / Sign Up</Button>
                 </div>
             </>
         )
