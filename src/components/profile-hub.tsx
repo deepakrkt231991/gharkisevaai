@@ -97,13 +97,13 @@ export function ProfileHub() {
                 
                 <Card className="glass-card">
                     <CardContent className="p-0 divide-y divide-border">
-                        <ProfileMenuItem icon={UserIcon} label="Edit Profile" href="#" />
-                        <ProfileMenuItem icon={Settings} label="App Settings" href="#" />
+                        <ProfileMenuItem icon={UserIcon} label="Edit Profile" href="/profile/edit" />
+                        <ProfileMenuItem icon={Settings} label="App Settings" href="/settings" />
                         <ProfileMenuItem icon={Shield} label="Privacy & Security" href="/privacy" />
                         <ProfileMenuItem icon={FileLock} label="Legal Vault" href="/legal-document" />
-                        <ProfileMenuItem icon={HelpCircle} label="Help & Support" href="#" />
+                        <ProfileMenuItem icon={HelpCircle} label="Help & Support" href="/support" />
                         <ProfileMenuItem icon={Handshake} label="Become a Worker" href="/worker-signup" />
-                        <ProfileMenuItem icon={Languages} label="Change Language" href="#" />
+                        <ProfileMenuItem icon={Languages} label="Change Language" href="/language" />
                     </CardContent>
                 </Card>
 
