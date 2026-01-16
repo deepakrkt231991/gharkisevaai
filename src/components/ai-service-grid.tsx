@@ -38,7 +38,7 @@ const serviceCategories = [
     services: [
       { name: 'Home Painting', icon: Paintbrush, href: '#' },
       { name: 'Deep Cleaning', icon: Sparkles, href: '#' },
-      { name: 'Plumbing', icon: Wrench, href: '#' },
+      { name: 'Plumbing', icon: Wrench, href: '/book-service' },
       { name: 'Electrician', icon: Zap, href: '#' },
     ],
   },
