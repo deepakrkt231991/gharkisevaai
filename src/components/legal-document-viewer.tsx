@@ -4,20 +4,32 @@ import { Card, CardContent, CardHeader, CardDescription, CardFooter } from '@/co
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Download, Shield, User, Package, IndianRupee, Info, LogIn, FileLock } from 'lucide-react';
+import { Download, Shield, User, Package, IndianRupee, Info, LogIn, FileLock, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { useUser } from '@/firebase/provider';
-import { useRouter } from 'next/navigation';
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { doc } from 'firebase/firestore';
+import type { LegalAgreement } from '@/lib/entities';
 
 export function LegalDocumentViewer() {
     const { toast } = useToast();
     const { user, isUserLoading } = useUser();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const firestore = useFirestore();
+    
+    const agreementId = searchParams.get('id');
 
-    const dealId = `GS-2026-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    const date = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+    const agreementRef = useMemoFirebase(() => {
+        if (!firestore || !agreementId) return null;
+        return doc(firestore, 'legal_agreements', agreementId);
+    }, [firestore, agreementId]);
+
+    const { data: deal, isLoading: isDealLoading } = useDoc<LegalAgreement>(agreementRef);
+    
+    const date = deal?.createdAt ? (deal.createdAt as any).toDate().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : '...';
 
     const handleDownload = () => {
         toast({
@@ -27,7 +39,7 @@ export function LegalDocumentViewer() {
         });
     };
 
-    if (isUserLoading) {
+    if (isUserLoading || (user && isDealLoading)) {
         return (
              <div className="space-y-4">
                 <Card className="glass-card overflow-hidden">
@@ -68,6 +80,18 @@ export function LegalDocumentViewer() {
             </Card>
         );
     }
+    
+    if (!deal) {
+         return (
+            <Card className="glass-card text-center p-8">
+                <CardContent className="flex flex-col items-center gap-4">
+                     <FileLock className="w-16 h-16 text-muted-foreground" />
+                    <h3 className="text-xl font-bold font-headline">Agreement Not Found</h3>
+                    <p className="text-muted-foreground">Could not find the requested legal agreement. Please check the ID and try again.</p>
+                </CardContent>
+            </Card>
+        );
+    }
 
 
     return (
@@ -76,10 +100,16 @@ export function LegalDocumentViewer() {
                 <CardHeader className="bg-black/20 p-4">
                     <p className="text-sm font-bold text-primary">GRIHSEVA AI - DIGITAL SECURITY AGREEMENT</p>
                     <div className="flex justify-between items-center">
-                         <p className="text-xs text-muted-foreground font-mono">Deal ID: {dealId}</p>
-                         <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-900/30">
-                            <Shield className="mr-2 h-3 w-3"/>Legally Verified
-                         </Badge>
+                         <p className="text-xs text-muted-foreground font-mono">Deal ID: {deal.dealId}</p>
+                          {deal.status === 'completed' ? (
+                             <Badge variant="outline" className="text-white border-primary/50 bg-primary/30">
+                                <Shield className="mr-2 h-3 w-3"/>Completed & Closed
+                             </Badge>
+                         ) : (
+                             <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-900/30">
+                                <Shield className="mr-2 h-3 w-3"/>Legally Verified (Active)
+                             </Badge>
+                         )}
                     </div>
                      <p className="text-xs text-muted-foreground">{date}</p>
                 </CardHeader>
@@ -93,20 +123,20 @@ export function LegalDocumentViewer() {
                                 <p className="text-xs font-bold uppercase text-muted-foreground w-16">SELLER</p>
                                 <div className="flex items-center gap-2">
                                     <Avatar className="h-8 w-8">
-                                        <AvatarImage src="https://i.pravatar.cc/150?u=seller" />
-                                        <AvatarFallback>S</AvatarFallback>
+                                        <AvatarImage src={`https://i.pravatar.cc/150?u=${deal.sellerId}`} />
+                                        <AvatarFallback>{deal.sellerName?.charAt(0) || 'S'}</AvatarFallback>
                                     </Avatar>
-                                    <span className="font-semibold text-white">Ramesh Patel</span>
+                                    <span className="font-semibold text-white">{deal.sellerName || 'Ramesh Patel'}</span>
                                 </div>
                             </div>
                              <div className="flex items-center gap-3 bg-black/10 p-2 rounded-lg">
                                  <p className="text-xs font-bold uppercase text-muted-foreground w-16">BUYER</p>
                                 <div className="flex items-center gap-2">
                                     <Avatar className="h-8 w-8">
-                                        <AvatarImage src={user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`} />
-                                        <AvatarFallback>{user.displayName?.charAt(0) || 'B'}</AvatarFallback>
+                                        <AvatarImage src={user.photoURL || `https://i.pravatar.cc/150?u=${deal.buyerId}`} />
+                                        <AvatarFallback>{deal.buyerName?.charAt(0) || 'B'}</AvatarFallback>
                                     </Avatar>
-                                    <span className="font-semibold text-white">{user.displayName || 'Priya Singh'}</span>
+                                    <span className="font-semibold text-white">{deal.buyerName || user.displayName}</span>
                                 </div>
                             </div>
                         </div>
@@ -119,9 +149,9 @@ export function LegalDocumentViewer() {
                         <h4 className="font-bold text-lg mb-2 text-white flex items-center gap-2"><Package size={20}/>Item/Service Details (विवरण)</h4>
                         <div className="bg-black/10 p-3 rounded-lg space-y-1">
                              <p className="text-sm text-muted-foreground">Object:</p>
-                             <p className="font-semibold text-white">Used Voltas 1.5 Ton AC</p>
+                             <p className="font-semibold text-white">{deal.itemName}</p>
                              <p className="text-sm text-muted-foreground pt-2">AI Condition Report:</p>
-                             <p className="font-semibold text-white">90% Working (AI Verified Images Attached)</p>
+                             <p className="font-semibold text-white">{deal.itemCondition || "90% Working (AI Verified)"}</p>
                         </div>
                     </div>
 
@@ -133,7 +163,7 @@ export function LegalDocumentViewer() {
                         <div className="bg-black/10 p-3 rounded-lg space-y-3">
                             <div className="flex justify-between items-center">
                                 <p className="text-sm text-muted-foreground">Final Price:</p>
-                                <p className="font-bold text-lg text-accent">₹ 12,500.00</p>
+                                <p className="font-bold text-lg text-accent">₹ {deal.finalPrice.toLocaleString('en-IN')}</p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Refund Policy:</p>

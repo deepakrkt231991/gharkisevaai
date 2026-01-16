@@ -22,7 +22,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
 
 const StatCard = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string }) => (
     <div className="glass-card flex flex-col items-center justify-center p-3 rounded-xl h-24 text-center">
@@ -42,22 +41,6 @@ const AmenityIcon = ({ icon: Icon, label }: { icon: React.ElementType, label: st
 );
 
 export function PropertyDetailPage() {
-    const { toast } = useToast();
-
-    const handleGenerateAgreement = () => {
-        toast({
-            title: "🚀 Generating Agreement...",
-            description: "AI is fetching verified data from buyer and seller to create the legal document.",
-            className: "bg-primary text-white"
-        });
-        setTimeout(() => {
-             toast({
-                title: "✅ Draft Ready!",
-                description: "Agreement draft has been shared in your chat with the owner.",
-                 className: "bg-green-600 text-white border-green-600"
-            });
-        }, 2500);
-    };
 
     return (
         <div className="flex-1">
@@ -109,12 +92,14 @@ export function PropertyDetailPage() {
                     {/* Actions */}
                     <div className="grid grid-cols-2 gap-3">
                         <Button variant="secondary" className="h-14 text-base" asChild>
-                            <Link href="/chat/property-deal-1">
+                            <Link href="/chat/deal-123">
                                 <MessageSquare className="mr-2"/> Chat Owner
                             </Link>
                         </Button>
-                         <Button variant="default" className="h-14 text-base bg-primary">
-                            <Sparkles className="mr-2"/> AI Legal Help
+                         <Button variant="default" className="h-14 text-base bg-primary" asChild>
+                            <Link href="/legal-vault">
+                                <Sparkles className="mr-2"/> AI Legal Help
+                            </Link>
                         </Button>
                     </div>
 
@@ -122,8 +107,10 @@ export function PropertyDetailPage() {
                     <Card className="glass-card p-4 space-y-3 bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
                         <h3 className="font-bold font-headline text-white">AI Legal Assistance</h3>
                         <p className="text-sm text-muted-foreground">Instantly generate legally binding rent agreements or sale deeds specifically optimized for local Hyderabad jurisdiction.</p>
-                        <Button variant="default" onClick={handleGenerateAgreement} className="w-full h-12 bg-white text-black hover:bg-gray-200">
-                           <FileText className="mr-2"/> Generate Agreement
+                        <Button variant="default" asChild className="w-full h-12 bg-white text-black hover:bg-gray-200">
+                           <Link href="/legal-vault">
+                                <FileText className="mr-2"/> Generate Agreement
+                           </Link>
                         </Button>
                     </Card>
                     
