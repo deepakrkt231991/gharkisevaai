@@ -116,6 +116,10 @@ export interface Property {
     propertyId: string; // Unique ID for the property.
     title: string; // Title of the listing, e.g., '4 BHK Luxury Suite'.
     location: string; // City and area, e.g., 'Worli, Mumbai'.
+    geo?: {
+        latitude: number;
+        longitude: number;
+    };
     price: number; // Price in a numerical format (e.g., 4.20 for crores).
     priceUnit: string; // Unit for the price, e.g., 'Cr'.
     sqft: number;

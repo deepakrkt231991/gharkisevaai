@@ -293,6 +293,14 @@
         "propertyId": { "type": "string", "description": "Unique ID for the property." },
         "title": { "type": "string", "description": "Title of the listing, e.g., '4 BHK Luxury Suite'." },
         "location": { "type": "string", "description": "City and area, e.g., 'Worli, Mumbai'." },
+        "geo": {
+          "type": "object",
+          "description": "Geographical coordinates of the property.",
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" }
+          }
+        },
         "price": { "type": "number", "description": "Price in a numerical format (e.g., 4.20 for crores)." },
         "priceUnit": { "type": "string", "description": "Unit for the price, e.g., 'Cr'." },
         "sqft": { "type": "number" },

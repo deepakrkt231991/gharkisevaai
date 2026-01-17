@@ -9,9 +9,29 @@ import { Button } from './ui/button';
 import { ArrowRight, ShoppingBag, Tag, KeyRound, Bot } from 'lucide-react';
 import { PropertyCard } from './property-card';
 import { Skeleton } from './ui/skeleton';
+import { useGeolocation } from '@/hooks/use-geolocation';
+import { useMemo } from 'react';
+
+// Helper function to calculate distance (Haversine formula)
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+};
+
 
 export function ExploreMarketplace() {
     const firestore = useFirestore();
+    const { latitude: userLat, longitude: userLon } = useGeolocation();
+
     const propertiesQuery = useMemoFirebase(() => {
         if (!firestore) return null;
         // In a real app, we'd filter based on Buy/Sell/Rent. For now, fetch all.
@@ -19,6 +39,25 @@ export function ExploreMarketplace() {
     }, [firestore]);
 
     const { data: properties, isLoading } = useCollection<Property>(propertiesQuery);
+
+    const sortedProperties = useMemo(() => {
+        if (!properties) return [];
+        if (userLat === null || userLon === null) return properties;
+
+        return [...properties].sort((a, b) => {
+            const geoA = a.geo;
+            const geoB = b.geo;
+
+            if (geoA?.latitude && geoA?.longitude && geoB?.latitude && geoB?.longitude) {
+                 const distA = calculateDistance(userLat, userLon, geoA.latitude, geoA.longitude);
+                 const distB = calculateDistance(userLat, userLon, geoB.latitude, geoB.longitude);
+                 return distA - distB;
+            }
+            if(geoA) return -1; // properties with geo info first
+            if(geoB) return 1;
+            return 0; // no geo info on both
+        });
+    }, [properties, userLat, userLon]);
 
     return (
         <div className="space-y-6">
@@ -80,11 +119,11 @@ export function ExploreMarketplace() {
                         </>
                     )}
                     
-                    {!isLoading && properties && properties.map(prop => (
+                    {!isLoading && sortedProperties && sortedProperties.map(prop => (
                         <PropertyCard key={prop.id} property={prop} />
                     ))}
 
-                     {!isLoading && (!properties || properties.length === 0) && (
+                     {!isLoading && (!sortedProperties || sortedProperties.length === 0) && (
                         <div className="text-center py-8">
                             <p className="text-muted-foreground">No properties found.</p>
                              <p className="text-xs text-muted-foreground/50 mt-2">In a real app, properties from Firestore would be displayed here.</p>
