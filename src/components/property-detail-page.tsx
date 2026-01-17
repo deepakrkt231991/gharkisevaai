@@ -170,7 +170,7 @@ export function PropertyDetailPage() {
                         <h3 className="font-bold font-headline text-white">AI Legal Assistance</h3>
                         <p className="text-sm text-muted-foreground">Instantly generate legally binding rent or sale agreements, optimized for local jurisdiction.</p>
                         <Button variant="default" asChild className="w-full h-12 bg-white text-black hover:bg-gray-200">
-                           <Link href="/legal-vault">
+                           <Link href={`/legal-vault?dealId=${property.id}`}>
                                 <FileText className="mr-2"/> Generate Agreement
                            </Link>
                         </Button>
@@ -201,5 +201,3 @@ export function PropertyDetailPage() {
         </div>
     );
 }
-
-    
