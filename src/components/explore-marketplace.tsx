@@ -65,13 +65,13 @@ export function ExploreMarketplace() {
             <Tabs defaultValue="buy" className="w-full">
                 <TabsList className="grid w-full grid-cols-3 bg-card h-14 rounded-xl p-1">
                     <TabsTrigger value="buy" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                        <ShoppingBag className="mr-2" /> Buy
+                        <ShoppingBag className="mr-2" /> Buy Home
                     </TabsTrigger>
                     <TabsTrigger value="sell" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                        <Tag className="mr-2" /> Sell
+                        <Tag className="mr-2" /> Sell Home
                     </TabsTrigger>
                     <TabsTrigger value="rent" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                        <KeyRound className="mr-2" /> Rent
+                        <KeyRound className="mr-2" /> Rent Home
                     </TabsTrigger>
                 </TabsList>
             </Tabs>
@@ -134,5 +134,3 @@ export function ExploreMarketplace() {
         </div>
     );
 }
-
-    
