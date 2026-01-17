@@ -1,251 +1,102 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Video, Shield, Clock, Send, Paperclip, FileText, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { confirmDelivery, requestRefund } from '@/app/chat/[chatId]/actions';
-import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
-import type { Job, LegalAgreement } from '@/lib/entities';
-import { Skeleton } from './ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
-const partner = {
-    name: 'Ramesh Patel',
-    avatar: 'https://i.pravatar.cc/150?u=seller',
+const worker = {
+    name: 'Rajesh',
+    profession: 'Plumber',
+    avatar: 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWxlJTIwcGx1bWJlciUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODc0NjAwN3ww&ixlib=rb-4.1.0&q=80&w=1080',
     isOnline: true,
+    rating: 5.0,
 };
 
 const initialMessages = [
-    { id: 1, sender: 'other', text: 'Hello, I have accepted the deal for the AC.' },
-    { id: 2, sender: 'me', text: 'Great! Payment has been made. The amount is now in GrihSeva escrow.' },
-    { id: 3, sender: 'other', text: 'Perfect. I will deliver it by tomorrow evening.' },
+    { id: 1, sender: 'worker', text: "Hello! I'm your assigned plumber. Could you please send a photo of the defect so I can bring the right parts?", time: '10:14 AM' },
+    { id: 2, sender: 'user', text: "Sure, let me take a quick picture of the kitchen sink leak. It's pooling under the cabinet.", time: '10:15 AM' },
+    { id: 3, sender: 'user', image: true, time: '10:15 AM' },
 ];
 
-const Confetti = () => (
-    <div className="absolute inset-0 w-full h-full pointer-events-none z-[100] overflow-hidden">
-        {Array.from({ length: 150 }).map((_, index) => (
-            <div
-                key={index}
-                className="absolute w-2 h-4"
-                style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${-10 - Math.random() * 20}%`,
-                    backgroundColor: ['#AFFF37', '#006970', '#FFFFFF'][Math.floor(Math.random() * 3)],
-                    transform: `rotate(${Math.random() * 360}deg)`,
-                    animation: `fall ${2 + Math.random() * 2}s linear ${Math.random() * 2}s forwards`,
-                }}
-            />
-        ))}
-        <style>{`
-            @keyframes fall {
-                to {
-                    transform: translateY(100vh) rotate(720deg);
-                    opacity: 0;
-                }
-            }
-        `}</style>
+const AiSuggestions = () => (
+    <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+        <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary flex-shrink-0" />
+            <p className="text-sm font-bold text-white flex-shrink-0">AI</p>
+        </div>
+        <Button variant="secondary" size="sm" className="rounded-full bg-card h-8 whitespace-nowrap">When will you arrive?</Button>
+        <Button variant="secondary" size="sm" className="rounded-full bg-card h-8 whitespace-nowrap">Is the price fixed?</Button>
+        <Button variant="secondary" size="sm" className="rounded-full bg-card h-8 whitespace-nowrap">I'll send a photo</Button>
     </div>
 );
 
-
 export function ChatInterface({ chatId }: { chatId: string }) {
-    const { toast } = useToast();
-    const [timeLeft, setTimeLeft] = useState(24 * 60 * 60 - 300); // 23:55:00
-    const [showConfetti, setShowConfetti] = useState(false);
     
-    const firestore = useFirestore();
-
-    const jobRef = useMemoFirebase(() => firestore ? doc(firestore, 'jobs', chatId) : null, [firestore, chatId]);
-    const agreementRef = useMemoFirebase(() => firestore ? doc(firestore, 'legal_agreements', chatId) : null, [firestore, chatId]);
-
-    const { data: job, isLoading: isJobLoading } = useDoc<Job>(jobRef);
-    const { data: agreement, isLoading: isAgreementLoading } = useDoc<LegalAgreement>(agreementRef);
-
-    const isDealCompleted = job?.status === 'completed';
-
-    useEffect(() => {
-        if (timeLeft <= 0 || isDealCompleted) return;
-
-        const timer = setInterval(() => {
-            setTimeLeft(prevTime => prevTime - 1);
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [timeLeft, isDealCompleted]);
-
-    const formatTime = (seconds: number) => {
-        const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-        const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-        const s = (seconds % 60).toString().padStart(2, '0');
-        return `${h}:${m}:${s}`;
-    };
-    
-    const handleGenerateAgreement = () => {
-        toast({
-            title: "🚀 Generating Agreement...",
-            description: "AI is fetching verified data and creating the legal document.",
-            className: "bg-primary text-white"
-        });
-        // In a real app, this would be a server action that creates the document.
-        // Here, we just show a toast. The UI will update when the doc appears in Firestore.
-        setTimeout(() => {
-             toast({
-                title: "✅ Agreement Generated!",
-                description: "Saved to your Legal Vault and shared in chat.",
-                 className: "bg-green-600 text-white border-green-600"
-            });
-        }, 2500);
-    };
-
-    const handleConfirmDelivery = async () => {
-        const result = await confirmDelivery(chatId);
-        if (result.success) {
-            toast({
-                title: "Deal Successful!",
-                description: result.message,
-                className: "bg-green-600 text-white border-green-600"
-            });
-            setShowConfetti(true);
-            setTimeout(() => setShowConfetti(false), 4000); 
-        } else {
-             toast({
-                variant: 'destructive',
-                title: "Error Completing Deal",
-                description: result.message,
-            });
-        }
-    }
-
-    const handleRequestRefund = async () => {
-        const result = await requestRefund(chatId);
-        if (result.success) {
-            toast({
-                title: "Refund Processed",
-                description: "The job status has been updated to refunded.",
-                className: "bg-primary text-white"
-            });
-        } else {
-             toast({
-                variant: 'destructive',
-                title: "Error Processing Refund",
-                description: result.message,
-            });
-        }
-    }
-    
-    const isLoading = isJobLoading || isAgreementLoading;
-
     return (
-        <div className="flex flex-col h-full bg-card">
-            {showConfetti && <Confetti />}
-            {/* Header with Timer */}
-            <header className="sticky top-0 z-10 flex flex-col gap-2 p-4 bg-background/80 backdrop-blur-md border-b border-border">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <Button variant="ghost" size="icon" className="-ml-2" asChild>
-                            <Link href="/explore"><ArrowLeft/></Link>
-                        </Button>
-                        <Avatar>
-                            <AvatarImage src={partner.avatar} />
-                            <AvatarFallback>{partner.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <h2 className="font-bold text-white">{partner.name}</h2>
-                            <p className="text-xs text-green-400">{partner.isOnline ? 'Online' : 'Offline'}</p>
+        <div className="flex flex-col h-full bg-background text-white">
+            {/* Header */}
+            <header className="sticky top-0 z-10 flex items-center justify-between p-4 bg-background/80 backdrop-blur-md border-b border-border">
+                <div className="flex items-center gap-3">
+                    <Button variant="ghost" size="icon" className="-ml-2" asChild>
+                        <Link href="/find-a-worker"><ArrowLeft/></Link>
+                    </Button>
+                    <Avatar>
+                        <AvatarImage src={worker.avatar} />
+                        <AvatarFallback>{worker.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <h2 className="font-bold text-white">{worker.name} - {worker.profession}</h2>
+                        <div className="flex items-center gap-1.5">
+                            <Badge variant="outline" className={cn("border-none px-0", worker.isOnline ? "text-green-400" : "text-muted-foreground")}>
+                                {worker.isOnline ? 'ONLINE' : 'OFFLINE'}
+                            </Badge>
+                            <span className="text-muted-foreground text-xs">•</span>
+                             <p className="text-xs text-muted-foreground">{worker.rating.toFixed(1)} Rating</p>
                         </div>
                     </div>
                 </div>
-                 
-                 {isDealCompleted ? (
-                    <div className="bg-green-500/10 border border-green-500/30 p-2 rounded-lg flex items-center justify-center gap-2">
-                        <CheckCircle className="text-green-400 w-5 h-5"/>
-                        <p className="font-bold text-lg text-green-400">Deal Completed</p>
-                    </div>
-                 ) : (
-                    <div className="bg-primary/10 border border-primary/30 p-2 rounded-lg flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                            <Clock className="text-primary w-5 h-5"/>
-                            <div>
-                                <p className="text-xs text-primary font-bold">WAITING TIMER</p>
-                                <p className="font-mono font-bold text-lg text-white">{formatTime(timeLeft)}</p>
-                            </div>
-                        </div>
-                        {timeLeft <=0 && (
-                            <Button variant="destructive" size="sm" onClick={handleRequestRefund}>
-                                <AlertTriangle className="mr-2 h-4 w-4"/>
-                                Instant Refund
-                            </Button>
-                        )}
-                    </div>
-                 )}
-
-                 <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-1">
-                    <Shield size={12} className="text-green-400" />
-                    <span>AI Guarded: Your payments and chats are 100% secure.</span>
-                </div>
+                <Button variant="ghost" size="icon">
+                    <Phone className="w-6 h-6 text-white"/>
+                </Button>
             </header>
 
             {/* Chat Body */}
-            <main className="flex-1 overflow-y-auto p-4 space-y-4">
+            <main className="flex-1 overflow-y-auto p-4 space-y-6">
+                <div className="text-center text-xs text-muted-foreground font-medium">TODAY</div>
                 {initialMessages.map((msg) => (
-                    <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-xs lg:max-w-md p-3 rounded-2xl ${msg.sender === 'me' ? 'bg-primary text-white rounded-br-none' : 'bg-secondary text-white rounded-bl-none'}`}>
-                            <p>{msg.text}</p>
+                    <div key={msg.id} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                        {msg.sender === 'worker' && <p className="text-sm text-muted-foreground mb-1">{worker.name}</p>}
+                        <div className={`max-w-xs lg:max-w-md p-3 rounded-2xl ${msg.sender === 'user' ? 'bg-primary text-white rounded-br-none' : 'bg-card rounded-bl-none'}`}>
+                           {msg.image ? (
+                               <div className="h-40 w-40 bg-card/50 rounded-lg border border-border"></div>
+                           ) : (
+                               <p>{msg.text}</p>
+                           )}
                         </div>
+                        <p className="text-[10px] text-muted-foreground mt-1 px-1">{msg.time}</p>
                     </div>
                 ))}
-                 {/* AI Generated Agreement Card */}
-                 {isLoading ? (
-                    <div className="flex justify-center">
-                        <Skeleton className="w-full max-w-sm h-32 rounded-lg"/>
-                    </div>
-                 ) : agreement ? (
-                     <div className="flex justify-center">
-                        <div className="w-full max-w-sm p-3 rounded-lg bg-black/30 border border-border text-center space-y-2">
-                            <Shield className="mx-auto text-green-400" />
-                            <h4 className="font-bold text-white">Legal Agreement Generated</h4>
-                            <p className="text-xs text-muted-foreground">The deal is now legally binding.</p>
-                            <Button variant="link" className="text-primary" asChild>
-                                <Link href={`/legal-document?id=${chatId}`}>View Here</Link>
-                            </Button>
-                        </div>
-                     </div>
-                 ) : null}
-
-                 {isDealCompleted && (
-                     <div className="flex justify-center">
-                        <div className="w-full max-w-sm p-3 rounded-lg bg-green-900/50 border border-green-500/60 text-center space-y-2">
-                           <CheckCircle className="mx-auto text-green-400" />
-                            <h4 className="font-bold text-white">Deal Closed</h4>
-                            <p className="text-xs text-muted-foreground">Payment has been released to the seller. Your agreement is saved in the Legal Vault.</p>
-                        </div>
-                     </div>
-                 )}
             </main>
 
             {/* Footer with Smart Buttons */}
             <footer className="sticky bottom-0 z-10 p-4 bg-background/80 backdrop-blur-md border-t border-border space-y-3">
-                 <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" className="bg-transparent" onClick={handleGenerateAgreement} disabled={isDealCompleted || !!agreement}>
-                        <FileText className="mr-2"/> Generate Agreement
-                    </Button>
-                     <Button variant="outline" className="bg-transparent" disabled={isDealCompleted}>
-                        <Video className="mr-2"/> Request Live Video
-                    </Button>
-                 </div>
+                 <AiSuggestions />
                  <div className="flex items-center gap-2">
+                    <Button size="icon" variant="secondary" className="rounded-full h-12 w-12 bg-card">
+                        <Plus className="w-6 h-6"/>
+                    </Button>
                     <div className="relative flex-1">
-                        <Input placeholder="Type your message..." className="pr-12" disabled={isDealCompleted}/>
-                        <Button size="icon" variant="ghost" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" disabled={isDealCompleted}>
-                            <Paperclip className="w-5 h-5"/>
+                        <Input placeholder="Type a message..." className="pr-12 bg-card h-12 rounded-full"/>
+                        <Button size="icon" variant="ghost" className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10">
+                            <Smile className="w-6 h-6 text-muted-foreground"/>
                         </Button>
                     </div>
-                    <Button className="bg-accent text-accent-foreground flex-1" onClick={handleConfirmDelivery} disabled={isDealCompleted}>
-                        <CheckCircle className="mr-2"/> Confirm Delivery
+                     <Button size="icon" variant="default" className="rounded-full h-12 w-12 bg-primary">
+                        <Send className="w-6 h-6"/>
                     </Button>
                  </div>
             </footer>
