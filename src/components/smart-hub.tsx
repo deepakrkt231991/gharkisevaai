@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from './ui/card';
 import Link from 'next/link';
-import { Bot, Camera, Wrench, ScanSearch } from 'lucide-react';
+import { Sofa, Camera, Wrench, ScanSearch } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function SmartHub() {
@@ -37,7 +37,7 @@ export function SmartHub() {
                      <Link href="/interior-analysis" className="block">
                         <Card className={cn("bg-card/70 backdrop-blur-sm border-border text-center hover:border-primary transition-all")}>
                             <CardContent className="p-4 flex flex-col items-center justify-center gap-2 h-full">
-                                 <Bot className="h-8 w-8 text-primary" />
+                                 <Sofa className="h-8 w-8 text-primary" />
                                 <h4 className="font-bold font-headline">AI Interior</h4>
                                 <p className="text-xs text-muted-foreground">डिजाइन स्टूडियो</p>
                             </CardContent>

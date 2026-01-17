@@ -31,7 +31,7 @@ export function TrendingNow() {
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold font-headline">Help Repairing / मरम्मत में मदद</h3>
+                <h3 className="text-xl font-bold font-headline">Trending Now / ट्रेंडिंग</h3>
                 <Link href="/find-a-worker" className="text-sm font-bold text-primary">VIEW ALL</Link>
             </div>
             <div className="grid grid-cols-2 gap-4">
