@@ -1,9 +1,11 @@
+
 "use client";
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState, ChangeEvent } from 'react';
+import Image from 'next/image';
 import { useFormStatus } from 'react-dom';
-import { Loader2, AlertCircle, Building, IndianRupee } from 'lucide-react';
-import { listProperty } from '@/app/list-property/actions';
+import { Loader2, AlertCircle, Building, UploadCloud, Video, Sparkles } from 'lucide-react';
+import { listProperty, getPropertyMediaTips } from '@/app/list-property/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +13,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from '@/components/ui/alert-dialog';
+
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -38,6 +42,12 @@ export function ListPropertyForm() {
     const { toast } = useToast();
     const router = useRouter();
 
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [videoPreview, setVideoPreview] = useState<string | null>(null);
+    const [showAiHelp, setShowAiHelp] = useState(false);
+    const [aiTips, setAiTips] = useState<string[]>([]);
+    const [isLoadingTips, setIsLoadingTips] = useState(false);
+
     useEffect(() => {
         if (state.success) {
             toast({
@@ -49,74 +59,160 @@ export function ListPropertyForm() {
         }
     }, [state, toast, router]);
 
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>, fileType: 'image' | 'video') => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const dataUrl = event.target?.result as string;
+                if (fileType === 'image') {
+                    setImagePreview(dataUrl);
+                } else {
+                    setVideoPreview(dataUrl);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    
+    const handleAiHelp = async () => {
+        setShowAiHelp(true);
+        setIsLoadingTips(true);
+        const result = await getPropertyMediaTips();
+        setAiTips(result.tips);
+        setIsLoadingTips(false);
+    };
+
     const getError = (path: string) => state.errors?.find(e => e.path.includes(path))?.message;
 
     return (
-        <form action={formAction} className="space-y-6">
-            <div className="glass-card rounded-xl p-5 space-y-4">
-                {state.message && !state.success && (
-                    <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{state.message}</AlertDescription>
-                    </Alert>
-                )}
+        <>
+            <form action={formAction} className="space-y-6">
+                <div className="glass-card rounded-xl p-5 space-y-4">
+                    {state.message && !state.success && (
+                        <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>{state.message}</AlertDescription>
+                        </Alert>
+                    )}
 
-                <div className="space-y-2">
-                    <Label htmlFor="title" className="text-muted-foreground">Property Title</Label>
-                    <Input id="title" name="title" placeholder="e.g., 2 BHK Modern Apartment" required className="bg-input border-border-dark text-white"/>
-                    {getError('title') && <p className="text-sm text-destructive">{getError('title')}</p>}
-                </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="title" className="text-muted-foreground">Property Title</Label>
+                        <Input id="title" name="title" placeholder="e.g., 2 BHK Modern Apartment" required className="bg-input border-border-dark text-white"/>
+                        {getError('title') && <p className="text-sm text-destructive">{getError('title')}</p>}
+                    </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="location" className="text-muted-foreground">Location</Label>
-                    <Input id="location" name="location" placeholder="e.g., Indiranagar, Bangalore" required className="bg-input border-border-dark text-white"/>
-                    {getError('location') && <p className="text-sm text-destructive">{getError('location')}</p>}
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="price" className="text-muted-foreground">Price</Label>
-                        <Input id="price" name="price" type="number" step="0.01" placeholder="e.g., 1.85" required className="bg-input border-border-dark text-white"/>
-                        {getError('price') && <p className="text-sm text-destructive">{getError('price')}</p>}
+                        <Label className="text-muted-foreground">Property Photo & Video</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <label className="relative flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-input border-border-dark hover:border-primary">
+                                <input id="image" name="image" type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} />
+                                {imagePreview ? (
+                                    <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="cover" className="rounded-lg" />
+                                ) : (
+                                    <div className="text-center text-muted-foreground">
+                                        <UploadCloud className="mx-auto h-8 w-8" />
+                                        <p className="text-xs mt-1">Upload Photo</p>
+                                    </div>
+                                )}
+                            </label>
+                             <label className="relative flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-input border-border-dark hover:border-primary">
+                                <input id="video" name="video" type="file" className="sr-only" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} />
+                                {videoPreview ? (
+                                    <video src={videoPreview} controls className="w-full h-full rounded-lg object-cover" />
+                                ) : (
+                                    <div className="text-center text-muted-foreground">
+                                        <Video className="mx-auto h-8 w-8" />
+                                        <p className="text-xs mt-1">Upload Video</p>
+                                    </div>
+                                )}
+                            </label>
+                        </div>
+                        {imagePreview && <input type="hidden" name="imageUrl" value={imagePreview} />}
+                        {videoPreview && <input type="hidden" name="videoUrl" value={videoPreview} />}
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="priceUnit" className="text-muted-foreground">Unit</Label>
-                         <Select name="priceUnit" required>
-                            <SelectTrigger className="bg-input border-border-dark text-white">
-                                <SelectValue placeholder="Select Unit" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Cr">Crore (Cr)</SelectItem>
-                                <SelectItem value="L">Lakh (L)</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        {getError('priceUnit') && <p className="text-sm text-destructive">{getError('priceUnit')}</p>}
-                    </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                    <Button type="button" variant="outline" className="w-full h-12" onClick={handleAiHelp}>
+                        <Sparkles className="mr-2" /> AI Photo & Video Guide
+                    </Button>
+                    
                     <div className="space-y-2">
-                        <Label htmlFor="sqft" className="text-muted-foreground">Area (sq. ft.)</Label>
-                        <Input id="sqft" name="sqft" type="number" placeholder="e.g., 1450" required className="bg-input border-border-dark text-white"/>
-                        {getError('sqft') && <p className="text-sm text-destructive">{getError('sqft')}</p>}
+                        <Label htmlFor="location" className="text-muted-foreground">Location</Label>
+                        <Input id="location" name="location" placeholder="e.g., Indiranagar, Bangalore" required className="bg-input border-border-dark text-white"/>
+                        {getError('location') && <p className="text-sm text-destructive">{getError('location')}</p>}
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="parking" className="text-muted-foreground">Parking Spots</Label>
-                        <Input id="parking" name="parking" type="number" placeholder="e.g., 1" required className="bg-input border-border-dark text-white"/>
-                        {getError('parking') && <p className="text-sm text-destructive">{getError('parking')}</p>}
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="price" className="text-muted-foreground">Price</Label>
+                            <Input id="price" name="price" type="number" step="0.01" placeholder="e.g., 1.85" required className="bg-input border-border-dark text-white"/>
+                            {getError('price') && <p className="text-sm text-destructive">{getError('price')}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="priceUnit" className="text-muted-foreground">Unit</Label>
+                            <Select name="priceUnit" required>
+                                <SelectTrigger className="bg-input border-border-dark text-white">
+                                    <SelectValue placeholder="Select Unit" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Cr">Crore (Cr)</SelectItem>
+                                    <SelectItem value="L">Lakh (L)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {getError('priceUnit') && <p className="text-sm text-destructive">{getError('priceUnit')}</p>}
+                        </div>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="sqft" className="text-muted-foreground">Area (sq. ft.)</Label>
+                            <Input id="sqft" name="sqft" type="number" placeholder="e.g., 1450" required className="bg-input border-border-dark text-white"/>
+                            {getError('sqft') && <p className="text-sm text-destructive">{getError('sqft')}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="parking" className="text-muted-foreground">Parking Spots</Label>
+                            <Input id="parking" name="parking" type="number" placeholder="e.g., 1" required className="bg-input border-border-dark text-white"/>
+                            {getError('parking') && <p className="text-sm text-destructive">{getError('parking')}</p>}
+                        </div>
+                    </div>
+
                 </div>
-                
-                <div className="space-y-2">
-                    <Label htmlFor="imageUrl" className="text-muted-foreground">Image URL (Optional)</Label>
-                    <Input id="imageUrl" name="imageUrl" placeholder="https://..." className="bg-input border-border-dark text-white"/>
-                     {getError('imageUrl') && <p className="text-sm text-destructive">{getError('imageUrl')}</p>}
+                <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent">
+                <SubmitButton />
                 </div>
-            </div>
-            <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent">
-              <SubmitButton />
-            </div>
-        </form>
+            </form>
+
+            <AlertDialog open={showAiHelp} onOpenChange={setShowAiHelp}>
+                <AlertDialogContent className="glass-card">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                            <Sparkles className="text-primary"/> AI Guide for Property Media
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Follow these expert tips to attract more buyers and get the best price for your property.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    {isLoadingTips ? (
+                        <div className="flex justify-center items-center h-48">
+                            <Loader2 className="animate-spin h-8 w-8 text-primary" />
+                        </div>
+                    ) : (
+                        <div className="max-h-80 overflow-y-auto pr-4 text-sm space-y-4">
+                            {aiTips.map((tip, i) => (
+                                <p key={i} className={`text-muted-foreground ${tip.endsWith(':') ? 'text-white font-bold mt-4' : 'ml-4'}`}>
+                                    {tip.endsWith(':') ? tip : `• ${tip}`}
+                                </p>
+                            ))}
+                        </div>
+                    )}
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Close</AlertDialogCancel>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     );
 }
+
+    

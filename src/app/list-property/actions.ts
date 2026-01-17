@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { revalidatePath } from 'next/cache';
+import { analyzeHomeForVastu } from '@/ai/flows/home-vastu-agent';
 
 const ListPropertySchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -13,7 +14,8 @@ const ListPropertySchema = z.object({
   priceUnit: z.enum(['Cr', 'L']),
   sqft: z.coerce.number().positive({ message: "Square feet must be a positive number." }),
   parking: z.coerce.number().int().min(0, { message: "Parking must be a non-negative number." }),
-  imageUrl: z.string().url({ message: "Please enter a valid image URL." }).optional().or(z.literal('')),
+  imageUrl: z.string().url().optional().or(z.literal('')),
+  videoUrl: z.string().url().optional().or(z.literal('')),
   listingType: z.enum(['sale', 'rent']),
 });
 
@@ -36,6 +38,7 @@ export async function listProperty(
     sqft: formData.get('sqft'),
     parking: formData.get('parking'),
     imageUrl: formData.get('imageUrl'),
+    videoUrl: formData.get('videoUrl'),
     listingType: formData.get('listingType') || 'sale',
   });
 
@@ -88,6 +91,30 @@ export async function listProperty(
       message: `An error occurred while listing the property. Details: ${errorMessage}`,
     };
   }
+}
+
+export async function getPropertyMediaTips(): Promise<{success: boolean; tips: string[]}> {
+    try {
+        const result = await analyzeHomeForVastu({
+            // A dummy image URI is required for the flow input schema.
+            homeLayoutImageUri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+            userInstructions: "Provide a step-by-step guide for a user to record a high-quality video walkthrough and take excellent photos for a real estate listing. Separate tips for photos and videos clearly.",
+        });
+        
+        // The updated AI prompt puts photo tips in `vastuSuggestions` and video tips in `videoInstructions`
+        const allTips = [
+            "Photo Tips:",
+            ...result.vastuSuggestions,
+            "Video Tips:",
+            ...result.videoInstructions
+        ];
+        
+        return { success: true, tips: allTips };
+
+    } catch (error) {
+        console.error("Error fetching media tips:", error);
+        return { success: false, tips: ["Could not load AI tips at this time. Please try again later."] };
+    }
 }
 
     

@@ -127,6 +127,7 @@ export interface Property {
     sqft: number;
     parking: number;
     imageUrl?: string;
+    videoUrl?: string; // URL of the property video walkthrough.
     isAiVerified: boolean; // Whether the property has been verified by AI.
     listingType: "sale" | "rent"; // Whether the property is for sale or for rent.
     vastuScore?: number; // Vastu compliance score from 0 to 10.
