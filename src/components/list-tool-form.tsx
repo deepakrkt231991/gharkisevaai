@@ -1,9 +1,10 @@
 // src/components/list-tool-form.tsx
 "use client";
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState, ChangeEvent } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Loader2, AlertCircle, Wrench, IndianRupee } from 'lucide-react';
+import Image from 'next/image';
+import { Loader2, AlertCircle, Wrench, IndianRupee, MapPin, UploadCloud } from 'lucide-react';
 import { listToolForRent } from '@/app/list-tool/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +39,7 @@ export function ListToolForm() {
     const [state, formAction] = useActionState(listToolForRent, initialState);
     const { toast } = useToast();
     const router = useRouter();
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     useEffect(() => {
         if (state.success) {
@@ -49,6 +51,17 @@ export function ListToolForm() {
             router.push('/rent-tools');
         }
     }, [state, toast, router]);
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setImagePreview(event.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const getError = (path: string) => state.errors?.find(e => e.path.includes(path))?.message;
 
@@ -63,10 +76,37 @@ export function ListToolForm() {
                     </Alert>
                 )}
 
+                 <div className="space-y-2">
+                    <Label htmlFor="image" className="text-muted-foreground">Tool Photo</Label>
+                    <label className="relative flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-input border-border-dark hover:border-primary">
+                        <input id="image" name="image" type="file" className="sr-only" accept="image/*" onChange={handleFileChange} />
+                        {imagePreview ? (
+                            <Image src={imagePreview} alt="Tool image preview" layout="fill" objectFit="cover" className="rounded-lg" />
+                        ) : (
+                            <div className="text-center text-muted-foreground">
+                                <UploadCloud className="mx-auto h-8 w-8" />
+                                <p className="text-xs mt-1">Upload Photo</p>
+                            </div>
+                        )}
+                    </label>
+                    {imagePreview && <input type="hidden" name="imageUrl" value={imagePreview} />}
+                    {getError('imageUrl') && <p className="text-sm text-destructive">{getError('imageUrl')}</p>}
+                </div>
+
+
                 <div className="space-y-2">
                     <Label htmlFor="name" className="text-muted-foreground">Tool Name</Label>
                     <Input id="name" name="name" placeholder="e.g., Bosch Hammer Drill" required className="bg-input border-border-dark text-white"/>
                     {getError('name') && <p className="text-sm text-destructive">{getError('name')}</p>}
+                </div>
+                
+                 <div className="space-y-2">
+                    <Label htmlFor="location" className="text-muted-foreground">Your Location</Label>
+                     <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"/>
+                        <Input id="location" name="location" placeholder="e.g., Koramangala, Bangalore" required className="pl-10 bg-input border-border-dark text-white" />
+                    </div>
+                    {getError('location') && <p className="text-sm text-destructive">{getError('location')}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -74,13 +114,23 @@ export function ListToolForm() {
                     <Textarea id="description" name="description" placeholder="Describe the tool's condition, features, and any accessories included." className="bg-input border-border-dark text-white"/>
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="rental_price_per_day" className="text-muted-foreground">Rental Price (per day)</Label>
-                    <div className="relative">
-                        <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"/>
-                        <Input id="rental_price_per_day" name="rental_price_per_day" type="number" placeholder="e.g., 250" required className="pl-10 bg-input border-border-dark text-white" />
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="rental_price_per_day" className="text-muted-foreground">Rent Price /day</Label>
+                        <div className="relative">
+                            <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"/>
+                            <Input id="rental_price_per_day" name="rental_price_per_day" type="number" placeholder="e.g., 250" required className="pl-10 bg-input border-border-dark text-white" />
+                        </div>
+                        {getError('rental_price_per_day') && <p className="text-sm text-destructive">{getError('rental_price_per_day')}</p>}
                     </div>
-                    {getError('rental_price_per_day') && <p className="text-sm text-destructive">{getError('rental_price_per_day')}</p>}
+                    <div className="space-y-2">
+                        <Label htmlFor="deposit" className="text-muted-foreground">Security Deposit</Label>
+                        <div className="relative">
+                            <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"/>
+                            <Input id="deposit" name="deposit" type="number" placeholder="e.g., 1000" required className="pl-10 bg-input border-border-dark text-white" />
+                        </div>
+                        {getError('deposit') && <p className="text-sm text-destructive">{getError('deposit')}</p>}
+                    </div>
                 </div>
             </div>
             <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent">

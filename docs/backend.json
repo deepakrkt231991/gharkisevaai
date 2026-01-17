@@ -196,7 +196,10 @@
         "name": { "type": "string" },
         "description": { "type": "string" },
         "rental_price_per_day": { "type": "number" },
-        "is_available": { "type": "boolean" }
+        "is_available": { "type": "boolean" },
+        "imageUrl": { "type": "string", "description": "URL of the tool's image." },
+        "location": { "type": "string", "description": "Location of the tool owner." },
+        "deposit": { "type": "number", "description": "Security deposit amount for the tool." }
       },
       "required": ["toolId", "ownerId", "name", "rental_price_per_day"]
     },
@@ -209,9 +212,9 @@
         "rentalId": { "type": "string" },
         "toolId": { "type": "string" },
         "renterId": { "type": "string", "description": "The user ID of the person renting the tool." },
-        "startDate": { "type": "string", "format": "date" },
-        "endDate": { "type": "string", "format": "date" },
-        "status": { "type": "string", "enum": ["requested", "active", "completed", "cancelled"] }
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["requested", "accepted", "payment_pending", "active", "completed", "cancelled"] }
       },
       "required": ["rentalId", "toolId", "renterId", "startDate"]
     },
@@ -416,7 +419,3 @@
     ]
   }
 }
-
-    
-
-    

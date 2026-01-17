@@ -9,6 +9,7 @@ export interface User {
     userType: "customer" | "worker" | "doctor"; // Type of user.
     referredBy?: string; // The ID of the user or worker who referred this user.
     walletBalance?: number; // The balance of referral earnings for the user.
+    photoURL?: string; // User's photo URL
 }
 
 export interface Job {
@@ -60,15 +61,19 @@ export interface Tool {
     description?: string;
     rental_price_per_day: number;
     is_available?: boolean;
+    imageUrl?: string;
+    location?: string;
+    deposit?: number;
 }
 
 export interface Rental {
     rentalId: string;
     toolId: string;
     renterId: string; // The user ID of the person renting the tool.
-    startDate: string;
-    endDate?: string;
-    status?: "requested" | "active" | "completed" | "cancelled";
+    ownerId: string; // The user ID of the tool owner
+    startDate: any; // Firestore Timestamp
+    endDate?: any; // Firestore Timestamp
+    status?: "requested" | "accepted" | "payment_pending" | "active" | "completed" | "cancelled";
 }
 
 export interface Transaction {
@@ -132,5 +137,3 @@ export interface Property {
     listingType: "sale" | "rent"; // Whether the property is for sale or for rent.
     vastuScore?: number; // Vastu compliance score from 0 to 10.
 }
-
-    

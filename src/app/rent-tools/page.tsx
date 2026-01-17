@@ -6,39 +6,58 @@ import Image from 'next/image';
 import { useCollection, useMemoFirebase, useUser } from '@/firebase';
 import { useFirestore } from '@/firebase/provider';
 import { collection, query } from 'firebase/firestore';
-import type { Tool } from '@/lib/entities';
+import type { Tool, User as UserEntity } from '@/lib/entities';
+import { useDoc } from '@/firebase/firestore/use-doc';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Bell, Grid, Droplet, Zap, Plus } from 'lucide-react';
+import { Search, Bell, Grid, Droplet, Zap, Wrench, IndianRupee, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { doc } from 'firebase/firestore';
+
 
 function ToolCard({ tool }: { tool: Tool & { id: string } }) {
-    const ownerImage = PlaceHolderImages.find(p => p.id.startsWith('worker'))?.imageUrl || "https://i.pravatar.cc/150";
+    const firestore = useFirestore();
+    const ownerRef = useMemoFirebase(() => {
+        if (!firestore || !tool.ownerId) return null;
+        return doc(firestore, 'users', tool.ownerId);
+    }, [firestore, tool.ownerId]);
+    
+    const { data: owner } = useDoc<UserEntity>(ownerRef);
+
     return (
         <Card className="glass-card overflow-hidden">
             <div className="relative h-32 w-full">
                 <Image 
-                    src={`https://picsum.photos/seed/${tool.id}/400/300`} 
+                    src={tool.imageUrl || `https://picsum.photos/seed/${tool.id}/400/300`} 
                     alt={tool.name} 
                     fill 
                     className="object-cover"
                 />
                  <Badge className="absolute top-2 left-2 bg-green-500/80 border-green-400 text-white">VERIFIED</Badge>
                  <Avatar className="absolute top-2 right-2 h-8 w-8 border-2 border-background">
-                    <AvatarImage src={ownerImage} />
-                    <AvatarFallback>{tool.ownerId.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={owner?.photoURL || `https://i.pravatar.cc/150?u=${tool.ownerId}`} />
+                    <AvatarFallback>{owner?.name?.charAt(0) || 'O'}</AvatarFallback>
                 </Avatar>
             </div>
-            <CardContent className="p-3">
+            <CardContent className="p-3 space-y-2">
                 <h3 className="font-bold truncate text-white">{tool.name}</h3>
-                <div className="flex items-center justify-between mt-1">
-                    <p className="text-lg font-bold text-accent">₹{tool.rental_price_per_day}<span className="text-xs text-muted-foreground"> /day</span></p>
-                    {/* <Button size="sm" variant="outline" className="bg-transparent h-8">Rent</Button> */}
+                {tool.location && <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin size={12}/>{tool.location}</p>}
+                <div className="flex items-end justify-between">
+                    <div>
+                        <p className="text-xs text-muted-foreground">Rent</p>
+                        <p className="text-lg font-bold text-accent">₹{tool.rental_price_per_day}<span className="text-xs text-muted-foreground">/day</span></p>
+                    </div>
+                     <div>
+                        <p className="text-xs text-muted-foreground">Deposit</p>
+                        <p className="font-bold text-white text-right">₹{tool.deposit || 0}</p>
+                    </div>
                 </div>
+                 <Button asChild size="sm" className="w-full">
+                    <Link href={`/chat/tool-${tool.id}`}>Rent Now</Link>
+                </Button>
             </CardContent>
         </Card>
     );
@@ -113,8 +132,8 @@ export default function RentToolsPage() {
                 <main className="flex-1 space-y-6 overflow-y-auto p-4 pb-32">
                     <div className="flex gap-3 overflow-x-auto pb-2">
                         <Button className="rounded-full bg-primary h-10"><Grid size={16} className="mr-2"/> All Tools</Button>
-                        <Button variant="secondary" className="rounded-full h-10 bg-surface-dark text-white"><Droplet size={16} className="mr-2"/> Plumbing</Button>
-                        <Button variant="secondary" className="rounded-full h-10 bg-surface-dark text-white"><Zap size={16} className="mr-2"/> Electric</Button>
+                        <Button variant="secondary" className="rounded-full h-10 bg-card text-white"><Droplet size={16} className="mr-2"/> Plumbing</Button>
+                        <Button variant="secondary" className="rounded-full h-10 bg-card text-white"><Zap size={16} className="mr-2"/> Electric</Button>
                     </div>
 
                     <RegisterOwnerCard />
@@ -159,7 +178,3 @@ export default function RentToolsPage() {
         </div>
     );
 }
-
-const Wrench = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-)

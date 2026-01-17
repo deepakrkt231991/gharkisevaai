@@ -2,15 +2,17 @@
 "use server";
 
 import { z } from 'zod';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
-import { getAuth } from 'firebase/auth';
 import { revalidatePath } from 'next/cache';
 
 const ListToolSchema = z.object({
   name: z.string().min(3, { message: "Tool name must be at least 3 characters." }),
   description: z.string().optional(),
   rental_price_per_day: z.coerce.number().positive({ message: "Price must be a positive number." }),
+  deposit: z.coerce.number().min(0, { message: "Deposit must be a non-negative number." }),
+  location: z.string().min(3, { message: "Location is required." }),
+  imageUrl: z.string().url().optional().or(z.literal('')),
 });
 
 type State = {
@@ -28,6 +30,9 @@ export async function listToolForRent(
     name: formData.get('name'),
     description: formData.get('description'),
     rental_price_per_day: formData.get('rental_price_per_day'),
+    deposit: formData.get('deposit'),
+    location: formData.get('location'),
+    imageUrl: formData.get('imageUrl'),
   });
 
   if (!validatedFields.success) {
@@ -49,15 +54,18 @@ export async function listToolForRent(
         };
     }
 
+    const toolsCollectionRef = collection(firestore, 'tools');
+    const newDocRef = doc(toolsCollectionRef);
+
     const toolData = {
       ...validatedFields.data,
+      toolId: newDocRef.id,
       ownerId: currentUser.uid,
       is_available: true,
       createdAt: serverTimestamp(),
     };
     
-    const toolsCollectionRef = collection(firestore, 'tools');
-    await addDoc(toolsCollectionRef, toolData);
+    await setDoc(newDocRef, toolData);
 
     revalidatePath('/rent-tools'); // To refresh the list of tools on the rental page
 
