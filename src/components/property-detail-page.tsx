@@ -1,7 +1,12 @@
+
 'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import type { Property } from '@/lib/entities';
 import { 
     ArrowLeft, 
     Heart, 
@@ -22,6 +27,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from './ui/skeleton';
 
 const StatCard = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string }) => (
     <div className="glass-card flex flex-col items-center justify-center p-3 rounded-xl h-24 text-center">
@@ -41,27 +47,81 @@ const AmenityIcon = ({ icon: Icon, label }: { icon: React.ElementType, label: st
 );
 
 export function PropertyDetailPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const propertyId = searchParams.get('id');
+    const firestore = useFirestore();
+
+    const propertyRef = useMemoFirebase(() => {
+        if (!firestore || !propertyId) return null;
+        return doc(firestore, 'properties', propertyId);
+    }, [firestore, propertyId]);
+
+    const { data: property, isLoading } = useDoc<Property>(propertyRef);
+
+    if (isLoading) {
+        return (
+            <div className="flex-1">
+                 <header className="absolute top-0 left-0 w-full z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/50 to-transparent">
+                    <Skeleton className="h-10 w-10 rounded-md" />
+                    <div className="flex gap-2">
+                        <Skeleton className="h-10 w-10 rounded-md" />
+                        <Skeleton className="h-10 w-10 rounded-md" />
+                    </div>
+                </header>
+                 <main>
+                    <Skeleton className="w-full aspect-[4/3]" />
+                    <div className="bg-background rounded-t-3xl p-4 -mt-8 relative z-10 space-y-6 pb-24">
+                        <div className="space-y-3">
+                            <Skeleton className="h-8 w-3/4"/>
+                            <Skeleton className="h-5 w-1/2"/>
+                            <Skeleton className="h-10 w-1/3"/>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                            <Skeleton className="h-24 w-full" />
+                            <Skeleton className="h-24 w-full" />
+                            <Skeleton className="h-24 w-full" />
+                        </div>
+                         <div className="grid grid-cols-2 gap-3">
+                            <Skeleton className="h-14 w-full" />
+                            <Skeleton className="h-14 w-full" />
+                        </div>
+                    </div>
+                 </main>
+            </div>
+        )
+    }
+
+    if (!property) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+                 <h2 className="text-2xl font-bold font-headline">Property not found</h2>
+                 <p className="text-muted-foreground">The property you are looking for does not exist.</p>
+                 <Button onClick={() => router.back()} className="mt-4">Go Back</Button>
+            </div>
+        )
+    }
 
     return (
         <div className="flex-1">
             <header className="absolute top-0 left-0 w-full z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/50 to-transparent">
-                <Button variant="ghost" size="icon" onClick={() => window.history.back()} className="bg-black/20 text-white">
+                <Button variant="ghost" size="icon" onClick={() => router.back()} className="bg-black/20 text-white hover:bg-black/40 hover:text-white">
                     <ArrowLeft />
                 </Button>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="bg-black/20 text-white"><Heart /></Button>
-                    <Button variant="ghost" size="icon" className="bg-black/20 text-white"><Share2 /></Button>
+                    <Button variant="ghost" size="icon" className="bg-black/20 text-white hover:bg-black/40 hover:text-white"><Heart /></Button>
+                    <Button variant="ghost" size="icon" className="bg-black/20 text-white hover:bg-black/40 hover:text-white"><Share2 /></Button>
                 </div>
             </header>
 
             <main>
                 <div className="relative w-full aspect-[4/3]">
                     <Image 
-                        src="https://picsum.photos/seed/villa-1/800/600"
-                        alt="Serene Vista Villa"
+                        src={property.imageUrl || `https://picsum.photos/seed/${property.id}/800/600`}
+                        alt={property.title}
                         fill
                         className="object-cover"
-                        data-ai-hint="modern villa exterior"
+                        data-ai-hint="modern house exterior"
                     />
                 </div>
                 
@@ -69,30 +129,32 @@ export function PropertyDetailPage() {
                     {/* Property Info */}
                     <div className="space-y-2">
                         <div className="flex justify-between items-start">
-                            <h1 className="text-3xl font-bold font-headline text-white">Serene Vista Villa</h1>
-                            <Badge variant="outline" className="text-yellow-400 border-yellow-500/50 bg-yellow-900/30 font-bold mt-1">VERIFIED</Badge>
+                            <h1 className="text-3xl font-bold font-headline text-white">{property.title}</h1>
+                            {property.isAiVerified && (
+                                <Badge variant="outline" className="text-yellow-400 border-yellow-500/50 bg-yellow-900/30 font-bold mt-1">VERIFIED</Badge>
+                            )}
                         </div>
                         <div className="flex items-center gap-2 text-muted-foreground">
                             <MapPin size={16} />
-                            <span>Jubilee Hills, Hyderabad</span>
+                            <span>{property.location}</span>
                         </div>
                         <div className="flex items-baseline gap-2 pt-1">
-                             <p className="text-4xl font-extrabold text-white">₹4.5 Cr</p>
-                             <p className="text-muted-foreground font-medium">₹14,000 / sq.ft.</p>
+                             <p className="text-4xl font-extrabold text-white">₹{property.price} {property.priceUnit}</p>
+                             <p className="text-muted-foreground font-medium">₹{Math.round((property.price * (property.priceUnit === 'Cr' ? 10000000 : 100000)) / property.sqft).toLocaleString('en-IN')} / sq.ft.</p>
                         </div>
                     </div>
 
                     {/* Stats */}
                     <div className="grid grid-cols-3 gap-3">
-                        <StatCard icon={Scaling} label="AREA" value="3,200 sqft" />
-                        <StatCard icon={Diamond} label="VASTU" value="9.2 / 10" />
-                        <StatCard icon={ParkingCircle} label="PARKING" value="2 Slots" />
+                        <StatCard icon={Scaling} label="AREA" value={`${property.sqft} sqft`} />
+                        <StatCard icon={Diamond} label="VASTU" value={property.vastuScore ? `${property.vastuScore} / 10` : 'N/A'} />
+                        <StatCard icon={ParkingCircle} label="PARKING" value={`${property.parking} Slots`} />
                     </div>
 
                     {/* Actions */}
                     <div className="grid grid-cols-2 gap-3">
                         <Button variant="secondary" className="h-14 text-base" asChild>
-                            <Link href="/chat/deal-123">
+                            <Link href={`/chat/deal-${property.id}`}>
                                 <MessageSquare className="mr-2"/> Chat Owner
                             </Link>
                         </Button>
@@ -106,7 +168,7 @@ export function PropertyDetailPage() {
                     {/* AI Legal Assistance */}
                     <Card className="glass-card p-4 space-y-3 bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
                         <h3 className="font-bold font-headline text-white">AI Legal Assistance</h3>
-                        <p className="text-sm text-muted-foreground">Instantly generate legally binding rent agreements or sale deeds specifically optimized for local Hyderabad jurisdiction.</p>
+                        <p className="text-sm text-muted-foreground">Instantly generate legally binding rent or sale agreements, optimized for local jurisdiction.</p>
                         <Button variant="default" asChild className="w-full h-12 bg-white text-black hover:bg-gray-200">
                            <Link href="/legal-vault">
                                 <FileText className="mr-2"/> Generate Agreement
@@ -139,3 +201,5 @@ export function PropertyDetailPage() {
         </div>
     );
 }
+
+    

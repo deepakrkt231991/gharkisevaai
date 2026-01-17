@@ -1,3 +1,4 @@
+
 'use client';
 import { useUser } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -10,7 +11,9 @@ export function MarketplaceHeader() {
     return (
         <header className="sticky top-0 z-50 flex items-center justify-between bg-background/80 p-4 backdrop-blur-md">
             <Link href="/" className="flex items-center gap-2 font-bold text-lg font-headline">
-                <Shield className="h-6 w-6 text-primary" />
+                <div className="bg-primary/10 p-2 rounded-full">
+                    <Shield className="h-5 w-5 text-primary" />
+                </div>
                 <span className='text-white'>GrihSeva AI</span>
             </Link>
             <div className="flex items-center gap-2">

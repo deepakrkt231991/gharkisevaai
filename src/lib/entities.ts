@@ -128,4 +128,8 @@ export interface Property {
     parking: number;
     imageUrl?: string;
     isAiVerified: boolean; // Whether the property has been verified by AI.
+    listingType: "sale" | "rent"; // Whether the property is for sale or for rent.
+    vastuScore?: number; // Vastu compliance score from 0 to 10.
 }
+
+    

@@ -2,7 +2,7 @@
 'use client';
 import { useCollection, useMemoFirebase } from '@/firebase';
 import { useFirestore } from '@/firebase/provider';
-import { collection, query } from 'firebase/firestore';
+import { collection, query, where } from 'firebase/firestore';
 import type { Property } from '@/lib/entities';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from './ui/card';
@@ -13,6 +13,7 @@ import { Skeleton } from './ui/skeleton';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { useMemo } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 // Helper function to calculate distance (Haversine formula)
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -33,17 +34,24 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 export function ExploreMarketplace() {
     const firestore = useFirestore();
     const { latitude: userLat, longitude: userLon } = useGeolocation();
+    const searchParams = useSearchParams();
+    const defaultTab = searchParams.get('tab') || 'buy';
 
-    const propertiesQuery = useMemoFirebase(() => {
+    const salePropertiesQuery = useMemoFirebase(() => {
         if (!firestore) return null;
-        // In a real app, we'd filter based on Buy/Sell/Rent. For now, fetch all.
-        return query(collection(firestore, 'properties'));
+        return query(collection(firestore, 'properties'), where('listingType', '==', 'sale'));
     }, [firestore]);
 
-    const { data: properties, isLoading } = useCollection<Property>(propertiesQuery);
+    const rentPropertiesQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return query(collection(firestore, 'properties'), where('listingType', '==', 'rent'));
+    }, [firestore]);
 
-    const sortedProperties = useMemo(() => {
-        if (!properties) return [];
+    const { data: saleProperties, isLoading: isSaleLoading } = useCollection<Property>(salePropertiesQuery);
+    const { data: rentProperties, isLoading: isRentLoading } = useCollection<Property>(rentPropertiesQuery);
+
+    const sortPropertiesByDistance = (properties: Property[] | null) => {
+         if (!properties) return [];
         if (userLat === null || userLon === null) return properties;
 
         return [...properties].sort((a, b) => {
@@ -59,7 +67,11 @@ export function ExploreMarketplace() {
             if(geoB) return 1;
             return 0; // no geo info on both
         });
-    }, [properties, userLat, userLon]);
+    }
+
+    const sortedSaleProperties = useMemo(() => sortPropertiesByDistance(saleProperties), [saleProperties, userLat, userLon]);
+    const sortedRentProperties = useMemo(() => sortPropertiesByDistance(rentProperties), [rentProperties, userLat, userLon]);
+
 
     const AiPriceEstimatorCard = () => (
         <Card className="bg-gradient-to-br from-primary/90 to-primary/60 border-none text-white">
@@ -75,8 +87,8 @@ export function ExploreMarketplace() {
             </CardContent>
         </Card>
     );
-
-    const PropertyList = () => (
+    
+    const PropertyList = ({properties, isLoading}: {properties: Property[], isLoading: boolean}) => (
         <div>
             <div className="flex justify-between items-center my-4">
                 <h2 className="text-xl font-bold font-headline text-white">Curated for You</h2>
@@ -86,33 +98,27 @@ export function ExploreMarketplace() {
             <div className="space-y-6">
                 {isLoading && (
                     <>
-                        <div className="space-y-3">
-                            <Skeleton className="h-60 w-full rounded-2xl" />
-                            <div className="flex justify-around">
-                                <Skeleton className="h-4 w-20" />
-                                <Skeleton className="h-4 w-20" />
-                                <Skeleton className="h-4 w-20" />
+                        {[...Array(2)].map((_, i) => (
+                             <div className="space-y-3" key={i}>
+                                <Skeleton className="h-60 w-full rounded-2xl" />
+                                <div className="flex justify-around">
+                                    <Skeleton className="h-4 w-20" />
+                                    <Skeleton className="h-4 w-20" />
+                                    <Skeleton className="h-4 w-20" />
+                                </div>
                             </div>
-                        </div>
-                         <div className="space-y-3">
-                            <Skeleton className="h-60 w-full rounded-2xl" />
-                            <div className="flex justify-around">
-                                <Skeleton className="h-4 w-20" />
-                                <Skeleton className="h-4 w-20" />
-                                <Skeleton className="h-4 w-20" />
-                            </div>
-                        </div>
+                        ))}
                     </>
                 )}
                 
-                {!isLoading && sortedProperties && sortedProperties.map(prop => (
+                {!isLoading && properties.map(prop => (
                     <PropertyCard key={prop.id} property={prop} />
                 ))}
 
-                 {!isLoading && (!sortedProperties || sortedProperties.length === 0) && (
+                 {!isLoading && properties.length === 0 && (
                     <div className="text-center py-8">
-                        <p className="text-muted-foreground">No properties found.</p>
-                         <p className="text-xs text-muted-foreground/50 mt-2">Be the first to list a property!</p>
+                        <p className="text-muted-foreground">No properties found for this category.</p>
+                         <p className="text-xs text-muted-foreground/50 mt-2">Check back later or list your own property!</p>
                     </div>
                 )}
             </div>
@@ -143,33 +149,34 @@ export function ExploreMarketplace() {
 
     return (
         <div className="space-y-6">
-            <Tabs defaultValue="buy" className="w-full">
+            <Tabs defaultValue={defaultTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-3 bg-card h-14 rounded-xl p-1">
                     <TabsTrigger value="buy" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                        <ShoppingBag /> Buy Home
+                        <ShoppingBag /> Buy
                     </TabsTrigger>
                     <TabsTrigger value="sell" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                        <Tag /> Sell Home
+                        <Tag /> Sell
                     </TabsTrigger>
                     <TabsTrigger value="rent" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                        <KeyRound /> Rent Home
+                        <KeyRound /> Rent
                     </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="buy" className="pt-6 space-y-6">
                     <AiPriceEstimatorCard />
-                    <PropertyList />
+                    <PropertyList properties={sortedSaleProperties} isLoading={isSaleLoading} />
                 </TabsContent>
                 <TabsContent value="sell" className="pt-6 space-y-6">
                     <AiPriceEstimatorCard />
                     <ListPropertyCtaCard />
                 </TabsContent>
                 <TabsContent value="rent" className="pt-6 space-y-6">
-                    <AiPriceEstimatorCard />
-                    <PropertyList />
+                    <PropertyList properties={sortedRentProperties} isLoading={isRentLoading} />
                     <ListPropertyCtaCard forRent />
                 </TabsContent>
             </Tabs>
         </div>
     );
 }
+
+    

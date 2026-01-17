@@ -14,6 +14,7 @@ const ListPropertySchema = z.object({
   sqft: z.coerce.number().positive({ message: "Square feet must be a positive number." }),
   parking: z.coerce.number().int().min(0, { message: "Parking must be a non-negative number." }),
   imageUrl: z.string().url({ message: "Please enter a valid image URL." }).optional().or(z.literal('')),
+  listingType: z.enum(['sale', 'rent']),
 });
 
 type State = {
@@ -35,6 +36,7 @@ export async function listProperty(
     sqft: formData.get('sqft'),
     parking: formData.get('parking'),
     imageUrl: formData.get('imageUrl'),
+    listingType: formData.get('listingType') || 'sale',
   });
 
   if (!validatedFields.success) {
@@ -65,6 +67,11 @@ export async function listProperty(
       propertyId: newDocRef.id,
       isAiVerified: false, // AI verification will be a separate process
       createdAt: serverTimestamp(),
+      // Add a default geo location for sorting if not provided
+      geo: {
+          latitude: 17.3850, // Default to Hyderabad
+          longitude: 78.4867
+      }
     });
 
     revalidatePath('/explore');
@@ -82,3 +89,5 @@ export async function listProperty(
     };
   }
 }
+
+    
