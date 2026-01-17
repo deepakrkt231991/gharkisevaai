@@ -1,63 +1,34 @@
-'use client';
-
-import { useDoc, useMemoFirebase } from '@/firebase';
-import { useFirestore } from '@/firebase/provider';
-import type { AppSettings } from '@/lib/entities';
-import { doc } from 'firebase/firestore';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
-import { Skeleton } from './ui/skeleton';
-import { ArrowRight, Gift } from 'lucide-react';
+import { ArrowRight, Shield } from 'lucide-react';
 import Link from 'next/link';
-
-const defaultOffer: AppSettings = {
-    content: "लाइफटाइम कमाई! हर रेफरल पर 0.05% कमीशन पाएं।\\nLifetime Earnings! Get 0.05% commission on every referral.",
-    backgroundColor: '#006970', // Using primary color as a fallback
-    style: 'dynamic_card'
-};
+import Image from 'next/image';
 
 export function SeasonCheckCard() {
-  const firestore = useFirestore();
-
-  const settingsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    // The 'top_banner' doc holds the dynamic content
-    return doc(firestore, 'app_settings', 'top_banner');
-  }, [firestore]);
-
-  const { data: settingsFromDb, isLoading } = useDoc<AppSettings>(settingsQuery);
-
-  if (isLoading) {
-    return <Skeleton className="h-24 w-full rounded-xl" />;
-  }
-
-  // Use data from DB if available, otherwise use the default hardcoded offer.
-  const settings = settingsFromDb?.content ? settingsFromDb : defaultOffer;
-
-  // Don't render anything if there's no setting, to avoid empty space
-  if (!settings?.content) {
-    return null;
-  }
-
-  // Split content by newline for multi-line display
-  const [line1, line2] = (settings.content || '').split('\\n');
-
   return (
-    <Card
-      className="border-none text-white overflow-hidden shadow-lg"
-      style={{ backgroundColor: settings.backgroundColor || '#FF8C00' }}
-    >
-      <CardContent className="p-4 flex items-center gap-4">
-        <div className="bg-white/10 p-3 rounded-full border border-white/20">
-            <Gift className="h-6 w-6" />
+    <Card className="relative border-none text-white overflow-hidden rounded-xl shadow-lg h-40">
+        <Image 
+            src="https://picsum.photos/seed/roof/600/400"
+            alt="Monsoon roof checkup"
+            fill
+            className="object-cover z-0"
+            data-ai-hint="rooftop view city"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/20 z-10" />
+      <CardContent className="relative p-4 flex flex-col justify-between h-full z-20">
+        <div>
+            <div className="flex items-center gap-1.5 text-xs font-bold text-accent mb-1">
+                <Shield className="h-3 w-3" />
+                <span>AI SEASON CHECK</span>
+            </div>
+            <h2 className="font-bold font-headline text-2xl leading-tight">
+                Monsoon Roof <br/> Checkup / मानसून सुरक्षा
+            </h2>
+            <p className="text-sm opacity-90 mt-1">AI-verified structural health scanning.</p>
         </div>
-        <div className="flex-1">
-          <h2 className="font-bold font-headline text-lg leading-tight">{line1 || "Special Offer"}</h2>
-          {line2 && <p className="text-sm opacity-90">{line2}</p>}
-        </div>
-        <Button asChild size="icon" variant="ghost" className="bg-white/10 hover:bg-white/20 rounded-full flex-shrink-0">
-            <Link href="/promote">
-                <ArrowRight />
+        <Button asChild size="sm" variant="ghost" className="bg-transparent hover:bg-transparent text-white p-0 justify-start h-auto w-fit">
+            <Link href="/analyze">
+                Scan Now <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
         </Button>
       </CardContent>

@@ -1,12 +1,8 @@
 
 import { Card, CardContent } from './ui/card';
 import Link from 'next/link';
-import { ArrowRight, Bot, Camera, Wrench } from 'lucide-react';
+import { Bot, Camera, Wrench, ScanSearch } from 'lucide-react';
 import { cn } from '@/lib/utils';
-// A temporary microscope icon as a placeholder
-const MicroscopeIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-primary"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M9 6.8A6 6 0 0 1 15 6a6 6 0 0 1 6 6v2"/></svg>
-)
 
 export function SmartHub() {
     return (
@@ -24,7 +20,7 @@ export function SmartHub() {
                                     <Camera className="h-4 w-4"/>
                                 </div>
                             </div>
-                            <MicroscopeIcon />
+                            <ScanSearch className="h-8 w-8 text-primary" />
                         </CardContent>
                     </Card>
                  </Link>
