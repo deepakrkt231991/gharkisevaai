@@ -1,3 +1,4 @@
+
 // This file is auto-generated, do not edit.
 
 export interface User {
@@ -114,6 +115,7 @@ export interface LegalAgreement {
 
 export interface Property {
     propertyId: string; // Unique ID for the property.
+    ownerId: string; // The user ID of the person who listed the property.
     title: string; // Title of the listing, e.g., '4 BHK Luxury Suite'.
     location: string; // City and area, e.g., 'Worli, Mumbai'.
     geo?: {
@@ -127,5 +129,3 @@ export interface Property {
     imageUrl?: string;
     isAiVerified: boolean; // Whether the property has been verified by AI.
 }
-
-    

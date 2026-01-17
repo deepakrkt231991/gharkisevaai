@@ -91,10 +91,11 @@ service cloud.firestore {
     }
 
     // PROPERTIES Collection
-    // Any signed-in user can view property listings.
+    // Any signed-in user can view property listings and create their own.
     match /properties/{propertyId} {
       allow get, list: if isSignedIn();
-      allow write: if false; // Should only be written by a backend process/Cloud Function
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if resource.data.ownerId == request.auth.uid;
     }
   }
 }

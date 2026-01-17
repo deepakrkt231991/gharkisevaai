@@ -1,3 +1,4 @@
+
 "use server";
 
 import { z } from 'zod';
@@ -45,13 +46,22 @@ export async function listProperty(
   }
   
   try {
-    const { firestore } = initializeFirebase();
+    const { firestore, auth } = initializeFirebase();
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+        return {
+            success: false,
+            message: 'You must be logged in to list a property.',
+        };
+    }
     
     const propertiesCollectionRef = collection(firestore, 'properties');
     const newDocRef = doc(propertiesCollectionRef);
 
     await setDoc(newDocRef, {
       ...validatedFields.data,
+      ownerId: currentUser.uid,
       propertyId: newDocRef.id,
       isAiVerified: false, // AI verification will be a separate process
       createdAt: serverTimestamp(),

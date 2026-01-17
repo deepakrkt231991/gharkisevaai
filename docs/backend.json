@@ -291,6 +291,7 @@
       "description": "Represents a property listing in the marketplace.",
       "properties": {
         "propertyId": { "type": "string", "description": "Unique ID for the property." },
+        "ownerId": { "type": "string", "description": "The user ID of the person who listed the property." },
         "title": { "type": "string", "description": "Title of the listing, e.g., '4 BHK Luxury Suite'." },
         "location": { "type": "string", "description": "City and area, e.g., 'Worli, Mumbai'." },
         "geo": {
@@ -308,7 +309,7 @@
         "imageUrl": { "type": "string" },
         "isAiVerified": { "type": "boolean", "description": "Whether the property has been verified by AI." }
       },
-      "required": ["propertyId", "title", "location", "price", "priceUnit", "sqft", "parking"]
+      "required": ["propertyId", "ownerId", "title", "location", "price", "priceUnit", "sqft", "parking"]
     }
   },
   "auth": {
@@ -412,5 +413,3 @@
     ]
   }
 }
-
-    

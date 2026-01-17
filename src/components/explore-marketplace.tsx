@@ -1,3 +1,4 @@
+
 'use client';
 import { useCollection, useMemoFirebase } from '@/firebase';
 import { useFirestore } from '@/firebase/provider';
@@ -145,13 +146,13 @@ export function ExploreMarketplace() {
             <Tabs defaultValue="buy" className="w-full">
                 <TabsList className="grid w-full grid-cols-3 bg-card h-14 rounded-xl p-1">
                     <TabsTrigger value="buy" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                        <ShoppingBag /> Buy
+                        <ShoppingBag /> Buy Home
                     </TabsTrigger>
                     <TabsTrigger value="sell" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                        <Tag /> Sell
+                        <Tag /> Sell Home
                     </TabsTrigger>
                     <TabsTrigger value="rent" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                        <KeyRound /> Rent
+                        <KeyRound /> Rent Home
                     </TabsTrigger>
                 </TabsList>
                 
