@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
+// Mock data to represent the user from the screenshot
 const worker = {
     name: 'Rajesh',
     profession: 'Plumber',
@@ -16,6 +17,7 @@ const worker = {
     rating: 5.0,
 };
 
+// Mock messages to represent the conversation from the screenshot
 const initialMessages = [
     { id: 1, sender: 'worker', text: "Hello! I'm your assigned plumber. Could you please send a photo of the defect so I can bring the right parts?", time: '10:14 AM' },
     { id: 2, sender: 'user', text: "Sure, let me take a quick picture of the kitchen sink leak. It's pooling under the cabinet.", time: '10:15 AM' },
@@ -35,6 +37,11 @@ const AiSuggestions = () => (
 );
 
 export function ChatInterface({ chatId }: { chatId: string }) {
+    // In a real app, you would use `chatId` to fetch conversation data
+    // For example:
+    // const { data: messages, isLoading } = useCollection(`/jobs/${chatId}/messages`);
+    // const { data: job } = useDoc(`/jobs/${chatId}`);
+    // const { data: otherUser } = useDoc(job ? `/users/${job.workerId}` : null);
     
     return (
         <div className="flex flex-col h-full bg-background text-white">
@@ -72,6 +79,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
                         {msg.sender === 'worker' && <p className="text-sm text-muted-foreground mb-1">{worker.name}</p>}
                         <div className={`max-w-xs lg:max-w-md p-3 rounded-2xl ${msg.sender === 'user' ? 'bg-primary text-white rounded-br-none' : 'bg-card rounded-bl-none'}`}>
                            {msg.image ? (
+                               // This is a placeholder for the image sent by the user
                                <div className="h-40 w-40 bg-card/50 rounded-lg border border-border"></div>
                            ) : (
                                <p>{msg.text}</p>
