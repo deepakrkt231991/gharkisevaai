@@ -18,9 +18,17 @@ type State = {
 }
 
 export async function analyzeInterior(
-  prevState: State,
+  prevState: State | undefined,
   formData: FormData,
 ): Promise<State> {
+  
+  if (!formData.get('roomPhotoUri')) {
+    return {
+      success: false,
+      message: '',
+      data: null,
+    };
+  }
   
   const validatedFields = schema.safeParse({
     roomPhotoUri: formData.get('roomPhotoUri'),
@@ -68,9 +76,17 @@ type RenderState = {
 }
 
 export async function generate3dRender(
-  prevState: RenderState,
+  prevState: RenderState | undefined,
   formData: FormData,
 ): Promise<RenderState> {
+    if (!formData.get('roomPhotoUri')) {
+        return {
+          success: false,
+          message: '',
+          renderData: null,
+        };
+    }
+
   const validatedFields = renderSchema.safeParse({
     roomPhotoUri: formData.get('roomPhotoUri'),
     suggestions: formData.get('suggestions'),

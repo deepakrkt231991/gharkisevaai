@@ -38,31 +38,40 @@ export function InteriorAnalyzer() {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      handleResetStates();
       const reader = new FileReader();
       reader.onloadend = () => {
         const dataUrl = reader.result as string;
         setImage(dataUrl);
 
         if (analysisFormRef.current) {
-          // This is a workaround to reset the action states. A more robust solution might use a key on the component.
-          analysisFormRef.current.reset();
-
+          const formData = new FormData(analysisFormRef.current);
+          formData.set('roomPhotoUri', dataUrl);
           startTransition(() => {
-            const emptyRenderForm = new FormData();
-            renderAction(emptyRenderForm);
+              analysisAction(formData);
           });
-
-          (analysisFormRef.current.elements.namedItem('roomPhotoUri') as HTMLInputElement).value = dataUrl;
-          analysisFormRef.current.requestSubmit();
         }
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const handleResetStates = () => {
+      setImage(null);
+      if (analysisFormRef.current) {
+          analysisFormRef.current.reset();
+      }
+      startTransition(() => {
+          analysisAction(new FormData());
+          renderAction(new FormData());
+      });
+  }
+
   const handleStartOver = () => {
-      // A simple way to reset everything is to reload the page.
-      window.location.reload();
+      handleResetStates();
+      if(fileInputRef.current) {
+          fileInputRef.current.value = "";
+      }
   };
 
   const AnalysisResults = () => {
@@ -98,7 +107,7 @@ export function InteriorAnalyzer() {
                     <h2 className="text-2xl font-bold font-headline">AI Analysis</h2>
                     <p className="text-sm text-muted-foreground">{analysisState.data.suggestions.length} Hotspots detected</p>
                 </div>
-                <Badge className="bg-primary/20 text-primary border-primary/40">PREMIUM</Badge>
+                 <Badge className="bg-accent/20 text-accent border-accent/40 font-bold tracking-widest">FREE AI CONSULTATION</Badge>
             </div>
 
              <Tabs defaultValue="vastu" className="w-full">
@@ -148,7 +157,7 @@ export function InteriorAnalyzer() {
         <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
           <ArrowLeft />
         </Button>
-        <h1 className="text-lg font-bold font-headline text-white">GrihSeva AI</h1>
+        <h1 className="text-lg font-bold font-headline text-white">AI Home Consultant</h1>
         <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon"><Share /></Button>
             <Button variant="ghost" size="icon"><Heart /></Button>
@@ -203,7 +212,17 @@ export function InteriorAnalyzer() {
         
         {analysisState.success && !renderState.success && <AnalysisResults />}
         
-        {renderState.message && !renderState.success && (
+        {analysisState.message && !analysisState.success && image && (
+             <div className="p-4">
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Analysis Failed</AlertTitle>
+                    <AlertDescription>{analysisState.message}</AlertDescription>
+                </Alert>
+             </div>
+        )}
+        
+        {renderState.message && !renderState.success && analysisState.success && (
             <div className="p-4">
                 <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
