@@ -4,7 +4,7 @@ import { useFormStatus } from 'react-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
 import Image from 'next/image';
-import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin } from 'lucide-react';
+import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin, Mail } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
 import { verifyWorker } from '@/ai/flows/verification-agent';
@@ -262,9 +262,19 @@ export function WorkerSignupForm() {
                     </Button>
                     {verificationResult && (
                         <Alert variant={verificationResult.verified ? 'default' : 'destructive'} className={verificationResult.verified ? 'bg-green-900/50 border-green-500/50 text-white' : ''}>
-                            <CheckCircle className="h-4 w-4" />
+                            {verificationResult.verified ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                             <AlertTitle className='font-bold'>{verificationResult.verified ? 'Verification Successful' : 'Verification Failed'}</AlertTitle>
-                            <AlertDescription>{verificationResult.reasoning}</AlertDescription>
+                            <AlertDescription>
+                                <p>{verificationResult.reasoning}</p>
+                                {!verificationResult.verified && (
+                                    <Button asChild className="mt-3 w-full" variant="secondary">
+                                        <a href={`mailto:gharkisevaai@gmail.com?subject=Manual%20Worker%20Verification%20Request&body=Hello%20Admin,%0D%0A%0D%0AMy%20AI%20verification%20failed.%20Please%20manually%20verify%20my%20profile.%0D%0A%0D%0AName:%20${name}%0D%0APhone:%20${phone}%0D%0A%0D%0AThank%20you.`}>
+                                            <Mail className="mr-2 h-4 w-4" />
+                                            Request Manual Review
+                                        </a>
+                                    </Button>
+                                )}
+                            </AlertDescription>
                         </Alert>
                     )}
                 </div>
