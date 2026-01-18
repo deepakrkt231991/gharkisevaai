@@ -4,7 +4,7 @@ import { useFormStatus } from 'react-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
 import Image from 'next/image';
-import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft } from 'lucide-react';
+import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
 import { verifyWorker } from '@/ai/flows/verification-agent';
@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { useGeolocation } from '@/hooks/use-geolocation';
 
 
 declare global {
@@ -29,6 +30,7 @@ export function WorkerSignupForm() {
   const { toast } = useToast();
   
   const [currentStep, setCurrentStep] = useState(1);
+  const { latitude, longitude, error: geoError, isLoading: isGeoLoading } = useGeolocation();
 
   // Step 1 State
   const [name, setName] = useState('');
@@ -61,11 +63,12 @@ export function WorkerSignupForm() {
         if(verificationResult?.verified) newProgress = 66;
     } else if (currentStep === 3) {
         newProgress = 66;
-        if(skills) newProgress += 17;
-        if(emergencyContact) newProgress += 17;
+        if(skills) newProgress += 11;
+        if(emergencyContact) newProgress += 11;
+        if (latitude && longitude) newProgress += 12;
     }
     setProgress(Math.min(100, newProgress));
-  }, [name, phone, idCardUri, selfieUri, verificationResult, skills, emergencyContact, currentStep]);
+  }, [name, phone, idCardUri, selfieUri, verificationResult, skills, emergencyContact, latitude, longitude, currentStep]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'id' | 'selfie') => {
@@ -249,7 +252,7 @@ export function WorkerSignupForm() {
                         </label>
                         <label className="relative group cursor-pointer border-2 border-dashed border-border hover:border-accent/50 rounded-xl aspect-square flex flex-col items-center justify-center bg-input/50 transition-all scan-glow">
                             <input type="file" accept="image/*" capture="user" className="sr-only" onChange={(e) => handleFileChange(e, 'selfie')}/>
-                            {selfieUri ? <Image src={selfieUri} alt="Selfie preview" fill className="object-cover rounded-xl"/> : <><Camera className="text-3xl text-primary/50 group-hover:text-accent transition-colors" /><p className="text-[10px] text-center mt-2 font-bold text-[#9ab9bc] uppercase tracking-tighter">Live Selfie</p></>}
+                            {selfieUri ? <Image src={selfieUri} alt="Selfie preview" fill className="object-cover rounded-xl"/> : <><Camera className="text-3xl text-primary/50 group-hover:text-accent transition-colors" /><p className="text-[10px] text-center mt-2 font-bold text-[#9ab9bc] uppercase tracking-tighter">Live Selfie</p><p className="text-[9px] text-center text-muted-foreground px-1">Opens camera for live capture</p></>}
                             <div className="absolute -top-1 -right-1"><span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span></span></div>
                         </label>
                     </div>
@@ -297,6 +300,16 @@ export function WorkerSignupForm() {
                         <Input name="emergencyContact" value={emergencyContact} onChange={(e) => setEmergencyContact(e.target.value)} placeholder="A family member's number" type="tel" />
                     </div>
                     <div className="space-y-2">
+                        <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Live Location</Label>
+                        <div className="flex items-center gap-2 bg-input border border-border rounded-lg p-3 h-14">
+                            <MapPin className="text-primary"/>
+                            {isGeoLoading && <span className="text-sm text-muted-foreground">Fetching location...</span>}
+                            {geoError && <span className="text-sm text-destructive">{geoError}</span>}
+                            {latitude && longitude && <span className="text-sm text-white">{latitude.toFixed(4)}, {longitude.toFixed(4)}</span>}
+                        </div>
+                         <p className="text-xs text-muted-foreground">We need your location to show you relevant nearby jobs.</p>
+                    </div>
+                    <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Bank Account Holder Name</Label>
                         <Input name="accountHolderName" placeholder="Name as per bank records" />
                     </div>
@@ -316,6 +329,8 @@ export function WorkerSignupForm() {
             )}
             <input type="hidden" name="name" value={name} />
             <input type="hidden" name="phone" value={phone} />
+            <input type="hidden" name="latitude" value={latitude || ''} />
+            <input type="hidden" name="longitude" value={longitude || ''} />
         </form>
       </div>
 

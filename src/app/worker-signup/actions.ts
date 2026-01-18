@@ -8,7 +8,7 @@ import { getAuth } from 'firebase/auth';
 import { headers } from 'next/headers';
 
 
-// Updated schema to include new fields for bank details
+// Updated schema to include new fields for bank details and location
 const WorkerProfileSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   phone: z.string().min(10, { message: "Please enter a valid 10-digit phone number." }),
@@ -17,6 +17,8 @@ const WorkerProfileSchema = z.object({
   accountHolderName: z.string().min(2, { message: "Please enter the account holder's name." }),
   accountNumber: z.string().min(9, { message: "Please enter a valid bank account number." }),
   ifscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, { message: "Please enter a valid IFSC code." }),
+  latitude: z.coerce.number().optional(),
+  longitude: z.coerce.number().optional(),
 });
 
 type State = {
@@ -38,6 +40,8 @@ export async function createWorkerProfile(
     accountHolderName: formData.get('accountHolderName'),
     accountNumber: formData.get('accountNumber'),
     ifscCode: formData.get('ifscCode'),
+    latitude: formData.get('latitude'),
+    longitude: formData.get('longitude'),
   });
 
   if (!validatedFields.success) {
@@ -52,9 +56,6 @@ export async function createWorkerProfile(
     const { firestore, auth } = initializeFirebase();
     const currentUser = auth.currentUser;
     
-    // In a real app with server-side auth, you'd get the user from the session/token.
-    // Since this is a client-driven action, we rely on the client's auth state.
-    // For a more secure version, you'd pass an ID token and verify it.
     if (!currentUser) {
         return {
             success: false,
@@ -62,7 +63,7 @@ export async function createWorkerProfile(
         };
     }
 
-    const { accountHolderName, accountNumber, ifscCode, ...workerData } = validatedFields.data;
+    const { accountHolderName, accountNumber, ifscCode, latitude, longitude, ...workerData } = validatedFields.data;
     
     const workerId = currentUser.uid;
     const workerDocRef = doc(firestore, 'workers', workerId);
@@ -76,6 +77,10 @@ export async function createWorkerProfile(
         accountHolderName,
         accountNumber,
         ifscCode
+      },
+      location: {
+        latitude: latitude || null,
+        longitude: longitude || null,
       },
       isVerified: true, // Assuming verification was passed on the client
       rating: 0,
@@ -95,5 +100,3 @@ export async function createWorkerProfile(
     };
   }
 }
-
-    
