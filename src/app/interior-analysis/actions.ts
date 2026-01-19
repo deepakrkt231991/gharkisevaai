@@ -67,6 +67,7 @@ export async function analyzeInterior(
 const renderSchema = z.object({
   roomPhotoUri: z.string().refine(val => val.startsWith('data:')),
   suggestions: z.string().transform(val => JSON.parse(val)),
+  style: z.string().optional(),
 });
 
 type RenderState = {
@@ -90,6 +91,7 @@ export async function generate3dRender(
   const validatedFields = renderSchema.safeParse({
     roomPhotoUri: formData.get('roomPhotoUri'),
     suggestions: formData.get('suggestions'),
+    style: formData.get('style'),
   });
 
   if (!validatedFields.success) {
@@ -105,6 +107,7 @@ export async function generate3dRender(
     const result = await generateInteriorRender({
       roomPhotoUri: validatedFields.data.roomPhotoUri,
       suggestions: validatedFields.data.suggestions,
+      style: validatedFields.data.style,
     });
     return {
       success: true,

@@ -32,6 +32,9 @@ export function InteriorAnalyzer() {
   const [renderState, renderAction, isRenderPending] = useActionState(generate3dRender, initialRenderState);
   
   const [image, setImage] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState('Modern');
+  const moodboardStyles = ['Modern', 'Classic', 'Minimalist', 'Industrial', 'Bohemian'];
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const analysisFormRef = useRef<HTMLFormElement>(null);
 
@@ -100,14 +103,14 @@ export function InteriorAnalyzer() {
     );
 
     return (
-        <div className="bg-background rounded-t-3xl p-4 -mt-8 relative z-10 space-y-4 pb-24">
+        <div className="bg-background rounded-t-3xl p-4 -mt-8 relative z-10 space-y-6 pb-24">
             <div className="w-12 h-1.5 bg-border rounded-full mx-auto" />
             <div className="flex justify-between items-center">
                 <div>
                     <h2 className="text-2xl font-bold font-headline">AI Analysis</h2>
                     <p className="text-sm text-muted-foreground">{analysisState.data.suggestions.length} Hotspots detected</p>
                 </div>
-                 <Badge className="bg-accent/20 text-accent border-accent/40 font-bold tracking-widest">FREE AI CONSULTATION</Badge>
+                 <Badge className="bg-accent/20 text-accent border-accent/40 font-bold tracking-widest animate-pulse">FREE AI CONSULTATION</Badge>
             </div>
 
              <Tabs defaultValue="vastu" className="w-full">
@@ -126,10 +129,28 @@ export function InteriorAnalyzer() {
                      {lightingInsights.map((item, i) => <InsightCard key={i} {...item} />)}
                 </TabsContent>
             </Tabs>
+            
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold font-headline text-white">Select a Mood</h3>
+              <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+                {moodboardStyles.map(style => (
+                  <Button
+                    key={style}
+                    variant={selectedStyle === style ? 'default' : 'secondary'}
+                    onClick={() => setSelectedStyle(style)}
+                    className="rounded-full h-10 whitespace-nowrap bg-card text-white data-[variant=default]:bg-primary"
+                  >
+                    {style}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
 
             <form action={renderAction}>
                 <input type="hidden" name="roomPhotoUri" value={image!} />
                 <input type="hidden" name="suggestions" value={JSON.stringify(analysisState.data?.suggestions)} />
+                <input type="hidden" name="style" value={selectedStyle} />
                 <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md p-4 z-20">
                     <Button type="submit" size="lg" className="w-full h-14 bg-primary text-lg" disabled={isRenderPending}>
                         {isRenderPending ? (
