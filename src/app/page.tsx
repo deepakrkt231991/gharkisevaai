@@ -2,7 +2,7 @@ import { HomeHeader } from '@/components/home-header';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { SeasonCheckCard } from '@/components/season-check-card';
 import { TrendingNow } from '@/components/trending-now';
-import { SmartHub } from '@/components/smart-hub';
+import { AiServiceGrid } from '@/components/ai-service-grid';
 import { UserStats } from '@/components/user-stats';
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
         <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-32">
           <SeasonCheckCard />
           <TrendingNow />
-          <SmartHub />
+          <AiServiceGrid />
           <UserStats />
         </main>
         <BottomNavBar />
