@@ -1,27 +1,24 @@
 "use client";
 
-import { useMemo, useTransition } from "react";
+import { useMemo, useTransition, useActionState } from "react";
+import Image from "next/image";
+import { useFormStatus } from "react-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2 } from "lucide-react";
+import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download } from "lucide-react";
 import { useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, where } from "firebase/firestore";
+import { collection, query, where, orderBy } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
-import type { SOSAlert, Worker } from "@/lib/entities";
-import { approveWorker, rejectWorker } from "@/app/admin/actions";
+import type { SOSAlert, Worker, Transaction } from "@/lib/entities";
+import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState } from "@/app/admin/actions";
 import { useToast } from "@/hooks/use-toast";
-
-// Mock Data
-const metrics = {
-  totalOrders: 1250,
-  dailyRevenue: "₹85,000",
-  activeWorkers: 150,
-  aiTrend: "AC Repair is the most requested service this week."
-};
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
 
 function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
     const { toast } = useToast();
@@ -76,6 +73,65 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
     )
 }
 
+function MarketingHub() {
+    const initialState: PosterState = { success: false, message: '', data: null };
+    const [state, formAction] = useActionState(generateAdminPromoPoster, initialState);
+
+    const SubmitButton = () => {
+        const { pending } = useFormStatus();
+        return (
+            <Button type="submit" disabled={pending} className="w-full">
+                {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Sparkles className="mr-2 h-4 w-4"/>}
+                Generate Poster
+            </Button>
+        )
+    }
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Marketing Content Generator</CardTitle>
+                <CardDescription>Create promotional posters for workers to share on social media.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <form action={formAction} className="space-y-4">
+                    <div className="space-y-1">
+                        <Label htmlFor="workerName">Worker Name</Label>
+                        <Input id="workerName" name="workerName" defaultValue="Suresh Kumar" />
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="workerPhotoUrl">Worker Photo URL</Label>
+                        <Input id="workerPhotoUrl" name="workerPhotoUrl" defaultValue="https://images.unsplash.com/photo-1558611848-73f7eb4001a1?w=400" />
+                    </div>
+                    <SubmitButton />
+                </form>
+
+                {state?.message && !state.success && (
+                    <Alert variant="destructive" className="mt-4">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>{state.message}</AlertDescription>
+                    </Alert>
+                )}
+
+                {state?.success && state.data?.posterDataUri && (
+                    <div className="space-y-4 pt-4">
+                        <h3 className="font-semibold">Generated Poster:</h3>
+                        <div className="relative w-full max-w-sm aspect-square rounded-lg overflow-hidden border">
+                            <Image src={state.data.posterDataUri} alt="Generated promotional poster" fill objectFit="contain" />
+                        </div>
+                        <Button asChild>
+                            <a href={state.data.posterDataUri} download="promo_poster.png">
+                                <Download className="mr-2 h-4 w-4" /> Download
+                            </a>
+                        </Button>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
 export function AdminDashboard() {
   const firestore = useFirestore();
 
@@ -86,13 +142,32 @@ export function AdminDashboard() {
   
   const pendingVerificationsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    // Query for workers who are NOT verified
     return query(collection(firestore, 'workers'), where('isVerified', '==', false));
+  }, [firestore]);
+
+  const transactionsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'transactions'), orderBy('timestamp', 'desc'));
   }, [firestore]);
 
   const { data: sosAlerts, isLoading: sosLoading } = useCollection<SOSAlert>(sosAlertsQuery);
   const { data: pendingVerifications, isLoading: pendingLoading } = useCollection<Worker>(pendingVerificationsQuery);
-  
+  const { data: transactions, isLoading: transactionsLoading } = useCollection<Transaction>(transactionsQuery);
+
+  const { totalRevenue, referralRevenue } = useMemo(() => {
+    if (!transactions) return { totalRevenue: 0, referralRevenue: 0 };
+    
+    let total = 0;
+    let referral = 0;
+    transactions.forEach(tx => {
+        total += tx.amount;
+        if (tx.type === 'referral_commission') {
+            referral += tx.amount;
+        }
+    });
+    return { totalRevenue: total, referralRevenue: referral };
+  }, [transactions]);
+
   const getTimeAgo = (timestamp: any) => {
     if (!timestamp) return 'N/A';
     const date = timestamp.toDate();
@@ -115,58 +190,100 @@ export function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold font-headline">Admin Command Center</h1>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening on GrihSeva AI.</p>
+        <p className="text-muted-foreground">Welcome back! Here's what's happening on Ghar Ki Seva.</p>
       </div>
 
-      <Tabs defaultValue="verification">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">
-            <TrendingUp className="mr-2 h-4 w-4" /> Overview
-          </TabsTrigger>
-          <TabsTrigger value="sos">
-            <AlertTriangle className="mr-2 h-4 w-4" /> SOS Alerts
-          </TabsTrigger>
+      <Tabs defaultValue="metrics">
+        <TabsList className="grid w-full grid-cols-4">
+           <TabsTrigger value="metrics"><TrendingUp className="mr-2 h-4 w-4" /> Metrics</TabsTrigger>
           <TabsTrigger value="verification">
-            <CheckCircle className="mr-2 h-4 w-4" /> Worker Verification
+            <CheckCircle className="mr-2 h-4 w-4" /> Verification
              {pendingVerifications && pendingVerifications.length > 0 && (
                 <Badge className="ml-2">{pendingVerifications.length}</Badge>
             )}
           </TabsTrigger>
+           <TabsTrigger value="marketing"><Share2 className="mr-2 h-4 w-4" /> Marketing</TabsTrigger>
+          <TabsTrigger value="sos">
+            <AlertTriangle className="mr-2 h-4 w-4" /> SOS Alerts
+          </TabsTrigger>
         </TabsList>
 
-        {/* Overview / Real-time Metrics Tab */}
-        <TabsContent value="overview">
+        <TabsContent value="metrics">
           <Card>
             <CardHeader>
-              <CardTitle>Real-time Metrics</CardTitle>
-              <CardDescription>{metrics.aiTrend}</CardDescription>
+              <CardTitle>Revenue Tracker</CardTitle>
+              <CardDescription>Real-time revenue and commission data.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-4xl">{metrics.totalOrders}</CardTitle>
-                    <CardDescription>Total Orders</CardDescription>
-                  </CardHeader>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-4xl">{metrics.dailyRevenue}</CardTitle>
-                    <CardDescription>Today's Revenue</CardDescription>
-                  </CardHeader>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-4xl">{metrics.activeWorkers}</CardTitle>
-                    <CardDescription>Active Workers</CardDescription>
-                  </CardHeader>
-                </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center mb-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-4xl">₹{totalRevenue.toFixed(2)}</CardTitle>
+                            <CardDescription>Total Revenue</CardDescription>
+                        </CardHeader>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-4xl">₹{referralRevenue.toFixed(2)}</CardTitle>
+                            <CardDescription>Referral Commissions Paid</CardDescription>
+                        </CardHeader>
+                    </Card>
+                </div>
+                 <h3 className="text-lg font-semibold mb-2">Recent Transactions</h3>
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>User ID</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>Amount</TableHead>
+                            <TableHead>Time</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {transactionsLoading && <TableRow><TableCell colSpan={4} className="text-center">Loading transactions...</TableCell></TableRow>}
+                        {transactions && transactions.length > 0 ? (
+                            transactions.slice(0, 5).map(tx => (
+                                <TableRow key={tx.id}>
+                                    <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
+                                    <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge></TableCell>
+                                    <TableCell className="font-semibold">₹{tx.amount.toFixed(2)}</TableCell>
+                                    <TableCell>{getTimeAgo(tx.timestamp)}</TableCell>
+                                </TableRow>
+                            ))
+                        ) : !transactionsLoading && (
+                            <TableRow><TableCell colSpan={4} className="text-center">No transactions yet.</TableCell></TableRow>
+                        )}
+                    </TableBody>
+                 </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="verification">
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Worker Verifications</CardTitle>
+              <CardDescription>Approve or reject new worker applications.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                 {pendingLoading && <p className="text-center p-8">Loading pending verifications...</p>}
+                 {pendingVerifications && pendingVerifications.length > 0 ? (
+                    pendingVerifications.map((p) => (
+                      <WorkerVerificationRow key={p.id} worker={p} />
+                    ))
+                 ) : !pendingLoading && (
+                    <p className="text-center text-muted-foreground p-8">No pending verifications.</p>
+                 )}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* SOS Alerts Tab */}
+        <TabsContent value="marketing">
+            <MarketingHub />
+        </TabsContent>
+
         <TabsContent value="sos">
           <Card>
             <CardHeader>
@@ -207,28 +324,6 @@ export function AdminDashboard() {
                   )}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Worker Verification Tab */}
-        <TabsContent value="verification">
-          <Card>
-            <CardHeader>
-              <CardTitle>Pending Worker Verifications</CardTitle>
-              <CardDescription>Approve or reject new worker applications.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                 {pendingLoading && <p className="text-center p-8">Loading pending verifications...</p>}
-                 {pendingVerifications && pendingVerifications.length > 0 ? (
-                    pendingVerifications.map((p) => (
-                      <WorkerVerificationRow key={p.id} worker={p} />
-                    ))
-                 ) : !pendingLoading && (
-                    <p className="text-center text-muted-foreground p-8">No pending verifications.</p>
-                 )}
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
