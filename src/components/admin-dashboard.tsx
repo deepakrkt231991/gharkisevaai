@@ -21,6 +21,21 @@ import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 
+function StatCard({ title, value, icon, description }: { title: string; value: string | number; icon: React.ReactNode, description?: string }) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {icon}
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        {description && <p className="text-xs text-muted-foreground">{description}</p>}
+      </CardContent>
+    </Card>
+  )
+}
+
 function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
@@ -180,11 +195,14 @@ export function AdminDashboard() {
     let total = 0;
     let referral = 0;
     transactions.forEach(tx => {
+        // Assuming all transactions contribute to total revenue for simplicity
         total += tx.amount;
         if (tx.type === 'referral_commission') {
             referral += tx.amount;
         }
     });
+    // This is a simplification. Real total revenue would likely be service fees, not just sum of all transactions.
+    // Let's assume for now total revenue is just the sum of all transaction amounts.
     return { totalRevenue: total, referralRevenue: referral };
   }, [transactions]);
 
@@ -210,46 +228,57 @@ export function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold font-headline">Ghar Ki Seva - Admin Panel</h1>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening on the platform.</p>
+        <p className="text-muted-foreground">Welcome back! Here's your real-time business overview.</p>
       </div>
 
-      <Tabs defaultValue="metrics">
+       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+              title="Total Revenue"
+              value={`₹${totalRevenue.toFixed(2)}`}
+              icon={<IndianRupee className="h-4 w-4 text-muted-foreground" />}
+          />
+          <StatCard
+              title="Referral Payouts"
+              value={`₹${referralRevenue.toFixed(2)}`}
+              icon={<Share2 className="h-4 w-4 text-muted-foreground" />}
+          />
+          <StatCard
+              title="Pending Verifications"
+              value={pendingLoading ? '...' : (pendingVerifications?.length || 0)}
+              icon={<Users className="h-4 w-4 text-muted-foreground" />}
+          />
+          <StatCard
+              title="Active SOS Alerts"
+              value={sosLoading ? '...' : (sosAlerts?.length || 0)}
+              icon={<AlertTriangle className="h-4 w-4 text-muted-foreground" />}
+          />
+      </div>
+
+      <Tabs defaultValue="verification">
         <TabsList className="grid w-full grid-cols-4">
-           <TabsTrigger value="metrics"><TrendingUp className="mr-2 h-4 w-4" /> Metrics</TabsTrigger>
-          <TabsTrigger value="verification">
+           <TabsTrigger value="verification">
             <CheckCircle className="mr-2 h-4 w-4" /> Verification
              {pendingVerifications && pendingVerifications.length > 0 && (
                 <Badge className="ml-2">{pendingVerifications.length}</Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="transactions"><TrendingUp className="mr-2 h-4 w-4" /> Transactions</TabsTrigger>
            <TabsTrigger value="marketing"><Share2 className="mr-2 h-4 w-4" /> Marketing</TabsTrigger>
           <TabsTrigger value="sos">
             <AlertTriangle className="mr-2 h-4 w-4" /> SOS Alerts
+             {sosAlerts && sosAlerts.length > 0 && (
+                <Badge variant="destructive" className="ml-2">{sosAlerts.length}</Badge>
+            )}
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="metrics">
+        <TabsContent value="transactions">
           <Card>
             <CardHeader>
-              <CardTitle>Revenue Tracker</CardTitle>
-              <CardDescription>Real-time revenue and commission data.</CardDescription>
+              <CardTitle>Recent Transactions</CardTitle>
+              <CardDescription>A log of all financial movements on the platform.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center mb-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-4xl">₹{totalRevenue.toFixed(2)}</CardTitle>
-                            <CardDescription>Total Revenue</CardDescription>
-                        </CardHeader>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-4xl">₹{referralRevenue.toFixed(2)}</CardTitle>
-                            <CardDescription>Referral Commissions Paid</CardDescription>
-                        </CardHeader>
-                    </Card>
-                </div>
-                 <h3 className="text-lg font-semibold mb-2">Recent Transactions</h3>
                  <Table>
                     <TableHeader>
                         <TableRow>
@@ -262,7 +291,7 @@ export function AdminDashboard() {
                     <TableBody>
                         {transactionsLoading && <TableRow><TableCell colSpan={4} className="text-center">Loading transactions...</TableCell></TableRow>}
                         {transactions && transactions.length > 0 ? (
-                            transactions.slice(0, 5).map(tx => (
+                            transactions.slice(0, 10).map(tx => (
                                 <TableRow key={tx.id}>
                                     <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
                                     <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge></TableCell>
@@ -287,7 +316,7 @@ export function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                 {pendingLoading && <p className="text-center p-8">Loading pending verifications...</p>}
+                 {pendingLoading && <div className="text-center p-8 flex items-center justify-center gap-2"><Loader2 className="animate-spin"/> Loading pending verifications...</div>}
                  {pendingVerifications && pendingVerifications.length > 0 ? (
                     pendingVerifications.map((p) => (
                       <WorkerVerificationRow key={p.id} worker={p} />
@@ -307,7 +336,7 @@ export function AdminDashboard() {
         <TabsContent value="sos">
           <Card>
             <CardHeader>
-              <CardTitle>Pending SOS Alerts</CardTitle>
+              <CardTitle>Active SOS Alerts</CardTitle>
               <CardDescription>Review and take immediate action on these alerts.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -323,14 +352,14 @@ export function AdminDashboard() {
                 <TableBody>
                   {sosLoading && (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center">Loading alerts...</TableCell>
+                      <TableCell colSpan={4} className="text-center flex items-center justify-center gap-2"><Loader2 className="animate-spin"/> Loading alerts...</TableCell>
                     </TableRow>
                   )}
                   {sosAlerts && sosAlerts.length > 0 ? (
                     sosAlerts.map((alert) => (
-                      <TableRow key={alert.alertId}>
-                        <TableCell className="font-medium">{alert.userId}</TableCell>
-                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location.latitude}, ${alert.location.longitude}`}</TableCell>
+                      <TableRow key={alert.id}>
+                        <TableCell className="font-medium font-mono text-xs">{alert.userId}</TableCell>
+                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location.latitude?.toFixed(4)}, ${alert.location.longitude?.toFixed(4)}`}</TableCell>
                         <TableCell>{getTimeAgo(alert.timestamp)}</TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm">View Details</Button>
