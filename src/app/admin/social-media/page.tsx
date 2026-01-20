@@ -17,8 +17,11 @@ export default function SocialMediaPage() {
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>
-                    <h1 className="text-3xl font-bold font-headline">AI Social Media Ad Maker</h1>
+                    <h1 className="text-3xl font-bold font-headline">Worker Recruitment Ads</h1>
                 </div>
+                 <p className="text-muted-foreground max-w-3xl mb-8">
+                    Use these pre-made templates to recruit workers on LinkedIn and Facebook. The copy is optimized to attract professionals by highlighting the benefits of your platform, like 0% commission and direct payments.
+                </p>
                 <SocialAdGenerator />
             </div>
            </main>

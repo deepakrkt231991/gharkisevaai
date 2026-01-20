@@ -1,87 +1,81 @@
 "use client";
 
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
 import { useToast } from "@/hooks/use-toast";
-import { generateSocialAd, type AdState } from "@/app/admin/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Loader2, Copy, Bot, AlertTriangle } from 'lucide-react';
+import { Copy, Linkedin, Facebook } from 'lucide-react';
+import Image from "next/image";
 
-function SubmitButton() {
-    const { pending } = useFormStatus();
+const linkedinTemplate = {
+    headline: "🚀 Join India’s First AI-Powered Home Service Platform – 0% Commission Forever!",
+    content: `Are you a professional worker or service provider? Join 'Ghar Ki Seva' (घर की सेवा) and connect directly with customers.
+
+✅ Zero Platform Fees: We don't charge any commission from you.
+✅ Direct Payments: Talk directly to the customer and get the full payment for your hard work.
+✅ AI Verification: Get your skills and certificates verified by our AI and earn a 'Trust Badge'.
+✅ World-Class Tech: Get the best jobs near your location through AI analysis.
+
+Upload your Live Selfie and Certificates today and become a 'Verified Global Professional'!
+
+👉 Register Now: https://app.gharkiseva.com/worker-signup`,
+    image: "https://picsum.photos/seed/linkedin-ad/1200/628",
+    imageHint: "professional tools layout"
+};
+
+const facebookTemplate = {
+    headline: "🏠 घर की सेवा (Ghar Ki Seva) से जुड़ें – बिना किसी कमीशन के काम पाएं! 🛠️",
+    content: `Ab kaam dhundne ke liye bhatakna band! 'Ghar Ki Seva' app par aayein aur apne hunar ki poori keemat paayein.
+
+✨ 0% Commission: Hum aapke kaam se ek rupaya bhi nahi kaatte.
+✨ Saccha Bharosa: Apni photo aur ID card daalein aur grahakon ka bharosa jeetein.
+✨ Aasan Kaam: Aapke ghar ke paas ke orders seedhe aapke phone par.
+✨ Muft Registration: Abhi judein aur apni dukaan ya service ko digital banayein.
+
+Mehnat aapki, kamai bhi aapki! Aaj hi judein.
+
+👇 Neeche diye link se app download karein aur apni selfie upload karein!
+https://app.gharkiseva.com/worker-signup`,
+    image: "https://picsum.photos/seed/facebook-ad/1080/1080",
+    imageHint: "happy worker tools"
+};
+
+const AdTemplateCard = ({ platform, icon, template }: { platform: string, icon: React.ReactNode, template: typeof linkedinTemplate }) => {
+    const { toast } = useToast();
+
+    const handleCopy = (textToCopy: string) => {
+        navigator.clipboard.writeText(textToCopy);
+        toast({ title: "Copied!", description: `${platform} ad copy has been copied to your clipboard.` });
+    };
+    
     return (
-        <Button type="submit" disabled={pending} className="w-full h-14">
-            {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Bot className="mr-2 h-4 w-4"/>}
-            Generate Ad Copy
-        </Button>
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">{icon} {platform}</CardTitle>
+                <CardDescription>Use this template to recruit workers on {platform}.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="w-full aspect-video relative rounded-lg overflow-hidden bg-muted">
+                    <Image src={template.image} alt={`${platform} ad visual`} fill className="object-cover" data-ai-hint={template.imageHint} />
+                </div>
+
+                <div className="relative w-full rounded-lg border bg-secondary p-4 whitespace-pre-wrap font-mono text-sm max-h-60 overflow-y-auto">
+                    <h4 className="font-bold mb-2">{template.headline}</h4>
+                    {template.content}
+                </div>
+                <Button onClick={() => handleCopy(`${template.headline}\n\n${template.content}`)} variant="outline" className="w-full">
+                    <Copy className="mr-2 h-4 w-4" /> Copy Text
+                </Button>
+            </CardContent>
+        </Card>
     )
 }
 
+
 export function SocialAdGenerator() {
-    const initialState: AdState = { success: false, message: '', data: null };
-    const [state, formAction] = useActionState(generateSocialAd, initialState);
-    const { toast } = useToast();
-
-    const handleCopy = () => {
-        if (state.data?.adCopy) {
-            navigator.clipboard.writeText(state.data.adCopy);
-            toast({ title: "Copied!", description: "Ad copy copied to clipboard." });
-        }
-    }
-
     return (
-        <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-                <CardTitle>Social Media Ad Generator</CardTitle>
-                <CardDescription>Generate ad copy for LinkedIn, Facebook, and Instagram to hire workers or promote your services.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <form action={formAction} className="space-y-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="topic">Ad Topic</Label>
-                        <Input id="topic" name="topic" defaultValue="Hiring verified plumbers in Delhi" />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="platform">Platform</Label>
-                         <Select name="platform" defaultValue="Facebook">
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a platform" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Facebook">Facebook</SelectItem>
-                                <SelectItem value="LinkedIn">LinkedIn</SelectItem>
-                                <SelectItem value="Instagram">Instagram</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <SubmitButton />
-                </form>
-
-                 {state?.message && !state.success && (
-                    <Alert variant="destructive" className="mt-4">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertTitle>Error</AlertTitle>
-                      <AlertDescription>{state.message}</AlertDescription>
-                    </Alert>
-                )}
-
-                 {state?.success && state.data?.adCopy && (
-                    <div className="space-y-4 pt-4">
-                        <h3 className="font-semibold">Generated Ad Copy:</h3>
-                        <div className="relative w-full rounded-lg border bg-secondary p-4 whitespace-pre-wrap font-mono text-sm max-h-60 overflow-y-auto">
-                            {state.data.adCopy}
-                        </div>
-                        <Button onClick={handleCopy} variant="outline">
-                            <Copy className="mr-2 h-4 w-4" /> Copy Text
-                        </Button>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+        <div className="grid md:grid-cols-2 gap-8">
+           <AdTemplateCard platform="LinkedIn" icon={<Linkedin className="text-[#0A66C2]"/>} template={linkedinTemplate} />
+           <AdTemplateCard platform="Facebook / Instagram" icon={<Facebook className="text-[#1877F2]"/>} template={facebookTemplate} />
+        </div>
     );
 }
