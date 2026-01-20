@@ -1,8 +1,45 @@
+'use client'; // Need this to use hooks
+
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { AdminDashboard } from '@/components/admin-dashboard';
+import { useUser } from '@/firebase';
+import { Loader2, ShieldAlert } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+// IMPORTANT: In a real app, this should be a list of admin UIDs stored in a secure config.
+const ADMIN_EMAIL = "admin@gharkiseva.com"; 
 
 export default function AdminPage() {
+  const { user, isUserLoading } = useUser();
+
+  if (isUserLoading) {
+    return (
+      <div className="flex flex-col min-h-screen items-center justify-center bg-secondary/50">
+        <Loader2 className="h-12 w-12 animate-spin text-primary"/>
+        <p className="mt-4 text-muted-foreground">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!user || user.email !== ADMIN_EMAIL) {
+    return (
+       <div className="flex flex-col min-h-screen items-center justify-center bg-secondary/50 p-4">
+          <Card className="max-w-md w-full text-center">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-center gap-2">
+                <ShieldAlert className="h-8 w-8 text-destructive"/>
+                Access Denied
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">You do not have permission to view this page. Please contact the administrator if you believe this is an error.</p>
+            </CardContent>
+          </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-secondary/50">
       <Header />

@@ -4,6 +4,7 @@ import { initializeFirebase } from '@/firebase';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createPromotionalContent, type CreateContentOutput } from '@/ai/flows/content-creator-agent';
+import { createSocialMediaAd, SocialMediaAdInputSchema, type SocialMediaAdOutput } from '@/ai/flows/social-media-agent';
 
 export async function approveWorker(workerId: string): Promise<{ success: boolean; message: string }> {
     if (!workerId) {
@@ -78,4 +79,32 @@ export async function generateAdminPromoPoster(
   } catch(e: any) {
     return { success: false, message: e.message || 'An unknown error occurred.', data: null };
   }
+}
+
+// NEW ACTION FOR SOCIAL MEDIA
+export type AdState = {
+    success: boolean;
+    message: string;
+    data: SocialMediaAdOutput | null;
+};
+
+export async function generateSocialAd(
+    prevState: AdState,
+    formData: FormData
+): Promise<AdState> {
+    const validatedFields = SocialMediaAdInputSchema.safeParse({
+        topic: formData.get('topic'),
+        platform: formData.get('platform'),
+    });
+
+    if (!validatedFields.success) {
+        return { success: false, message: 'Invalid input for ad generation.', data: null };
+    }
+
+    try {
+        const result = await createSocialMediaAd(validatedFields.data);
+        return { success: true, message: 'Ad copy generated!', data: result };
+    } catch(e: any) {
+        return { success: false, message: e.message || 'An unknown error occurred.', data: null };
+    }
 }
