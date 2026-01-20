@@ -30,13 +30,15 @@ export interface Job {
 export interface Worker {
     uid: string; // Firebase Authentication user ID.
     workerId: string; // Unique identifier for the worker (same as their uid).
+    name?: string; // Worker's name
+    phone?: string; // Worker's phone
     skills?: string[]; // List of worker's skills (e.g., plumber, electrician).
     rating?: number; // Average rating of the worker.
     location?: {
         latitude?: number;
         longitude?: number;
     }; // Geographical location of the worker.
-    isVerified: boolean; // Whether the worker is verified.
+    isVerified: boolean; // Whether the worker is verified by an admin.
     bankDetails?: {
         accountNumber?: string;
         ifscCode?: string;
@@ -44,6 +46,9 @@ export interface Worker {
     }; // Bank account details for payouts.
     referredBy?: string; // The ID of the user or worker who referred this worker.
     walletBalance?: number; // The balance of referral earnings for the worker.
+    certificationsUploaded?: boolean;
+    shopLicenseUploaded?: boolean;
+    successfulOrders?: number;
 }
 
 export interface Health {

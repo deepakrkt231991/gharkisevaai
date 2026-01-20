@@ -22,6 +22,10 @@ export const findVerifiedWorkers = ai.defineTool(
         name: z.string(),
         skills: z.array(z.string()),
         phone: z.string().optional(),
+        rating: z.number().optional(),
+        successfulOrders: z.number().optional(),
+        certificationsUploaded: z.boolean().optional(),
+        shopLicenseUploaded: z.boolean().optional(),
     })),
   },
   async (input) => {
@@ -31,7 +35,12 @@ export const findVerifiedWorkers = ai.defineTool(
     // In a real app, you'd use a more complex geospatial query.
     // For now, we query for all verified workers and let the AI filter.
     const workersRef = collection(firestore, 'workers');
-    const q = query(workersRef, where('isVerified', '==', true));
+    let q = query(workersRef, where('isVerified', '==', true));
+
+    // If skills are provided, filter by them
+    if (input.skills && input.skills.length > 0) {
+        q = query(q, where('skills', 'array-contains-any', input.skills));
+    }
 
     const querySnapshot = await getDocs(q);
     const workers = querySnapshot.docs.map(doc => ({
@@ -40,7 +49,16 @@ export const findVerifiedWorkers = ai.defineTool(
     })) as any[];
 
     console.log('Found workers:', workers);
-    // The AI will perform the final filtering based on skills and location from the prompt.
-    return workers.map(w => ({ workerId: w.workerId, name: w.name, skills: w.skills, phone: w.phone }));
+    // The AI will perform the final filtering based on location from the prompt.
+    return workers.map(w => ({ 
+        workerId: w.workerId, 
+        name: w.name, 
+        skills: w.skills, 
+        phone: w.phone,
+        rating: w.rating,
+        successfulOrders: w.successfulOrders,
+        certificationsUploaded: w.certificationsUploaded,
+        shopLicenseUploaded: w.shopLicenseUploaded
+    }));
   }
 );

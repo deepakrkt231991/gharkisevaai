@@ -1,17 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useTransition } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin } from "lucide-react";
+import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2 } from "lucide-react";
 import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, where } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
 import type { SOSAlert, Worker } from "@/lib/entities";
+import { approveWorker, rejectWorker } from "@/app/admin/actions";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock Data
 const metrics = {
@@ -20,6 +22,59 @@ const metrics = {
   activeWorkers: 150,
   aiTrend: "AC Repair is the most requested service this week."
 };
+
+function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
+    const { toast } = useToast();
+    const [isPending, startTransition] = useTransition();
+
+    const handleApprove = () => {
+        startTransition(async () => {
+            const result = await approveWorker(worker.id);
+            if(result.success) {
+                toast({ title: "Success", description: `Worker ${worker.name} has been approved.`, className: "bg-green-600 text-white" });
+            } else {
+                toast({ title: "Error", description: result.message, variant: "destructive" });
+            }
+        });
+    };
+
+    const handleReject = () => {
+         startTransition(async () => {
+            if (confirm(`Are you sure you want to reject and delete the profile for ${worker.name}? This action cannot be undone.`)) {
+                const result = await rejectWorker(worker.id);
+                 if(result.success) {
+                    toast({ title: "Success", description: `Worker ${worker.name} has been rejected.` });
+                } else {
+                    toast({ title: "Error", description: result.message, variant: "destructive" });
+                }
+            }
+        });
+    };
+
+    return (
+         <Card className="flex flex-col md:flex-row items-center justify-between p-4">
+            <div className="flex items-center gap-4 mb-4 md:mb-0">
+                <Avatar className="h-12 w-12">
+                    <AvatarImage src={`https://i.pravatar.cc/150?u=${worker.workerId}`} alt={(worker as any).name} />
+                    <AvatarFallback>{(worker as any).name?.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                    <p className="font-semibold">{(worker as any).name}</p>
+                    <p className="text-sm text-muted-foreground">ID: {worker.workerId}</p>
+                    <p className="text-sm font-bold text-primary capitalize">{worker.skills?.join(', ')}</p>
+                </div>
+            </div>
+            <div className="flex gap-2 mt-4 md:mt-0">
+                <Button variant="outline" disabled={isPending}>View Documents</Button>
+                <Button className="bg-green-600 hover:bg-green-700" onClick={handleApprove} disabled={isPending}>
+                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4"/>}
+                    Approve
+                </Button>
+                <Button variant="destructive" onClick={handleReject} disabled={isPending}>Reject</Button>
+            </div>
+        </Card>
+    )
+}
 
 export function AdminDashboard() {
   const firestore = useFirestore();
@@ -31,7 +86,8 @@ export function AdminDashboard() {
   
   const pendingVerificationsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    return query(collection(firestore, 'workers'), where('isVerified', '==', 'false'));
+    // Query for workers who are NOT verified
+    return query(collection(firestore, 'workers'), where('isVerified', '==', false));
   }, [firestore]);
 
   const { data: sosAlerts, isLoading: sosLoading } = useCollection<SOSAlert>(sosAlertsQuery);
@@ -62,7 +118,7 @@ export function AdminDashboard() {
         <p className="text-muted-foreground">Welcome back! Here's what's happening on GrihSeva AI.</p>
       </div>
 
-      <Tabs defaultValue="overview">
+      <Tabs defaultValue="verification">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">
             <TrendingUp className="mr-2 h-4 w-4" /> Overview
@@ -72,6 +128,9 @@ export function AdminDashboard() {
           </TabsTrigger>
           <TabsTrigger value="verification">
             <CheckCircle className="mr-2 h-4 w-4" /> Worker Verification
+             {pendingVerifications && pendingVerifications.length > 0 && (
+                <Badge className="ml-2">{pendingVerifications.length}</Badge>
+            )}
           </TabsTrigger>
         </TabsList>
 
@@ -161,29 +220,13 @@ export function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                 {pendingLoading && <p>Loading pending verifications...</p>}
+                 {pendingLoading && <p className="text-center p-8">Loading pending verifications...</p>}
                  {pendingVerifications && pendingVerifications.length > 0 ? (
                     pendingVerifications.map((p) => (
-                      <Card key={p.workerId} className="flex flex-col md:flex-row items-center justify-between p-4">
-                        <div className="flex items-center gap-4 mb-4 md:mb-0">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={`https://i.pravatar.cc/150?u=${p.workerId}`} alt={(p as any).name} />
-                            <AvatarFallback>{(p as any).name?.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold">{(p as any).name}</p>
-                            <p className="text-sm text-muted-foreground">ID: {p.workerId}</p>
-                          </div>
-                        </div>
-                        <div className="flex gap-2 mt-4 md:mt-0">
-                          <Button variant="outline">View Documents</Button>
-                          <Button className="bg-green-600 hover:bg-green-700">Approve</Button>
-                          <Button variant="destructive">Reject</Button>
-                        </div>
-                      </Card>
+                      <WorkerVerificationRow key={p.id} worker={p} />
                     ))
                  ) : !pendingLoading && (
-                    <p className="text-center text-muted-foreground">No pending verifications.</p>
+                    <p className="text-center text-muted-foreground p-8">No pending verifications.</p>
                  )}
               </div>
             </CardContent>

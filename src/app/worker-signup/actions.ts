@@ -19,6 +19,8 @@ const WorkerProfileSchema = z.object({
   ifscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, { message: "Please enter a valid IFSC code." }),
   latitude: z.coerce.number().optional(),
   longitude: z.coerce.number().optional(),
+  certificationsUploaded: z.string().optional(),
+  shopLicenseUploaded: z.string().optional(),
 });
 
 type State = {
@@ -42,6 +44,8 @@ export async function createWorkerProfile(
     ifscCode: formData.get('ifscCode'),
     latitude: formData.get('latitude'),
     longitude: formData.get('longitude'),
+    certificationsUploaded: formData.get('certificationsUploaded'),
+    shopLicenseUploaded: formData.get('shopLicenseUploaded'),
   });
 
   if (!validatedFields.success) {
@@ -82,14 +86,17 @@ export async function createWorkerProfile(
         latitude: latitude || null,
         longitude: longitude || null,
       },
-      isVerified: true, // Assuming verification was passed on the client
+      isVerified: false, // ALL workers must be manually approved by an admin
       rating: 0,
+      successfulOrders: 0,
+      certificationsUploaded: workerData.certificationsUploaded === 'on',
+      shopLicenseUploaded: workerData.shopLicenseUploaded === 'on',
       createdAt: serverTimestamp(),
     }, { merge: true });
 
     return {
       success: true,
-      message: 'Your profile has been created successfully! You can now start getting jobs.',
+      message: 'Your profile has been submitted for review! You will be notified once it is approved.',
     };
   } catch (error) {
     console.error('Error creating worker profile:', error);

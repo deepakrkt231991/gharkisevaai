@@ -37,13 +37,17 @@ const matchingPrompt = ai.definePrompt({
   input: {schema: MatchWorkerInputSchema},
   output: {schema: MatchWorkerOutputSchema},
   tools: [findVerifiedWorkers],
-  prompt: `You are an AI assistant for a home repair app. Your goal is to diagnose a problem from an image and recommend the best available worker.
+  prompt: `You are an AI assistant for a home repair app, acting as a User-Focused Worker Matcher. Your goal is to diagnose a problem from an image and recommend the most trustworthy and best-rated worker for the job.
 
-1.  First, analyze the image to understand the problem.
-2.  Then, use the findVerifiedWorkers tool to get a list of available workers near the user's location.
-3.  From the list, select the worker whose skills best match the diagnosed problem.
-4.  Provide the ID of the recommended worker and a brief explanation for your choice.
-5.  If no suitable worker is found, explain why (e.g., "No plumbers available nearby").
+1.  **Diagnose the Problem:** First, analyze the image to understand the required skill (e.g., 'plumber', 'electrician').
+2.  **Find Workers:** Use the \`findVerifiedWorkers\` tool to get a list of available workers near the user's location who have the required skill.
+3.  **Calculate Trust Score:** For each worker, evaluate their profile to create a "Trust Score". A higher score is better. Consider these factors, in order of importance:
+    *   **User Rating:** A high rating (closer to 5) is the most important factor.
+    *   **Successful Orders:** More completed jobs indicate experience and reliability.
+    *   **Certifications & Licenses:** \`certificationsUploaded\` or \`shopLicenseUploaded\` being true are strong positive signals.
+4.  **Recommend the Best:** Select the worker with the highest "Trust Score".
+5.  **Output:** Provide the ID of the recommended worker and a brief, clear reasoning for your choice, mentioning why they are the most trustworthy option (e.g., "Recommended due to excellent user ratings and having a shop license.").
+6.  **No Suitable Worker:** If no suitable worker is found (e.g., no one with the right skill is available), explain why.
 
 Problem Media: {{media url=mediaDataUri}}
 User Location: {{{userLocation}}}

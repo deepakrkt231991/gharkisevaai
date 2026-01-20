@@ -131,7 +131,7 @@
         },
         "isVerified": {
           "type": "boolean",
-          "description": "Whether the worker is verified."
+          "description": "Whether the worker is verified by an admin."
         },
         "bankDetails": {
             "type": "object",
@@ -149,6 +149,18 @@
         "walletBalance": {
             "type": "number",
             "description": "The balance of referral earnings for the worker."
+        },
+        "certificationsUploaded": {
+            "type": "boolean",
+            "description": "Indicates if the worker has uploaded professional certifications."
+        },
+        "shopLicenseUploaded": {
+            "type": "boolean",
+            "description": "Indicates if the worker has uploaded a shop/establishment license."
+        },
+        "successfulOrders": {
+            "type": "number",
+            "description": "The total number of successfully completed orders."
         }
       },
       "required": ["uid", "workerId", "isVerified"]

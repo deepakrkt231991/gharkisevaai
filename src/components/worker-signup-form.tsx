@@ -16,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useGeolocation } from '@/hooks/use-geolocation';
+import { Checkbox } from '@/components/ui/checkbox';
 
 
 declare global {
@@ -170,7 +171,7 @@ export function WorkerSignupForm() {
   const nextStep = () => {
     if (currentStep === 1 && name && phone) {
       setCurrentStep(2);
-    } else if (currentStep === 2 && verificationResult?.verified) {
+    } else if (currentStep === 2 && (idCardUri && selfieUri)) {
       setCurrentStep(3);
     }
   };
@@ -246,6 +247,15 @@ export function WorkerSignupForm() {
                         </div>
                         <span className="bg-accent/10 text-accent text-[10px] font-bold px-2 py-1 rounded border border-accent/20">SECURE</span>
                     </div>
+
+                    <Alert>
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle className="font-bold">Registration Rules</AlertTitle>
+                        <AlertDescription className="text-xs">
+                            You must upload a clear photo of your government ID and a live selfie. Providing false information will result in account suspension.
+                        </AlertDescription>
+                    </Alert>
+
                     <div className="grid grid-cols-2 gap-4">
                         <label className="relative group cursor-pointer border-2 border-dashed border-border hover:border-accent/50 rounded-xl aspect-square flex flex-col items-center justify-center bg-input/50 transition-all">
                             <input type="file" accept="image/*" className="sr-only" onChange={(e) => handleFileChange(e, 'id')}/>
@@ -271,7 +281,7 @@ export function WorkerSignupForm() {
                                     <Button asChild className="mt-3 w-full" variant="secondary">
                                         <a href={`mailto:gharkisevaai@gmail.com?subject=Manual%20Worker%20Verification%20Request&body=Hello%20Admin,%0D%0A%0D%0AMy%20AI%20verification%20failed.%20Please%20manually%20verify%20my%20profile.%0D%0A%0D%0AName:%20${name}%0D%0APhone:%20${phone}%0D%0A%0D%0AThank%20you.`}>
                                             <Mail className="mr-2 h-4 w-4" />
-                                            Request Manual Review
+                                            Send to Admin for Approval
                                         </a>
                                     </Button>
                                 )}
@@ -309,6 +319,23 @@ export function WorkerSignupForm() {
                      <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Emergency Contact</Label>
                         <Input name="emergencyContact" value={emergencyContact} onChange={(e) => setEmergencyContact(e.target.value)} placeholder="A family member's number" type="tel" />
+                    </div>
+                     <div className="space-y-2">
+                        <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Additional Documents</Label>
+                        <div className="space-y-3 pt-2">
+                            <div className="flex items-center space-x-3">
+                                <Checkbox id="certifications" name="certificationsUploaded" />
+                                <label htmlFor="certifications" className="text-sm font-medium leading-none text-white peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                I have professional certifications (e.g., ITI Diploma)
+                                </label>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <Checkbox id="shopLicense" name="shopLicenseUploaded" />
+                                <label htmlFor="shopLicense" className="text-sm font-medium leading-none text-white peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                I have a shop/establishment license
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Live Location</Label>
@@ -361,12 +388,12 @@ export function WorkerSignupForm() {
        {/* Sticky Bottom Actions */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] p-6 bg-gradient-to-t from-background via-background to-transparent pt-10">
         {currentStep < 3 ? (
-            <Button onClick={nextStep} className="w-full bg-primary text-white font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all" disabled={(currentStep===1 && (!name || !phone)) || (currentStep===2 && !verificationResult?.verified) }>
+            <Button onClick={nextStep} className="w-full bg-primary text-white font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all" disabled={(currentStep === 1 && (!name || !phone)) || (currentStep === 2 && (!idCardUri || !selfieUri))}>
                 Next Step
             </Button>
         ) : (
             <Button type="submit" onClick={() => document.querySelector('form')?.requestSubmit()} className="w-full bg-accent text-accent-foreground font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-accent/20 active:scale-[0.98] transition-all">
-                Create My Profile
+                Submit for Approval
             </Button>
         )}
       </div>
