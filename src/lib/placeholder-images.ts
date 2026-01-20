@@ -18,6 +18,9 @@ export type ImagePlaceholder = {
   sqft?: number;
   parking?: number;
   isAiVerified?: boolean;
+  type?: 'product' | 'worker' | 'property';
+  category?: 'furniture' | 'electronics' | 'other';
+  isReserved?: boolean;
 };
 
 export const PlaceHolderImages: ImagePlaceholder[] = data.placeholderImages;
