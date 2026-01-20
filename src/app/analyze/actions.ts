@@ -2,6 +2,7 @@
 "use server";
 
 import { analyzeDefect as analyzeDefectFlow, AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
+import { findVerifiedWorkers } from '@/services/worker-service';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -47,6 +48,8 @@ export async function analyzeDefect(
     const result = await analyzeDefectFlow({
       mediaDataUri: validatedFields.data.mediaDataUri,
       description: validatedFields.data.description,
+      // In a real app, you'd get this from user preferences
+      userLanguage: 'Hindi', 
     });
     return {
       success: true,
@@ -62,4 +65,26 @@ export async function analyzeDefect(
       data: null,
     };
   }
+}
+
+// New action to find workers
+export async function findNearbyWorkers(
+    { skill }: { skill: string }
+): Promise<{ success: boolean; workers: any[] }> {
+    if (!skill) {
+        return { success: false, workers: [] };
+    }
+    try {
+        // The findVerifiedWorkers tool is designed to be called by the AI, but we can call it directly.
+        // It returns an array of workers. We can add more logic here to filter by location if needed.
+        const workers = await findVerifiedWorkers({ skills: [skill] });
+        
+        // In a real app, we would also get the user's location and filter/sort by distance.
+        // For now, we'll return the first 3 matches.
+        return { success: true, workers: workers.slice(0, 3) };
+
+    } catch (error) {
+        console.error('Error finding nearby workers:', error);
+        return { success: false, workers: [] };
+    }
 }

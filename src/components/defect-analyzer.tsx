@@ -1,13 +1,13 @@
 
 "use client";
 
-import { useState, useRef, ChangeEvent, useActionState } from 'react';
+import { useState, useRef, ChangeEvent, useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import Link from 'next/link';
-import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package, ArrowLeft, History, CheckCircle, Download, UserCheck, ScanSearch } from 'lucide-react';
+import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package, ArrowLeft, History, CheckCircle, Download, UserCheck, ScanSearch, Star, MessageSquare, Phone } from 'lucide-react';
 
-import { analyzeDefect } from '@/app/analyze/actions';
+import { analyzeDefect, findNearbyWorkers } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,8 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from './ui/badge';
 import type { AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
 
 type Media = {
@@ -50,13 +52,64 @@ function SubmitButton({ hasMedia }: { hasMedia: boolean }) {
   );
 }
 
+// Worker Card Component
+const WorkerCard = ({ worker }: { worker: any }) => (
+    <Card className="glass-card">
+        <CardContent className="p-3">
+            <div className="flex items-start gap-3">
+                <Avatar className="h-12 w-12 border-2 border-primary">
+                    <AvatarImage src={`https://i.pravatar.cc/150?u=${worker.workerId}`} />
+                    <AvatarFallback>{worker.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                    <h4 className="font-bold text-white">{worker.name}</h4>
+                    <p className="text-xs text-muted-foreground capitalize">{worker.skills.join(', ')}</p>
+                    <div className="flex items-center gap-1.5 text-yellow-400 text-xs">
+                        <Star className="h-3 w-3 fill-current" />
+                        <span className="font-bold text-white">4.8</span>
+                        <span className="text-muted-foreground text-[10px]">(120 reviews)</span>
+                    </div>
+                </div>
+                 <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-900/30">Verified</Badge>
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+                <Button variant="secondary" size="sm" asChild>
+                    <Link href={`/chat/job-temp-${worker.workerId}`}>
+                        <MessageSquare className="mr-2 h-4 w-4"/>Free Chat
+                    </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                    <a href={`tel:123-456-7890`}>
+                        <Phone className="mr-2 h-4 w-4"/>Free Call
+                    </a>
+                </Button>
+            </div>
+        </CardContent>
+    </Card>
+);
+
 export function DefectAnalyzer() {
   const [state, formAction, isPending] = useActionState(analyzeDefect, initialState);
   
   const [media, setMedia] = useState<Media | null>(null);
   const [description, setDescription] = useState('');
+  const [workers, setWorkers] = useState<any[]>([]);
+  const [isLoadingWorkers, setIsLoadingWorkers] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  useEffect(() => {
+    if (state.success && state.data?.recommendedWorkerType) {
+        setIsLoadingWorkers(true);
+        findNearbyWorkers({ skill: state.data.recommendedWorkerType })
+            .then(result => {
+                if (result.success) {
+                    setWorkers(result.workers);
+                }
+            })
+            .finally(() => setIsLoadingWorkers(false));
+    }
+  }, [state.success, state.data]);
+
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -74,10 +127,11 @@ export function DefectAnalyzer() {
   const handleReset = () => {
     setMedia(null);
     setDescription('');
+    setWorkers([]);
+    setIsLoadingWorkers(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    // A bit of a hack to reset the form state since useActionState doesn't have a built-in reset
     const emptyFormData = new FormData();
     formAction(emptyFormData);
   };
@@ -97,23 +151,24 @@ export function DefectAnalyzer() {
       const result = state.data;
       return (
         <div className="space-y-6">
-          <div className="flex items-center gap-3">
-             <Sparkles className="text-primary"/>
-             <h2 className="text-xl font-bold font-headline">AI Report</h2>
-             {result.confidence && (
-                <div className="ml-auto w-28 text-center">
-                    <p className="text-[10px] font-bold text-green-400/80 tracking-wider">AI CONFIDENCE</p>
-                    <Progress value={result.confidence} className="h-1.5 mt-1 [&>div]:bg-green-400" />
-                    <p className="text-xs font-bold text-green-400 mt-0.5">{result.confidence}%</p>
-                </div>
-             )}
+          <div className="flex items-start justify-between">
+             <div className="flex items-center gap-3">
+                 <Sparkles className="text-primary"/>
+                 <h2 className="text-xl font-bold font-headline">AI Home Consultant Report</h2>
+             </div>
+             <Badge className="bg-accent/20 text-accent border-accent/40 font-bold tracking-widest animate-pulse">FREE CONSULTATION</Badge>
           </div>
           
           <Card className="glass-card border-l-4 border-l-primary/80">
             <CardContent className="p-4">
                 <p className="text-xs text-primary font-bold uppercase tracking-wider">Issue Identified</p>
                 <h3 className="text-2xl font-bold font-headline text-white mt-1">{result.defect}</h3>
-                <p className="text-sm text-muted-foreground mt-1">Detected: {result.requiredParts?.[0] || 'Component Wear'}</p>
+                <p className="text-sm text-muted-foreground mt-2">{result.analysisDetails}</p>
+                 <div className="w-28 text-center mt-3">
+                    <p className="text-[10px] font-bold text-green-400/80 tracking-wider">AI CONFIDENCE</p>
+                    <Progress value={result.confidence} className="h-1.5 mt-1 [&>div]:bg-green-400" />
+                    <p className="text-xs font-bold text-green-400 mt-0.5">{result.confidence}%</p>
+                </div>
             </CardContent>
           </Card>
 
@@ -129,28 +184,16 @@ export function DefectAnalyzer() {
                   <CardContent className="p-4">
                        <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-2">Required Parts</p>
                        <ul className="space-y-2">
-                           {result.requiredParts.map((part, index) => (
+                           {result.requiredParts.length > 0 ? result.requiredParts.map((part, index) => (
                                <li key={index} className="flex items-center gap-2 text-sm text-white">
                                    <CheckCircle size={16} className="text-accent"/>
                                    <span className="truncate">{part}</span>
                                </li>
-                           ))}
+                           )) : <p className="text-sm text-muted-foreground">None</p>}
                        </ul>
                   </CardContent>
               </Card>
           </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="h-12 bg-primary/10 border-primary/50 text-primary hover:bg-primary/20 hover:text-primary">
-                  <Package className="mr-2"/> Buy Parts
-              </Button>
-               <Button asChild className="h-12 bg-primary text-white">
-                 <Link href="/book-service">
-                    <UserCheck className="mr-2"/> Book Pro
-                 </Link>
-              </Button>
-          </div>
-
 
           {result.diySteps && result.diySteps.length > 0 && (
             <div>
@@ -167,6 +210,25 @@ export function DefectAnalyzer() {
               </Accordion>
             </div>
           )}
+
+           <div>
+              <h3 className="text-lg font-bold font-headline mb-2">Connect with a Pro (Free)</h3>
+              {isLoadingWorkers && (
+                  <div className="flex items-center justify-center gap-2 text-muted-foreground py-4">
+                      <Loader2 className="animate-spin h-5 w-5"/>
+                      <span>Finding best workers near you...</span>
+                  </div>
+              )}
+              {!isLoadingWorkers && workers.length > 0 && (
+                  <div className="space-y-3">
+                      {workers.map(worker => <WorkerCard key={worker.workerId} worker={worker} />)}
+                  </div>
+              )}
+              {!isLoadingWorkers && workers.length === 0 && (
+                   <p className="text-muted-foreground text-sm">No recommended workers found for this issue.</p>
+              )}
+           </div>
+
         </div>
       );
     }
