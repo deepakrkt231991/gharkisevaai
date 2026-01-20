@@ -19,29 +19,31 @@ interface ProductCardProps {
 
 function ProductCard({ product }: ProductCardProps) {
     return (
-        <Card className="rounded-xl overflow-hidden glass-card border-border group">
-            <CardContent className="p-0">
-                <div className="relative aspect-[4/5] w-full overflow-hidden">
-                    <Image
-                        src={product.imageUrl}
-                        alt={product.description}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    {product.isReserved && (
-                        <Badge className="absolute top-3 left-3 bg-gray-900/70 text-white backdrop-blur-sm border-none uppercase text-xs tracking-widest">RESERVE AVAILABLE</Badge>
-                    )}
-                    <Button size="icon" variant="secondary" className="absolute top-3 right-3 rounded-full h-9 w-9 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white">
-                        <Heart className="h-5 w-5" />
-                    </Button>
-                </div>
-                <div className="p-4 space-y-1">
-                    <h3 className="font-bold text-white truncate">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1"><MapPin size={14}/>{product.location}</p>
-                    <p className="text-lg font-bold text-white pt-1">₹{product.price}</p>
-                </div>
-            </CardContent>
-        </Card>
+        <Link href={`/product-detail?id=${product.id}`}>
+            <Card className="rounded-xl overflow-hidden glass-card border-border group h-full">
+                <CardContent className="p-0 flex flex-col h-full">
+                    <div className="relative aspect-[4/5] w-full overflow-hidden">
+                        <Image
+                            src={product.imageUrl}
+                            alt={product.description}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        {product.isReserved && (
+                            <Badge className="absolute top-3 left-3 bg-gray-900/70 text-white backdrop-blur-sm border-none uppercase text-xs tracking-widest">RESERVE AVAILABLE</Badge>
+                        )}
+                        <div className="absolute top-3 right-3 rounded-full h-9 w-9 bg-black/30 backdrop-blur-sm flex items-center justify-center text-white">
+                            <Heart className="h-5 w-5" />
+                        </div>
+                    </div>
+                    <div className="p-4 space-y-1 flex-grow flex flex-col justify-end">
+                        <h3 className="font-bold text-white truncate">{product.name}</h3>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1"><MapPin size={14}/>{product.location}</p>
+                        <p className="text-lg font-bold text-white pt-1">₹{product.price}</p>
+                    </div>
+                </CardContent>
+            </Card>
+        </Link>
     );
 }
 // --- End ProductCard Component ---
