@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee } from 'lucide-react';
+import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee, FileText, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useDoc, useCollection, useMemoFirebase, useUser, useFirestore } from '@/firebase';
 import { doc, collection, query, orderBy, serverTimestamp, addDoc, updateDoc } from 'firebase/firestore';
@@ -14,6 +14,7 @@ import type { Job, User as UserEntity, Tool, Rental, Property } from '@/lib/enti
 import React, { useState, useEffect } from 'react';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from './ui/separator';
 
 
 type OtherUser = Partial<UserEntity> & { id: string, photoURL?: string, displayName?: string };
@@ -30,6 +31,73 @@ const AiSuggestions = () => (
         <Button variant="secondary" size="sm" className="rounded-full bg-card h-8 whitespace-nowrap">I'll send a photo</Button>
     </div>
 );
+
+const InvoiceCard = ({ job, contextType }: { job: Job, contextType: string }) => {
+    const { toast } = useToast();
+
+    if (contextType !== 'job' || job.status !== 'completed') {
+        return null;
+    }
+
+    const handleDownload = () => {
+        toast({
+            title: "Downloading Invoice...",
+            description: "In a real app, a PDF would be generated and downloaded.",
+        });
+        // In a real app, you would generate a PDF here.
+    }
+
+    const finalCost = job.final_cost || 0;
+    const platformFee = job.platformFee || 0;
+    const gst = job.gst || 0;
+    const totalPaid = finalCost; // Customer pays the final agreed cost.
+
+    return (
+        <Card className="glass-card border-l-4 border-l-green-500">
+            <CardHeader className="flex-row items-center justify-between p-4">
+                <CardTitle className="flex items-center gap-2 font-headline text-white">
+                    <FileText size={20}/>
+                    Final Invoice
+                </CardTitle>
+                <Badge className="bg-green-600/80 border-green-500 text-white">PAID</Badge>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm p-4">
+                 <div className="flex justify-between">
+                    <p className="text-muted-foreground">Final Service Cost</p>
+                    <p className="font-medium text-white">₹{finalCost.toFixed(2)}</p>
+                </div>
+                <div className="pl-4">
+                    <div className="flex justify-between text-xs">
+                        <p className="text-muted-foreground">Worker Payout</p>
+                        <p className="font-medium text-white">₹{(job.workerPayout || 0).toFixed(2)}</p>
+                    </div>
+                     <div className="flex justify-between text-xs">
+                        <p className="text-muted-foreground">Platform Fee (incl. GST)</p>
+                        <p className="font-medium text-white">- ₹{platformFee.toFixed(2)}</p>
+                    </div>
+                </div>
+
+                <Separator className="my-2 bg-border/50"/>
+                
+                <div className="flex justify-between font-bold">
+                    <p className="text-white">Total Paid by Customer</p>
+                    <p className="text-accent text-lg">₹{totalPaid.toFixed(2)}</p>
+                </div>
+
+                 <div className="text-xs text-muted-foreground pt-2">
+                    <p>Platform Fee of ₹{platformFee.toFixed(2)} includes ₹{gst.toFixed(2)} GST (18%).</p>
+                    <p>Thank you for using Ghar Ki Seva!</p>
+                </div>
+            </CardContent>
+            <CardFooter className="p-4">
+                 <Button onClick={handleDownload} className="w-full">
+                    <Download className="mr-2" size={16}/>
+                    Download Invoice
+                </Button>
+            </CardFooter>
+        </Card>
+    );
+};
 
 
 const DealFlowControls = ({ context, docId, contextType }: { context: ContextDoc | null, docId: string, contextType: 'job' | 'tool' | 'property' | 'unknown' }) => {
@@ -247,6 +315,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
             {/* Chat Body */}
             <main className="flex-1 overflow-y-auto p-4 space-y-6">
                 <DealFlowControls context={contextDoc} docId={chatId} contextType={contextType} />
+                <InvoiceCard job={contextDoc as Job} contextType={contextType} />
                 <div className="text-center text-xs text-muted-foreground font-medium">TODAY</div>
                 {initialMessages.map((msg) => (
                     <div key={msg.id} className={`flex flex-col ${msg.sender === user?.uid ? 'items-end' : 'items-start'}`}>

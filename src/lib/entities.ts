@@ -25,6 +25,9 @@ export interface Job {
     paymentStatus?: "pending" | "held_in_escrow" | "paid_to_worker" | "refunded"; // The status of the payment.
     status: "pending_diagnosis" | "awaiting_payment" | "worker_assigned" | "in_progress" | "pending_confirmation" | "completed" | "disputed" | "cancelled"; // Current status of the job.
     otp?: string; // A one-time password sent to the user to verify the start of the job.
+    platformFee?: number;
+    gst?: number;
+    workerPayout?: number;
 }
 
 export interface Worker {
@@ -85,7 +88,7 @@ export interface Transaction {
     transactionId: string;
     userId: string; // The ID of the user/worker who this transaction belongs to.
     amount: number;
-    type: "referral_commission" | "payout" | "refund" | "platform_fee";
+    type: "referral_commission" | "payout" | "refund" | "platform_fee" | "tax";
     sourceJobId?: string; // The job ID that triggered this transaction.
     timestamp?: any; // Firestore Timestamp
 }

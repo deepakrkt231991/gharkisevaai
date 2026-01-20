@@ -94,6 +94,18 @@
         "otp": {
           "type": "string",
           "description": "A one-time password sent to the user to verify the start of the job."
+        },
+        "platformFee": {
+          "type": "number",
+          "description": "Platform fee charged for the job."
+        },
+        "gst": {
+          "type": "number",
+          "description": "GST applied to the job."
+        },
+        "workerPayout": {
+          "type": "number",
+          "description": "Amount paid out to the worker."
         }
       },
       "required": ["jobId", "customerId", "status"]
@@ -239,7 +251,7 @@
         "transactionId": { "type": "string" },
         "userId": { "type": "string", "description": "The ID of the user/worker who this transaction belongs to." },
         "amount": { "type": "number" },
-        "type": { "type": "string", "enum": ["referral_commission", "payout", "refund", "platform_fee"] },
+        "type": { "type": "string", "enum": ["referral_commission", "payout", "refund", "platform_fee", "tax"] },
         "sourceJobId": { "type": "string", "description": "The job ID that triggered this transaction." },
         "timestamp": { "type": "string", "format": "date-time" }
       },
