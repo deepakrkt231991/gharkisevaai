@@ -3,23 +3,23 @@
 import { useMemo, useTransition, useActionState } from "react";
 import Image from "next/image";
 import { useFormStatus } from "react-dom";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Copy, Bot } from "lucide-react";
+import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot } from "lucide-react";
 import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, where, orderBy } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
 import type { SOSAlert, Worker, Transaction } from "@/lib/entities";
-import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, generateSocialAd, type AdState } from "@/app/admin/actions";
+import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState } from "@/app/admin/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
     const { toast } = useToast();
@@ -72,80 +72,6 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
             </div>
         </Card>
     )
-}
-
-function SocialAdGenerator() {
-    const initialState: AdState = { success: false, message: '', data: null };
-    const [state, formAction] = useActionState(generateSocialAd, initialState);
-    const { toast } = useToast();
-
-    const SubmitButton = () => {
-        const { pending } = useFormStatus();
-        return (
-            <Button type="submit" disabled={pending} className="w-full">
-                {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Bot className="mr-2 h-4 w-4"/>}
-                Generate Ad Copy
-            </Button>
-        )
-    }
-
-    const handleCopy = () => {
-        if (state.data?.adCopy) {
-            navigator.clipboard.writeText(state.data.adCopy);
-            toast({ title: "Copied!", description: "Ad copy copied to clipboard." });
-        }
-    }
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Social Media Ad Generator</CardTitle>
-                <CardDescription>Generate ad copy for LinkedIn, Facebook, and Instagram.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <form action={formAction} className="space-y-4">
-                    <div className="space-y-1">
-                        <Label htmlFor="topic">Ad Topic</Label>
-                        <Input id="topic" name="topic" defaultValue="Hiring verified plumbers in Delhi" />
-                    </div>
-                     <div className="space-y-1">
-                        <Label htmlFor="platform">Platform</Label>
-                         <Select name="platform" defaultValue="Facebook">
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a platform" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Facebook">Facebook</SelectItem>
-                                <SelectItem value="LinkedIn">LinkedIn</SelectItem>
-                                <SelectItem value="Instagram">Instagram</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <SubmitButton />
-                </form>
-
-                 {state?.message && !state.success && (
-                    <Alert variant="destructive" className="mt-4">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertTitle>Error</AlertTitle>
-                      <AlertDescription>{state.message}</AlertDescription>
-                    </Alert>
-                )}
-
-                 {state?.success && state.data?.adCopy && (
-                    <div className="space-y-4 pt-4">
-                        <h3 className="font-semibold">Generated Ad Copy:</h3>
-                        <div className="relative w-full rounded-lg border bg-secondary p-4 whitespace-pre-wrap font-mono text-sm max-h-60 overflow-y-auto">
-                            {state.data.adCopy}
-                        </div>
-                        <Button onClick={handleCopy} variant="outline">
-                            <Copy className="mr-2 h-4 w-4" /> Copy Text
-                        </Button>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
-    );
 }
 
 function PosterGenerator() {
@@ -210,7 +136,17 @@ function PosterGenerator() {
 function MarketingHub() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <SocialAdGenerator />
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5"/> Social Media Ad Generator</CardTitle>
+                    <CardDescription>Generate ad copy for LinkedIn, Facebook, and Instagram to hire workers or promote your services.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button asChild className="w-full">
+                        <Link href="/admin/social-media">Create Ad</Link>
+                    </Button>
+                </CardContent>
+            </Card>
             <PosterGenerator />
         </div>
     );
