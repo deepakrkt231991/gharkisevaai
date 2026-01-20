@@ -1,10 +1,12 @@
 
+
 "use client";
 
 import { useFormStatus } from 'react-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin, Mail } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
@@ -48,6 +50,8 @@ export function WorkerSignupForm() {
   // Step 3 State
   const [skills, setSkills] = useState('');
   const [emergencyContact, setEmergencyContact] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+
 
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -67,12 +71,13 @@ export function WorkerSignupForm() {
         if(verificationResult?.verified) newProgress = 66;
     } else if (currentStep === 3) {
         newProgress = 66;
-        if(skills) newProgress += 11;
-        if(emergencyContact) newProgress += 11;
-        if (latitude && longitude) newProgress += 12;
+        if(skills) newProgress += 8;
+        if(emergencyContact) newProgress += 8;
+        if (latitude && longitude) newProgress += 8;
+        if(agreedToTerms) newProgress += 10;
     }
     setProgress(Math.min(100, newProgress));
-  }, [name, phone, referredBy, idCardUri, selfieUri, verificationResult, skills, emergencyContact, latitude, longitude, currentStep]);
+  }, [name, phone, referredBy, idCardUri, selfieUri, verificationResult, skills, emergencyContact, latitude, longitude, currentStep, agreedToTerms]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'id' | 'selfie') => {
@@ -256,9 +261,9 @@ export function WorkerSignupForm() {
 
                     <Alert>
                         <AlertCircle className="h-4 w-4" />
-                        <AlertTitle className="font-bold">Registration Rules</AlertTitle>
+                        <AlertTitle className="font-bold">AI Verification Disclaimer</AlertTitle>
                         <AlertDescription className="text-xs">
-                            You must upload a clear photo of your government ID and a live selfie. Providing false information will result in account suspension.
+                           आपकी जानकारी AI द्वारा जांची जाएगी। गलत डेटा देने पर आपका अकाउंट कानूनी रूप से सस्पेंड किया जा सकता है।
                         </AlertDescription>
                     </Alert>
 
@@ -365,6 +370,12 @@ export function WorkerSignupForm() {
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">IFSC Code</Label>
                         <Input name="ifscCode" />
                     </div>
+                    <div className="flex items-center space-x-2 pt-4">
+                        <Checkbox id="terms" onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} />
+                        <Label htmlFor="terms" className="text-sm text-muted-foreground">
+                            I agree to the <Link href="/terms" className="underline text-primary">Terms & Conditions</Link>.
+                        </Label>
+                    </div>
                 </div>
                 {state.message && !state.success && (
                     <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertTitle>Error</AlertTitle><AlertDescription>{state.message}</AlertDescription></Alert>
@@ -395,11 +406,11 @@ export function WorkerSignupForm() {
        {/* Sticky Bottom Actions */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] p-6 bg-gradient-to-t from-background via-background to-transparent pt-10">
         {currentStep < 3 ? (
-            <Button onClick={nextStep} className="w-full bg-primary text-white font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all" disabled={(currentStep === 1 && (!name || !phone)) || (currentStep === 2 && (!idCardUri || !selfieUri))}>
+            <Button onClick={nextStep} className="w-full bg-primary text-white font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all" disabled={(currentStep === 1 && (!name || !phone)) || (currentStep === 2 && !verificationResult?.verified)}>
                 Next Step
             </Button>
         ) : (
-            <Button type="submit" onClick={() => document.querySelector('form')?.requestSubmit()} className="w-full bg-accent text-accent-foreground font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-accent/20 active:scale-[0.98] transition-all">
+            <Button type="submit" onClick={() => document.querySelector('form')?.requestSubmit()} className="w-full bg-accent text-accent-foreground font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-accent/20 active:scale-[0.98] transition-all" disabled={!agreedToTerms}>
                 Submit for Approval
             </Button>
         )}

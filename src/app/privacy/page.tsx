@@ -2,56 +2,29 @@
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, MapPin, Camera, CreditCard, Bot, Shield, Share2, Languages, Trash2, Users, Mail } from 'lucide-react';
+import { Lock, FileLock, Camera, Share2, Shield, Mail } from 'lucide-react';
 
 export default function PrivacyPolicyPage() {
   const policySections = [
     {
-      title: "1. Information We Collect",
-      icon: <Lock className="h-6 w-6" />,
-      points: [
-        { subtitle: "Personal Data:", text: "Name, phone number, and email for account registration.", icon: <Users className="h-5 w-5 text-primary" /> },
-        { subtitle: "Location Data:", text: "We collect real-time location to connect users with local services and for the Emergency SOS feature.", icon: <MapPin className="h-5 w-5 text-primary" /> },
-        { subtitle: "Media:", text: "Videos and photos uploaded for AI-Guided Verification (for selling items or renting rooms).", icon: <Camera className="h-5 w-5 text-primary" /> },
-        { subtitle: "Payment Information:", text: "Processed securely via Razorpay/Stripe. We do not store your credit card or UPI pins.", icon: <CreditCard className="h-5 w-5 text-primary" /> },
-      ],
+      title: "Data Vault & Encryption",
+      icon: <FileLock className="h-6 w-6" />,
+      content: "हम यूजर के ID प्रूफ और डॉक्यूमेंट्स को AES-256 Bank-Grade Encryption में स्टोर करते हैं। यह 'Legal Vault' से बाहर कभी नहीं जाएगा।",
     },
     {
-      title: "2. How We Use Your Data",
-      icon: <Bot className="h-6 w-6" />,
-      points: [
-        { subtitle: "AI Verification:", text: "To analyze item condition and property details without physical inspection.", icon: <Bot className="h-5 w-5 text-accent" /> },
-        { subtitle: "Safety (SOS):", text: "To share your location with emergency contacts and authorities during an alert.", icon: <Shield className="h-5 w-5 text-accent" /> },
-        { subtitle: "Referral System:", text: "To track and credit the 0.05% Lifetime Commission to your wallet.", icon: <Share2 className="h-5 w-5 text-accent" /> },
-        { subtitle: "Branding:", text: "To show the app in your preferred language (Hindi/English/etc.).", icon: <Languages className="h-5 w-5 text-accent" /> },
-      ],
+      title: "Live Selfie & ID Usage",
+      icon: <Camera className="h-6 w-6" />,
+      content: "वर्कर्स की सेल्फी और ID का उपयोग केवल AI Verification के लिए किया जाता है ताकि प्लेटफॉर्म को सुरक्षित रखा जा सके और फ्रॉड को रोका जा सके।",
     },
     {
-        title: "3. Data Security & Fraud Prevention",
-        icon: <Shield className="h-6 w-6" />,
-        points: [
-            { text: "We use AI Fraud Detection to ensure all listings are genuine." },
-            { text: "Your data is encrypted and stored securely on Firebase/Google Cloud servers." },
-            { text: "We do not sell your personal data to third-party advertisers." },
-        ],
+      title: "No-Sharing Policy",
+      icon: <Share2 className="h-6 w-6" />,
+      content: "हम आपका पर्सनल नंबर या कोई भी संवेदनशील जानकारी किसी तीसरे पक्ष (Third Party) को मार्केटिंग के लिए नहीं बेचते या शेयर नहीं करते। आपका डेटा सिर्फ आप और आपके वेरिफाइड पार्टनर के बीच रहता है।",
     },
     {
-        title: "4. User Rights (Rent/Sell/Repair)",
-        icon: <Trash2 className="h-6 w-6" />,
-        points: [
-            { text: "Users can delete their listings or account at any time." },
-            { text: "All AI-guided video uploads are used solely for verification and trust-building between buyer and seller." },
-        ],
-    },
-    {
-      title: "5. Third-Party Services",
-      icon: <Users className="h-6 w-6" />,
-      preamble: "We use trusted partners to enhance your experience:",
-      points: [
-        { text: "Google Gemini AI: For automated verification and chat translation." },
-        { text: "Razorpay: For secure automated payments and referral payouts." },
-        { text: "Google Maps: For location-based service matching." },
-      ],
+      title: "AI & Data",
+      icon: <Shield className="h-6 w-6" />,
+      content: "जब आप किसी खराबी की फोटो अपलोड करते हैं, तो हमारा AI उसे विश्लेषण करने के लिए उपयोग करता है। यह डेटा हमारे AI मॉडल को बेहतर बनाने में मदद करता है, लेकिन आपकी व्यक्तिगत पहचान से जुड़ा नहीं होता है।",
     },
   ];
 
@@ -62,14 +35,14 @@ export default function PrivacyPolicyPage() {
         <div className="container max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">
-              Privacy Policy for GrihSeva AI
+              Privacy Policy for Ghar Ki Seva
             </h1>
             <p className="mt-2 text-muted-foreground">Last Updated: January 15, 2026</p>
           </div>
 
           <div className="space-y-8">
             <p className="text-center text-muted-foreground">
-              At GrihSeva AI (also operating as Home Responsibility AI), we value your privacy and are committed to protecting your personal data. This policy explains how we handle your information.
+             At Ghar Ki Seva, we are committed to protecting your personal data. This policy explains how we handle your information to ensure your privacy and security.
             </p>
 
             {policySections.map((section) => (
@@ -80,17 +53,8 @@ export default function PrivacyPolicyPage() {
                     {section.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {section.preamble && <p className="text-muted-foreground">{section.preamble}</p>}
-                  {section.points.map((point, index) => (
-                    <div key={index} className="flex items-start gap-4">
-                      {point.icon && <div className="mt-1">{point.icon}</div>}
-                      <div>
-                        {point.subtitle && <h4 className="font-semibold">{point.subtitle}</h4>}
-                        <p className="text-muted-foreground">{point.text}</p>
-                      </div>
-                    </div>
-                  ))}
+                <CardContent>
+                  <p className="text-muted-foreground">{section.content}</p>
                 </CardContent>
               </Card>
             ))}
@@ -99,12 +63,12 @@ export default function PrivacyPolicyPage() {
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl flex items-center gap-3">
                         <Mail className="h-6 w-6" />
-                        6. Contact Us
+                        Contact Us
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground">
-                        For any privacy concerns, help contact us at: <a href="mailto:gharkisevaai@gmail.com" className="text-primary hover:underline">gharkisevaai@gmail.com</a>
+                        For any privacy concerns, please contact us at: <a href="mailto:gharkisevaai@gmail.com" className="text-primary hover:underline">gharkisevaai@gmail.com</a>
                     </p>
                 </CardContent>
             </Card>

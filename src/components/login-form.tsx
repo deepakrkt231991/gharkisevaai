@@ -21,6 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, Wrench } from 'lucide-react';
+import { Checkbox } from './ui/checkbox';
 
 const GoogleIcon = (props: React.ComponentProps<'svg'>) => (
     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -34,6 +35,7 @@ export function LoginForm() {
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
+  const [signupAgreed, setSignupAgreed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,6 +61,10 @@ export function LoginForm() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!signupAgreed) {
+      setError("You must agree to the Terms and Conditions.");
+      return;
+    }
     setIsLoading(true);
     setError(null);
     if (!auth || !firestore) {
@@ -80,7 +86,7 @@ export function LoginForm() {
         createdAt: serverTimestamp(),
       });
       
-      toast({ title: 'Account Created!', description: 'Welcome to GrihSeva AI.' });
+      toast({ title: 'Account Created!', description: 'Welcome to Ghar Ki Seva.' });
       router.push('/profile');
 
     } catch (err: any) {
@@ -126,7 +132,7 @@ export function LoginForm() {
     <Card className="glass-card w-full">
       <CardHeader className="text-center">
         <Wrench className="mx-auto h-10 w-10 text-primary mb-2" />
-        <CardTitle className="font-headline text-2xl">Welcome to GrihSeva AI</CardTitle>
+        <CardTitle className="font-headline text-2xl">Welcome to Ghar Ki Seva</CardTitle>
         <CardDescription>Log in or create an account to get started.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -191,7 +197,13 @@ export function LoginForm() {
                 <Label htmlFor="signup-password">Password</Label>
                 <Input id="signup-password" type="password" placeholder="••••••••" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} required />
               </div>
-              <Button type="submit" disabled={isLoading} className="w-full">
+               <div className="flex items-center space-x-2">
+                <Checkbox id="signup-terms" onCheckedChange={(checked) => setSignupAgreed(checked as boolean)} checked={signupAgreed}/>
+                <Label htmlFor="signup-terms" className="text-xs text-muted-foreground">
+                    I agree to the <Link href="/terms" className="underline hover:text-primary">Terms & Conditions</Link>.
+                </Label>
+              </div>
+              <Button type="submit" disabled={isLoading || !signupAgreed} className="w-full">
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Customer Account
               </Button>
