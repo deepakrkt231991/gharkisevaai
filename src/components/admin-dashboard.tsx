@@ -351,22 +351,24 @@ export function AdminDashboard() {
                             <TableHead>User ID</TableHead>
                             <TableHead>Type</TableHead>
                             <TableHead>Amount</TableHead>
+                            <TableHead>Job ID</TableHead>
                             <TableHead>Time</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {transactionsLoading && <TableRow><TableCell colSpan={4} className="text-center">Loading transactions...</TableCell></TableRow>}
+                        {transactionsLoading && <TableRow><TableCell colSpan={5} className="text-center">Loading transactions...</TableCell></TableRow>}
                         {transactions && transactions.length > 0 ? (
                             transactions.slice(0, 10).map(tx => (
                                 <TableRow key={tx.id}>
                                     <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
                                     <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge></TableCell>
                                     <TableCell className="font-semibold">₹{tx.amount.toFixed(2)}</TableCell>
+                                    <TableCell className="font-mono text-xs">{tx.sourceJobId || 'N/A'}</TableCell>
                                     <TableCell>{getTimeAgo(tx.timestamp)}</TableCell>
                                 </TableRow>
                             ))
                         ) : !transactionsLoading && (
-                            <TableRow><TableCell colSpan={4} className="text-center">No transactions yet.</TableCell></TableRow>
+                            <TableRow><TableCell colSpan={5} className="text-center">No transactions yet.</TableCell></TableRow>
                         )}
                     </TableBody>
                  </Table>

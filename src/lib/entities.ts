@@ -28,6 +28,7 @@ export interface Job {
     platformFee?: number;
     gst?: number;
     workerPayout?: number;
+    completedAt?: any; // Firestore Timestamp
 }
 
 export interface Worker {
@@ -91,6 +92,7 @@ export interface Transaction {
     type: "referral_commission" | "payout" | "refund" | "platform_fee" | "tax";
     sourceJobId?: string; // The job ID that triggered this transaction.
     timestamp?: any; // Firestore Timestamp
+    jobCompletedAt?: any; // Firestore Timestamp
 }
 
 export interface SOSAlert {
@@ -145,5 +147,3 @@ export interface Property {
     listingType: "sale" | "rent"; // Whether the property is for sale or for rent.
     vastuScore?: number; // Vastu compliance score from 0 to 10.
 }
-
-    

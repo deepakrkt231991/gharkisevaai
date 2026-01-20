@@ -3,7 +3,7 @@ import { doc, getDoc, updateDoc, collection, addDoc, serverTimestamp } from 'fir
 import { initializeFirebase } from '@/firebase';
 import { revalidatePath } from 'next/cache';
 
-const PLATFORM_FEE_PERCENTAGE = 0.05; // 5% of final cost
+const PLATFORM_FEE_PERCENTAGE = 0.15; // 15% of final cost
 const REFERRAL_COMMISSION_PERCENTAGE = 0.0005; // 0.05% of final cost
 const GST_PERCENTAGE = 0.18; // 18% GST
 
@@ -29,11 +29,11 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
         }
 
         // --- Fee & Tax Calculation ---
-        // The 5% platform fee is inclusive of 18% GST.
         const platformFeeGross = finalCost * PLATFORM_FEE_PERCENTAGE;
         const platformFeeNet = platformFeeGross / (1 + GST_PERCENTAGE);
         const gstAmount = platformFeeGross - platformFeeNet;
         const workerPayout = finalCost - platformFeeGross;
+        const completionTimestamp = serverTimestamp();
 
 
         // Update job status and add calculated values for invoice
@@ -42,6 +42,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
             platformFee: platformFeeGross,
             gst: gstAmount,
             workerPayout: workerPayout,
+            completedAt: completionTimestamp,
         });
 
         // Update legal agreement status, if it exists
@@ -59,7 +60,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
             amount: platformFeeNet,
             type: 'platform_fee',
             sourceJobId: jobId,
-            timestamp: serverTimestamp(),
+            timestamp: completionTimestamp,
         });
 
         // 2. GST on Platform Fee
@@ -68,7 +69,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
             amount: gstAmount,
             type: 'tax',
             sourceJobId: jobId,
-            timestamp: serverTimestamp(),
+            timestamp: completionTimestamp,
         });
 
         // 3. Worker Payout
@@ -78,7 +79,8 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
                 amount: workerPayout,
                 type: 'payout',
                 sourceJobId: jobId,
-                timestamp: serverTimestamp(),
+                timestamp: completionTimestamp,
+                jobCompletedAt: completionTimestamp, // For the 1-hour rule
             });
         }
         
@@ -94,13 +96,14 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
                     amount: commission,
                     type: 'referral_commission',
                     sourceJobId: jobId,
-                    timestamp: serverTimestamp(),
+                    timestamp: completionTimestamp,
                 });
             }
         }
         revalidatePath('/legal-vault');
         revalidatePath(`/chat/${jobId}`);
         revalidatePath('/admin');
+        revalidatePath('/dashboard/earnings');
         return { success: true, message: 'Deal completed and all payments processed.' };
     } catch(e: any) {
         console.error("Confirm Delivery Error:", e);
@@ -120,5 +123,3 @@ export async function requestRefund(jobId: string): Promise<{success: boolean, m
         return { success: false, message: e.message };
     }
 }
-
-    

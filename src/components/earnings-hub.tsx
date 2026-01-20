@@ -1,52 +1,25 @@
 'use client';
 
+import { useMemo, useState } from 'react';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, where, orderBy } from 'firebase/firestore';
+import type { Transaction } from '@/lib/entities';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Bell, TrendingUp, Banknote, FileText, Users, Wrench, QrCode, IndianRupee } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Bell, TrendingUp, Banknote, FileText, Users, Wrench, QrCode, IndianRupee, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-
-// Mock Data based on the new design
-const totalPassiveIncome = "45,280";
-const monthlyGrowth = "+12.5%";
-const referralIncome = "28,400";
-const referralGrowth = "8%";
-const toolRentalIncome = "16,880";
-const toolRentalGrowth = "15%";
-
-const transactions = [
-  {
-    icon: Wrench, // Placeholder for AC Repair
-    title: 'AC Repair Referral',
-    date: 'Oct 24 • 14:20',
-    amount: '850.00',
-    status: 'PAID',
-  },
-  {
-    icon: Wrench, // Placeholder for Drill Kit
-    title: 'Drill Kit Rental',
-    date: 'Oct 23 • 09:15',
-    amount: '450.00',
-    status: 'PENDING',
-  },
-  {
-    icon: Wrench, // Placeholder for Interior Design
-    title: 'Interior Design Lead',
-    date: 'Oct 22 • 18:45',
-    amount: '1,200.00',
-    status: 'PAID',
-  },
-];
-
+import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from './ui/skeleton';
 
 function HubHeader() {
+    const { user } = useUser();
     return (
         <header className="sticky top-0 z-50 flex items-center justify-between bg-background/80 p-4 backdrop-blur-md">
             <div className="flex items-center gap-3">
                 <Avatar>
-                    <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" />
-                    <AvatarFallback>U</AvatarFallback>
+                    <AvatarImage src={user?.photoURL || "https://i.pravatar.cc/150"} />
+                    <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div>
                     <p className="text-xs text-primary font-bold">GRIHSEVA AI</p>
@@ -64,25 +37,34 @@ function HubHeader() {
     );
 }
 
-function TotalIncomeCard() {
+function TotalIncomeCard({ totalEarnings }: { totalEarnings: number }) {
+    const { toast } = useToast();
+    
+    const handleWithdraw = () => {
+        toast({
+            title: "Coming Soon!",
+            description: "Bank withdrawal functionality is under development."
+        });
+    }
+
     return (
         <Card className="glass-card border-none bg-gradient-to-br from-primary/80 to-primary/50 text-primary-foreground">
             <CardContent className="p-6 space-y-4">
                 <div className="text-center">
-                    <p className="text-sm font-medium text-white/80">TOTAL PASSIVE INCOME</p>
+                    <p className="text-sm font-medium text-white/80">TOTAL WALLET BALANCE</p>
                     <p className="text-5xl font-bold font-headline text-white mt-1">
                         <IndianRupee className="inline-block h-10 w-10 -mt-2" />
-                        {totalPassiveIncome}
+                        {totalEarnings.toFixed(2)}
                     </p>
                     <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-black/20 px-3 py-1 text-xs font-medium text-accent">
                         <TrendingUp className="h-4 w-4" />
-                        <span>{monthlyGrowth} this month</span>
+                        <span>+12.5% this month</span>
                     </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                    <Button className="h-12 bg-white/90 text-primary hover:bg-white">
+                    <Button onClick={handleWithdraw} className="h-12 bg-white/90 text-primary hover:bg-white">
                         <Banknote className="mr-2"/>
-                        Withdraw
+                        Withdraw All
                     </Button>
                     <Button variant="outline" className="h-12 border-white/50 bg-transparent text-white hover:bg-white/10 hover:text-white">
                         <FileText className="mr-2"/>
@@ -94,41 +76,109 @@ function TotalIncomeCard() {
     );
 }
 
-function BreakdownSection() {
+const TransactionRow = ({ tx }: { tx: Transaction & {id: string} }) => {
+    const { toast } = useToast();
+    const [isWithdrawing, setIsWithdrawing] = useState(false);
+    
+    const isPayout = tx.type === 'payout';
+    const completedAt = tx.jobCompletedAt ? (tx.jobCompletedAt as any).toDate() : null;
+    const oneHour = 60 * 60 * 1000;
+    const isWithdrawalReady = completedAt ? (new Date().getTime() - completedAt.getTime()) > oneHour : false;
+    const timeRemaining = completedAt ? Math.max(0, oneHour - (new Date().getTime() - completedAt.getTime())) : 0;
+
+    const handleWithdraw = () => {
+        setIsWithdrawing(true);
+        toast({ title: 'Initiating Withdrawal...', description: 'This is a simulation.'});
+        setTimeout(() => {
+            setIsWithdrawing(false);
+            toast({ title: 'Success!', description: 'Amount has been transferred to your bank.', className: 'bg-green-600 text-white'});
+        }, 2000);
+    }
+    
     return (
-        <div className="space-y-4">
-             <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold font-headline">Breakdown</h3>
-                <Link href="#" className="text-sm font-bold text-primary">View Reports</Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-                <Card className="glass-card">
-                    <CardContent className="p-4">
-                        <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                            <Users size={16} className="text-primary"/>
-                            <p className="text-sm font-bold">REFERRALS</p>
-                        </div>
-                        <p className="text-2xl font-bold text-white">₹{referralIncome}</p>
-                        <p className="text-xs font-medium text-green-400 flex items-center gap-1"><TrendingUp size={14}/> {referralGrowth} GROWTH</p>
-                    </CardContent>
-                </Card>
-                 <Card className="glass-card">
-                    <CardContent className="p-4">
-                        <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                            <Wrench size={16} className="text-primary"/>
-                            <p className="text-sm font-bold">TOOL RENTALS</p>
-                        </div>
-                        <p className="text-2xl font-bold text-white">₹{toolRentalIncome}</p>
-                        <p className="text-xs font-medium text-green-400 flex items-center gap-1"><TrendingUp size={14}/> {toolRentalGrowth} GROWTH</p>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
+         <Card className="glass-card">
+            <CardContent className="p-3 flex items-center gap-4">
+                <div className="bg-primary/10 p-3 rounded-lg">
+                    {isPayout ? <Wrench className="text-primary" /> : <Users className="text-primary" />}
+                </div>
+                <div className="flex-1">
+                    <p className="font-bold text-white capitalize">{tx.type.replace('_', ' ')}</p>
+                    <p className="text-xs text-muted-foreground">Job ID: {tx.sourceJobId?.substring(0, 6)}...</p>
+                </div>
+                <div className="text-right">
+                    <p className="font-bold text-white text-lg">+ ₹{tx.amount.toFixed(2)}</p>
+                    {isPayout && (
+                        isWithdrawalReady ? (
+                             <Button size="sm" className="h-7 mt-1 text-xs" onClick={handleWithdraw} disabled={isWithdrawing}>
+                                {isWithdrawing ? <Loader2 className="mr-1 h-3 w-3 animate-spin"/> : null}
+                                Withdraw
+                            </Button>
+                        ) : (
+                             <p className="text-xs text-yellow-400">Ready in ~{Math.ceil(timeRemaining / 60000)} min</p>
+                        )
+                    )}
+                </div>
+            </CardContent>
+        </Card>
     );
 }
 
-function CreatePosterCard() {
-    return (
+export function EarningsHub() {
+    const { user, isUserLoading } = useUser();
+    const firestore = useFirestore();
+
+    const transactionsQuery = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return query(
+            collection(firestore, 'transactions'), 
+            where('userId', '==', user.uid),
+            orderBy('timestamp', 'desc')
+        );
+    }, [firestore, user]);
+
+    const { data: transactions, isLoading: isTransactionsLoading } = useCollection<Transaction>(transactionsQuery);
+
+    const totalEarnings = useMemo(() => {
+        if (!transactions) return 0;
+        return transactions.reduce((sum, tx) => sum + tx.amount, 0);
+    }, [transactions]);
+    
+    if (isUserLoading) {
+        return (
+             <div className="p-4 space-y-6">
+                <Skeleton className="h-48 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+             </div>
+        )
+    }
+
+  return (
+    <>
+      <HubHeader />
+      <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-24">
+        <TotalIncomeCard totalEarnings={totalEarnings} />
+        
+         <div className="space-y-4">
+             <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold font-headline">Recent Transactions</h3>
+                <Link href="#" className="text-sm font-bold text-primary">See All</Link>
+            </div>
+             {isTransactionsLoading && (
+                 <div className="space-y-3">
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                 </div>
+             )}
+            {transactions && transactions.length > 0 ? (
+                 <div className="space-y-3">
+                    {transactions.map((tx) => <TransactionRow key={tx.id} tx={tx} />)}
+                </div>
+            ) : !isTransactionsLoading && (
+                <p className="text-muted-foreground text-center py-8">No earnings yet. Complete jobs or refer friends to start earning!</p>
+            )}
+        </div>
+        
         <Card className="glass-card p-4 space-y-3 bg-gradient-to-br from-primary/20 to-transparent">
              <div className="flex items-center gap-2 text-accent text-xs font-bold">
                 <span className="animate-pulse">✨</span>
@@ -143,49 +193,6 @@ function CreatePosterCard() {
                 </Link>
             </Button>
         </Card>
-    );
-}
-
-function RecentTransactions() {
-    return (
-         <div className="space-y-4">
-             <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold font-headline">Recent Transactions</h3>
-                <Link href="#" className="text-sm font-bold text-primary">See All</Link>
-            </div>
-            <div className="space-y-3">
-                {transactions.map((tx, index) => (
-                    <Card key={index} className="glass-card">
-                        <CardContent className="p-3 flex items-center gap-4">
-                            <div className="bg-primary/10 p-3 rounded-lg">
-                                <tx.icon className="text-primary" />
-                            </div>
-                            <div className="flex-1">
-                                <p className="font-bold text-white">{tx.title}</p>
-                                <p className="text-xs text-muted-foreground">{tx.date}</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="font-bold text-white">₹{tx.amount}</p>
-                                <p className={`text-xs font-bold ${tx.status === 'PAID' ? 'text-green-400' : 'text-yellow-400'}`}>{tx.status}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-
-export function EarningsHub() {
-  return (
-    <>
-      <HubHeader />
-      <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-24">
-        <TotalIncomeCard />
-        <BreakdownSection />
-        <CreatePosterCard />
-        <RecentTransactions />
       </main>
     </>
   );

@@ -106,6 +106,11 @@
         "workerPayout": {
           "type": "number",
           "description": "Amount paid out to the worker."
+        },
+        "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of when the job was marked as completed."
         }
       },
       "required": ["jobId", "customerId", "status"]
@@ -253,7 +258,8 @@
         "amount": { "type": "number" },
         "type": { "type": "string", "enum": ["referral_commission", "payout", "refund", "platform_fee", "tax"] },
         "sourceJobId": { "type": "string", "description": "The job ID that triggered this transaction." },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "timestamp": { "type": "string", "format": "date-time" },
+        "jobCompletedAt": { "type": "string", "format": "date-time", "description": "Timestamp for when the source job was completed, used for payout rules."}
       },
       "required": ["transactionId", "userId", "amount", "type"]
     },
@@ -443,5 +449,3 @@
     ]
   }
 }
-
-    
