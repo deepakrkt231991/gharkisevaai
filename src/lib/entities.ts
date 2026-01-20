@@ -85,9 +85,9 @@ export interface Transaction {
     transactionId: string;
     userId: string; // The ID of the user/worker who this transaction belongs to.
     amount: number;
-    type: "referral_commission" | "payout" | "refund";
+    type: "referral_commission" | "payout" | "refund" | "platform_fee";
     sourceJobId?: string; // The job ID that triggered this transaction.
-    timestamp?: string;
+    timestamp?: any; // Firestore Timestamp
 }
 
 export interface SOSAlert {
@@ -142,3 +142,5 @@ export interface Property {
     listingType: "sale" | "rent"; // Whether the property is for sale or for rent.
     vastuScore?: number; // Vastu compliance score from 0 to 10.
 }
+
+    

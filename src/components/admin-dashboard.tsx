@@ -189,22 +189,41 @@ export function AdminDashboard() {
   const { data: pendingVerifications, isLoading: pendingLoading } = useCollection<Worker>(pendingVerificationsQuery);
   const { data: transactions, isLoading: transactionsLoading } = useCollection<Transaction>(transactionsQuery);
 
-  const { totalRevenue, referralRevenue } = useMemo(() => {
-    if (!transactions) return { totalRevenue: 0, referralRevenue: 0 };
+  const { totalVolume, platformFees, referralPayouts, netProfit } = useMemo(() => {
+    if (!transactions) return { totalVolume: 0, platformFees: 0, referralPayouts: 0, netProfit: 0 };
     
-    let total = 0;
-    let referral = 0;
+    let volume = 0;
+    let fees = 0;
+    let referrals = 0;
+    
+    const processedJobs = new Set();
+
     transactions.forEach(tx => {
-        // Assuming all transactions contribute to total revenue for simplicity
-        total += tx.amount;
+        // Calculate total volume from payouts and platform fees to avoid double counting
+        if ((tx.type === 'payout' || tx.type === 'platform_fee') && tx.sourceJobId && !processedJobs.has(tx.sourceJobId)) {
+            // Find all transactions for this job to sum up the total cost
+            const jobTransactions = transactions.filter(t => t.sourceJobId === tx.sourceJobId && (t.type === 'payout' || t.type === 'platform_fee'));
+            const jobTotal = jobTransactions.reduce((sum, current) => sum + current.amount, 0);
+            volume += jobTotal;
+            processedJobs.add(tx.sourceJobId);
+        }
+
+        if (tx.type === 'platform_fee') {
+            fees += tx.amount;
+        }
         if (tx.type === 'referral_commission') {
-            referral += tx.amount;
+            referrals += tx.amount;
         }
     });
-    // This is a simplification. Real total revenue would likely be service fees, not just sum of all transactions.
-    // Let's assume for now total revenue is just the sum of all transaction amounts.
-    return { totalRevenue: total, referralRevenue: referral };
+
+    return { 
+        totalVolume: volume, 
+        platformFees: fees, 
+        referralPayouts: referrals,
+        netProfit: fees - referrals
+    };
   }, [transactions]);
+
 
   const getTimeAgo = (timestamp: any) => {
     if (!timestamp) return 'N/A';
@@ -233,24 +252,28 @@ export function AdminDashboard() {
 
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
-              title="Total Revenue"
-              value={`₹${totalRevenue.toFixed(2)}`}
+              title="Total Transaction Volume"
+              value={`₹${totalVolume.toFixed(2)}`}
+              description="Total value of all completed jobs"
               icon={<IndianRupee className="h-4 w-4 text-muted-foreground" />}
           />
           <StatCard
+              title="Platform Fee Earned"
+              value={`₹${platformFees.toFixed(2)}`}
+              description="Your gross revenue from fees"
+              icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
+          />
+          <StatCard
               title="Referral Payouts"
-              value={`₹${referralRevenue.toFixed(2)}`}
+              value={`- ₹${referralPayouts.toFixed(2)}`}
+              description="Commissions paid to referrers"
               icon={<Share2 className="h-4 w-4 text-muted-foreground" />}
           />
           <StatCard
-              title="Pending Verifications"
-              value={pendingLoading ? '...' : (pendingVerifications?.length || 0)}
-              icon={<Users className="h-4 w-4 text-muted-foreground" />}
-          />
-          <StatCard
-              title="Active SOS Alerts"
-              value={sosLoading ? '...' : (sosAlerts?.length || 0)}
-              icon={<AlertTriangle className="h-4 w-4 text-muted-foreground" />}
+              title="Net Profit"
+              value={`₹${netProfit.toFixed(2)}`}
+              description="Platform Fees - Payouts"
+              icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />}
           />
       </div>
 
@@ -380,3 +403,5 @@ export function AdminDashboard() {
     </div>
   );
 }
+
+    

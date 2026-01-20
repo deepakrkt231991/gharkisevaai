@@ -239,7 +239,7 @@
         "transactionId": { "type": "string" },
         "userId": { "type": "string", "description": "The ID of the user/worker who this transaction belongs to." },
         "amount": { "type": "number" },
-        "type": { "type": "string", "enum": ["referral_commission", "payout", "refund"] },
+        "type": { "type": "string", "enum": ["referral_commission", "payout", "refund", "platform_fee"] },
         "sourceJobId": { "type": "string", "description": "The job ID that triggered this transaction." },
         "timestamp": { "type": "string", "format": "date-time" }
       },
@@ -431,3 +431,5 @@
     ]
   }
 }
+
+    

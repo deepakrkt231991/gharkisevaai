@@ -174,14 +174,15 @@ export function ServiceSlotBooking() {
                         <TooltipTrigger asChild>
                           <div className="flex justify-between items-center text-sm cursor-pointer">
                             <p className="text-muted-foreground flex items-center gap-1.5">
-                                Taxes (GST 18%)
+                                Taxes & Fees
                                 <Info className="h-3 w-3" />
                             </p>
                             <p className="text-white font-medium">₹0.00 <span className="text-xs text-accent">INCLUDED</span></p>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-xs">
-                           <p>100% Transparency: Platform fees helps us keep your payment safe in the Waiting Timer.</p>
+                           <p className="font-bold">0% Platform Fee for Customers.</p>
+                           <p>You only pay for the service. A small service fee is charged to the worker from their earnings to maintain platform security and features.</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -204,3 +205,5 @@ export function ServiceSlotBooking() {
     </div>
   );
 }
+
+    
