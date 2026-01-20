@@ -21,6 +21,7 @@ export const findVerifiedWorkers = ai.defineTool(
         workerId: z.string(),
         name: z.string(),
         skills: z.array(z.string()),
+        phone: z.string().optional(),
     })),
   },
   async (input) => {
@@ -40,6 +41,6 @@ export const findVerifiedWorkers = ai.defineTool(
 
     console.log('Found workers:', workers);
     // The AI will perform the final filtering based on skills and location from the prompt.
-    return workers.map(w => ({ workerId: w.workerId, name: w.name, skills: w.skills }));
+    return workers.map(w => ({ workerId: w.workerId, name: w.name, skills: w.skills, phone: w.phone }));
   }
 );

@@ -87,7 +87,7 @@ const WorkerCard = ({ worker }: { worker: any }) => (
                     </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
-                    <a href={`tel:123-456-7890`}>
+                    <a href={`tel:${worker.phone || ''}`}>
                         <Phone className="mr-2 h-4 w-4"/>Free Call
                     </a>
                 </Button>
