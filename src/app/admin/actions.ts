@@ -108,3 +108,20 @@ export async function generateSocialAd(
         return { success: false, message: e.message || 'An unknown error occurred.', data: null };
     }
 }
+
+export async function withdrawAdminFunds(amount: number): Promise<{ success: boolean; message: string }> {
+    if (amount <= 0) {
+        return { success: false, message: 'Withdrawal amount must be positive.' };
+    }
+    // In a real application, this would trigger a payout to a linked bank account via a payment provider like Stripe or Razorpay.
+    // It would also involve creating a 'payout' transaction in the database to log this withdrawal.
+    // For now, we will just simulate the success of this operation.
+    console.log(`Simulating withdrawal of ₹${amount}.`);
+
+    // Here you would:
+    // 1. Call your payment provider's API to initiate the transfer.
+    // 2. On success, create a new transaction document in Firestore to log the admin payout.
+    // 3. Update the admin's wallet/balance.
+
+    return { success: true, message: `Withdrawal of ₹${amount.toFixed(2)} has been successfully initiated.` };
+}

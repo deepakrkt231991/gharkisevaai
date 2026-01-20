@@ -15,7 +15,7 @@ import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, where, orderBy } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
 import type { SOSAlert, Worker, Transaction } from "@/lib/entities";
-import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState } from "@/app/admin/actions";
+import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds } from "@/app/admin/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Label } from "./ui/label";
@@ -167,6 +167,47 @@ function MarketingHub() {
     );
 }
 
+function RevenueWithdrawalCard({ netProfit }: { netProfit: number }) {
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
+
+  const handleWithdraw = () => {
+    if (netProfit <= 0) {
+        toast({ title: "No funds to withdraw", variant: "destructive" });
+        return;
+    }
+    startTransition(async () => {
+        // For now, we set a minimum withdrawal of 500 as suggested
+        if (netProfit < 500) {
+             toast({ title: "Minimum Withdrawal", description: "Minimum withdrawal amount is ₹500.", variant: "destructive" });
+             return;
+        }
+        const result = await withdrawAdminFunds(netProfit);
+        if (result.success) {
+            toast({ title: "Withdrawal Initiated!", description: result.message, className: "bg-green-600 text-white" });
+            // In a real app, we'd revalidate the data to show the new balance.
+        } else {
+            toast({ title: "Withdrawal Failed", description: result.message, variant: "destructive" });
+        }
+    });
+  }
+
+  return (
+    <Card className="bg-gray-900/50 border-accent text-white rounded-xl border">
+      <CardContent className="p-6 text-center space-y-3">
+        <p className="text-sm font-medium text-white/70">TOTAL APP EARNINGS (WITHDRAWABLE)</p>
+        <p className="text-4xl font-extrabold text-accent">₹{netProfit.toFixed(2)}</p>
+        <Button onClick={handleWithdraw} disabled={isPending || netProfit < 500} className="w-full max-w-xs mx-auto bg-accent text-accent-foreground hover:bg-accent/90 h-12 text-base font-bold">
+          {isPending ? <Loader2 className="mr-2 animate-spin" /> : null}
+          Withdraw to Bank
+        </Button>
+        <p className="text-xs text-muted-foreground">Minimum withdrawal amount: ₹500</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+
 export function AdminDashboard() {
   const firestore = useFirestore();
 
@@ -200,9 +241,9 @@ export function AdminDashboard() {
 
     transactions.forEach(tx => {
         // Calculate total volume from payouts and platform fees to avoid double counting
-        if ((tx.type === 'payout' || tx.type === 'platform_fee') && tx.sourceJobId && !processedJobs.has(tx.sourceJobId)) {
+        if ((tx.type === 'payout' || tx.type === 'platform_fee' || tx.type === 'tax') && tx.sourceJobId && !processedJobs.has(tx.sourceJobId)) {
             // Find all transactions for this job to sum up the total cost
-            const jobTransactions = transactions.filter(t => t.sourceJobId === tx.sourceJobId && (t.type === 'payout' || t.type === 'platform_fee'));
+            const jobTransactions = transactions.filter(t => t.sourceJobId === tx.sourceJobId && (t.type === 'payout' || t.type === 'platform_fee' || t.type === 'tax'));
             const jobTotal = jobTransactions.reduce((sum, current) => sum + current.amount, 0);
             volume += jobTotal;
             processedJobs.add(tx.sourceJobId);
@@ -276,6 +317,8 @@ export function AdminDashboard() {
               icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />}
           />
       </div>
+      
+      <RevenueWithdrawalCard netProfit={netProfit} />
 
       <Tabs defaultValue="verification">
         <TabsList className="grid w-full grid-cols-4">
@@ -403,5 +446,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-
-    
