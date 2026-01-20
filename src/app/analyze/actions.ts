@@ -4,6 +4,7 @@
 import { analyzeDefect as analyzeDefectFlow, AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
 import { findVerifiedWorkers } from '@/services/worker-service';
 import { z } from 'zod';
+import { createTransformationVideo, TransformationVideoOutput } from '@/ai/flows/transformation-video-agent';
 
 const schema = z.object({
   mediaDataUri: z.string().refine(val => val.startsWith('data:'), {
@@ -86,5 +87,61 @@ export async function findNearbyWorkers(
     } catch (error) {
         console.error('Error finding nearby workers:', error);
         return { success: false, workers: [] };
+    }
+}
+
+
+// New action for video generation
+const videoSchema = z.object({
+  mediaDataUri: z.string(),
+  defect: z.string(),
+});
+
+type VideoState = {
+    success: boolean;
+    message: string;
+    data: TransformationVideoOutput | null;
+}
+
+export async function generateVideo(
+    prevState: VideoState | undefined,
+    formData: FormData,
+): Promise<VideoState> {
+    
+    const validatedFields = videoSchema.safeParse({
+        mediaDataUri: formData.get('mediaDataUri'),
+        defect: formData.get('defect'),
+    });
+
+    if (!validatedFields.success) {
+        return {
+            success: false,
+            message: 'Invalid input for video generation.',
+            data: null,
+        };
+    }
+
+    try {
+        const videoPrompt = `Create a 5-second cinematic walkthrough video. Start with the provided image, which shows a defect: '${validatedFields.data.defect}'. Smoothly transition the scene to show the defect perfectly repaired and the entire area looking clean, new, and aspirational.`;
+        
+        const result = await createTransformationVideo({
+            imageDataUri: validatedFields.data.mediaDataUri,
+            prompt: videoPrompt,
+        });
+
+        return {
+            success: true,
+            message: 'Video generated successfully!',
+            data: result,
+        };
+
+    } catch (error) {
+        console.error('Error during video generation:', error);
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+        return {
+            success: false,
+            message: `Video generation failed. This can happen due to high demand. Please try again later. Details: ${errorMessage}`,
+            data: null,
+        };
     }
 }

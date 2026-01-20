@@ -5,9 +5,9 @@ import { useState, useRef, ChangeEvent, useActionState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import Link from 'next/link';
-import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package, ArrowLeft, History, CheckCircle, Download, UserCheck, ScanSearch, Star, MessageSquare, Phone } from 'lucide-react';
+import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package, ArrowLeft, History, CheckCircle, Download, UserCheck, ScanSearch, Star, MessageSquare, Phone, Film } from 'lucide-react';
 
-import { analyzeDefect, findNearbyWorkers } from '@/app/analyze/actions';
+import { analyzeDefect, findNearbyWorkers, generateVideo } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,8 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from './ui/badge';
 import type { AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
+import type { TransformationVideoOutput } from '@/ai/flows/transformation-video-agent';
+
 
 type Media = {
   dataUrl: string;
@@ -29,6 +31,12 @@ const initialState: {
   success: boolean;
   message: string;
   data: AnalyzeDefectOutput | null;
+} = { success: false, message: '', data: null };
+
+const initialVideoState: {
+  success: boolean;
+  message: string;
+  data: TransformationVideoOutput | null;
 } = { success: false, message: '', data: null };
 
 
@@ -89,7 +97,8 @@ const WorkerCard = ({ worker }: { worker: any }) => (
 );
 
 export function DefectAnalyzer() {
-  const [state, formAction, isPending] = useActionState(analyzeDefect, initialState);
+  const [analysisState, analysisAction, isAnalysisPending] = useActionState(analyzeDefect, initialState);
+  const [videoState, videoAction, isVideoPending] = useActionState(generateVideo, initialVideoState);
   
   const [media, setMedia] = useState<Media | null>(null);
   const [description, setDescription] = useState('');
@@ -98,9 +107,9 @@ export function DefectAnalyzer() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
-    if (state.success && state.data?.recommendedWorkerType) {
+    if (analysisState.success && analysisState.data?.recommendedWorkerType) {
         setIsLoadingWorkers(true);
-        findNearbyWorkers({ skill: state.data.recommendedWorkerType })
+        findNearbyWorkers({ skill: analysisState.data.recommendedWorkerType })
             .then(result => {
                 if (result.success) {
                     setWorkers(result.workers);
@@ -108,7 +117,7 @@ export function DefectAnalyzer() {
             })
             .finally(() => setIsLoadingWorkers(false));
     }
-  }, [state.success, state.data]);
+  }, [analysisState.success, analysisState.data]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -133,22 +142,25 @@ export function DefectAnalyzer() {
       fileInputRef.current.value = '';
     }
     const emptyFormData = new FormData();
-    formAction(emptyFormData);
+    analysisAction(emptyFormData);
+    videoAction(emptyFormData);
   };
 
   const AnalysisResult = () => {
-    if (state.message && !state.success && !isPending) {
+    if (isAnalysisPending) return null;
+
+    if (analysisState.message && !analysisState.success) {
       return (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Analysis Failed</AlertTitle>
-          <AlertDescription>{state.message}</AlertDescription>
+          <AlertDescription>{analysisState.message}</AlertDescription>
         </Alert>
       );
     }
 
-    if (state.success && state.data) {
-      const result = state.data;
+    if (analysisState.success && analysisState.data) {
+      const result = analysisState.data;
       return (
         <div className="space-y-6">
           <div className="flex items-start justify-between">
@@ -171,6 +183,48 @@ export function DefectAnalyzer() {
                 </div>
             </CardContent>
           </Card>
+
+          {media?.type === 'image' && (
+             <Card className="glass-card bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
+                <CardContent className="p-4 space-y-3">
+                  <h3 className="font-bold font-headline text-white">AI Visual Reinvention</h3>
+                  <p className="text-sm text-muted-foreground">
+                    See how your space could look after the repair with a short cinematic video.
+                  </p>
+                  
+                  {videoState.success && videoState.data ? (
+                    <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                      <video src={videoState.data.videoDataUri} controls autoPlay loop className="w-full h-full" />
+                    </div>
+                  ) : (
+                    <form action={videoAction}>
+                      <input type="hidden" name="mediaDataUri" value={media.dataUrl} />
+                      <input type="hidden" name="defect" value={result.defect} />
+                      <Button type="submit" disabled={isVideoPending} className="w-full h-12 bg-primary">
+                        {isVideoPending ? (
+                          <>
+                            <Loader2 className="mr-2 animate-spin" />
+                            Generating Video (takes ~1 min)...
+                          </>
+                        ) : (
+                          <>
+                            <Film className="mr-2" />
+                            Generate Transformation Video
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  )}
+                  {videoState.message && !videoState.success && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Video Generation Failed</AlertTitle>
+                      <AlertDescription>{videoState.message}</AlertDescription>
+                    </Alert>
+                  )}
+                </CardContent>
+              </Card>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
               <Card className="glass-card">
@@ -252,7 +306,7 @@ export function DefectAnalyzer() {
       </div>
       
       <main className="flex-1 space-y-6 overflow-y-auto p-4 pb-32">
-        <form action={formAction}>
+        <form action={analysisAction}>
            <div className="space-y-4">
               <div
                 className="relative group w-full aspect-video rounded-xl overflow-hidden border-2 border-dashed border-border bg-input/5 flex flex-col items-center justify-center cursor-pointer hover:border-accent scan-glow"
@@ -286,7 +340,7 @@ export function DefectAnalyzer() {
                     onChange={handleFileChange}
                  />
 
-                {isPending && (
+                {isAnalysisPending && (
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden">
                         <div className="scan-line"></div>
                         <Loader2 className="h-8 w-8 animate-spin text-accent/80" />
@@ -308,7 +362,7 @@ export function DefectAnalyzer() {
                   />
               </div>
 
-              {!state.success && (
+              {!analysisState.success && (
                 <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent">
                   <SubmitButton hasMedia={!!media} />
                 </div>
@@ -320,7 +374,7 @@ export function DefectAnalyzer() {
           <AnalysisResult />
         </div>
         
-        {state.success && (
+        {analysisState.success && (
              <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent">
                 <Button onClick={handleReset} variant="outline" className="w-full h-14 rounded-xl">
                     <RotateCw className="mr-2 h-4 w-4" />
