@@ -37,6 +37,7 @@ export function WorkerSignupForm() {
   // Step 1 State
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [referredBy, setReferredBy] = useState('');
   
   // Step 2 State
   const [idCardUri, setIdCardUri] = useState<string | null>(null);
@@ -56,8 +57,9 @@ export function WorkerSignupForm() {
   useEffect(() => {
     let newProgress = 0;
     if (currentStep === 1) {
-        if(name) newProgress += 16.5;
-        if(phone) newProgress += 16.5;
+        if(name) newProgress += 11;
+        if(phone) newProgress += 11;
+        if(referredBy) newProgress += 11;
     } else if (currentStep === 2) {
         newProgress = 33;
         if(idCardUri) newProgress += 16.5;
@@ -70,7 +72,7 @@ export function WorkerSignupForm() {
         if (latitude && longitude) newProgress += 12;
     }
     setProgress(Math.min(100, newProgress));
-  }, [name, phone, idCardUri, selfieUri, verificationResult, skills, emergencyContact, latitude, longitude, currentStep]);
+  }, [name, phone, referredBy, idCardUri, selfieUri, verificationResult, skills, emergencyContact, latitude, longitude, currentStep]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'id' | 'selfie') => {
@@ -234,6 +236,10 @@ export function WorkerSignupForm() {
                             <Input name="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="flex-1" placeholder="00000 00000" type="tel" />
                         </div>
                     </div>
+                     <div className="space-y-2">
+                        <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Referral Code (Optional)</Label>
+                        <Input name="referredBy" value={referredBy} onChange={(e) => setReferredBy(e.target.value)} placeholder="Enter referral code" />
+                    </div>
                 </div>
             )}
 
@@ -367,6 +373,7 @@ export function WorkerSignupForm() {
             )}
             <input type="hidden" name="name" value={name} />
             <input type="hidden" name="phone" value={phone} />
+            <input type="hidden" name="referredBy" value={referredBy} />
             <input type="hidden" name="latitude" value={latitude || ''} />
             <input type="hidden" name="longitude" value={longitude || ''} />
         </form>

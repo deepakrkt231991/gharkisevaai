@@ -21,6 +21,7 @@ const WorkerProfileSchema = z.object({
   longitude: z.coerce.number().optional(),
   certificationsUploaded: z.string().optional(),
   shopLicenseUploaded: z.string().optional(),
+  referredBy: z.string().optional(),
 });
 
 type State = {
@@ -46,6 +47,7 @@ export async function createWorkerProfile(
     longitude: formData.get('longitude'),
     certificationsUploaded: formData.get('certificationsUploaded'),
     shopLicenseUploaded: formData.get('shopLicenseUploaded'),
+    referredBy: formData.get('referredBy'),
   });
 
   if (!validatedFields.success) {

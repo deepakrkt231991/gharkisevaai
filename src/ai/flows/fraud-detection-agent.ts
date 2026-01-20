@@ -12,6 +12,7 @@ import {z} from 'genkit';
 
 const FraudDetectionInputSchema = z.object({
   userId: z.string().describe("The ID of the user/worker to check."),
+  referredBy: z.string().optional().describe("The ID of the user who referred this account."),
   ipAddress: z.string().optional().describe("The IP address used for registration or recent activity."),
   deviceId: z.string().optional().describe("A unique identifier for the user's device."),
   address: z.string().optional().describe("The user's physical address."),
@@ -46,11 +47,16 @@ Analyze the provided data based on these rules and suggest an action:
     -   Check for multiple accounts from the same \`deviceId\` or \`ipAddress\`.
     -   Check for very similar physical \`address\` submissions.
 
-2.  **Poor Performance (Medium Risk -> warn/monitor):**
+2.  **Referral Fraud (Medium/High Risk -> monitor/auto_ban):**
+    -   If a \`referredBy\` ID is provided, check the referrer's history.
+    -   Has the referrer referred other accounts that were later flagged for fraud?
+    -   Is the referrer's own account in good standing? A pattern of referring fraudulent accounts is a high-risk signal.
+
+3.  **Poor Performance (Medium Risk -> warn/monitor):**
     -   Check if the \`workerRating\` has dropped below a threshold (e.g., 3.0) based on \`recentReviews\`.
     -   If the rating is consistently low over 3+ reviews, suggest 'warn'.
 
-3.  **Off-Platform Payment Solicitation (High Risk -> auto_ban):**
+4.  **Off-Platform Payment Solicitation (High Risk -> auto_ban):**
     -   Analyze the \`chatTranscript\` for keywords suggesting payment outside the app.
     -   Look for phrases like "pay me directly", "Google Pay", "Paytm", "GPay", "cash de dena", "UPI kar do".
 
@@ -58,6 +64,7 @@ Based on your analysis, determine if this is a potential fraud case. Provide a c
 
 **Data to Analyze:**
 - User ID: {{{userId}}}
+{{#if referredBy}}- Referred By: {{{referredBy}}}{{/if}}
 {{#if ipAddress}}- IP Address: {{{ipAddress}}}{{/if}}
 {{#if deviceId}}- Device ID: {{{deviceId}}}{{/if}}
 {{#if address}}- Address: {{{address}}}{{/if}}
@@ -65,7 +72,7 @@ Based on your analysis, determine if this is a potential fraud case. Provide a c
 {{#if recentReviews}}- Recent Reviews: {{{recentReviews}}}{{/if}}
 {{#if chatTranscript}}- Chat Transcript: \`\`\`{{{chatTranscript}}}\`\`\`{{/if}}
 
-**Note:** In a real system, you would have access to tools to check against the database. For this simulation, assume you have that knowledge and make a logical determination based on the provided data. Invent a scenario if needed to justify your output (e.g., "Found 3 other accounts with the same Device ID.").
+**Note:** In a real system, you would have access to tools to check against the database (e.g., to find other accounts by deviceId or check a referrer's history). For this simulation, assume you have that knowledge and make a logical determination based on the provided data. Invent a scenario if needed to justify your output (e.g., "The referrer, user-xyz, has previously referred 2 accounts that were banned for payment fraud.").
 `,
 });
 
