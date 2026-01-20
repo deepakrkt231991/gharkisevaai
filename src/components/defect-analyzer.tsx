@@ -200,16 +200,16 @@ export function DefectAnalyzer() {
                     <form action={videoAction}>
                       <input type="hidden" name="mediaDataUri" value={media.dataUrl} />
                       <input type="hidden" name="defect" value={result.defect} />
-                      <Button type="submit" disabled={isVideoPending} className="w-full h-12 bg-primary">
+                      <Button type="submit" disabled={isVideoPending} className="w-full h-14 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg shadow-accent/20">
                         {isVideoPending ? (
                           <>
-                            <Loader2 className="mr-2 animate-spin" />
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                             Generating Video (takes ~1 min)...
                           </>
                         ) : (
                           <>
-                            <Film className="mr-2" />
-                            Generate Transformation Video
+                            <Film className="mr-2 h-5 w-5" />
+                            See My New Home (AI Video)
                           </>
                         )}
                       </Button>
