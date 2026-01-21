@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useActionState, useEffect, useState, ChangeEvent } from 'react';
@@ -42,6 +43,7 @@ export function ListPropertyForm() {
     const { toast } = useToast();
     const router = useRouter();
 
+    const [listingType, setListingType] = useState('sale');
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [videoPreview, setVideoPreview] = useState<string | null>(null);
     const [showAiHelp, setShowAiHelp] = useState(false);
@@ -142,28 +144,63 @@ export function ListPropertyForm() {
                         <Input id="location" name="location" placeholder="e.g., Indiranagar, Bangalore" required className="bg-input border-border-dark text-white"/>
                         {getError('location') && <p className="text-sm text-destructive">{getError('location')}</p>}
                     </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="price" className="text-muted-foreground">Price</Label>
-                            <Input id="price" name="price" type="number" step="0.01" placeholder="e.g., 1.85" required className="bg-input border-border-dark text-white"/>
-                            {getError('price') && <p className="text-sm text-destructive">{getError('price')}</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="priceUnit" className="text-muted-foreground">Unit</Label>
-                            <Select name="priceUnit" required>
-                                <SelectTrigger className="bg-input border-border-dark text-white">
-                                    <SelectValue placeholder="Select Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Cr">Crore (Cr)</SelectItem>
-                                    <SelectItem value="L">Lakh (L)</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            {getError('priceUnit') && <p className="text-sm text-destructive">{getError('priceUnit')}</p>}
-                        </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="listingType" className="text-muted-foreground">Listing For</Label>
+                        <Select name="listingType" required onValueChange={setListingType} defaultValue={listingType}>
+                            <SelectTrigger className="bg-input border-border-dark text-white">
+                                <SelectValue placeholder="Select listing type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="sale">Sale</SelectItem>
+                                <SelectItem value="rent">Rent</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
+                    {listingType === 'sale' ? (
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="price" className="text-muted-foreground">Price</Label>
+                                <Input id="price" name="price" type="number" step="0.01" placeholder="e.g., 1.85" required className="bg-input border-border-dark text-white"/>
+                                {getError('price') && <p className="text-sm text-destructive">{getError('price')}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="priceUnit" className="text-muted-foreground">Unit</Label>
+                                <Select name="priceUnit" required>
+                                    <SelectTrigger className="bg-input border-border-dark text-white">
+                                        <SelectValue placeholder="Select Unit" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Cr">Crore (Cr)</SelectItem>
+                                        <SelectItem value="L">Lakh (L)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {getError('priceUnit') && <p className="text-sm text-destructive">{getError('priceUnit')}</p>}
+                            </div>
+                        </div>
+                    ) : (
+                       <>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="rentAmount" className="text-muted-foreground">Monthly Rent (₹)</Label>
+                                <Input id="rentAmount" name="rentAmount" type="number" placeholder="e.g., 25000" required className="bg-input border-border-dark text-white"/>
+                                {getError('rentAmount') && <p className="text-sm text-destructive">{getError('rentAmount')}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="depositAmount" className="text-muted-foreground">Deposit (₹)</Label>
+                                <Input id="depositAmount" name="depositAmount" type="number" placeholder="e.g., 100000" required className="bg-input border-border-dark text-white"/>
+                                {getError('depositAmount') && <p className="text-sm text-destructive">{getError('depositAmount')}</p>}
+                            </div>
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="agreementYears" className="text-muted-foreground">Agreement Duration (Years)</Label>
+                            <Input id="agreementYears" name="agreementYears" type="number" placeholder="e.g., 1" className="bg-input border-border-dark text-white"/>
+                             {getError('agreementYears') && <p className="text-sm text-destructive">{getError('agreementYears')}</p>}
+                        </div>
+                       </>
+                    )}
+                    
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="sqft" className="text-muted-foreground">Area (sq. ft.)</Label>

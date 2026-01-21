@@ -361,8 +361,11 @@
             "longitude": { "type": "number" }
           }
         },
-        "price": { "type": "number", "description": "Price in a numerical format (e.g., 4.20 for crores)." },
-        "priceUnit": { "type": "string", "description": "Unit for the price, e.g., 'Cr'." },
+        "price": { "type": "number", "description": "Price for sale listings, in a numerical format (e.g., 4.20 for crores)." },
+        "priceUnit": { "type": "string", "description": "Unit for the price (e.g., 'Cr'), for sale listings." },
+        "rentAmount": { "type": "number", "description": "The monthly rent amount for a rental property." },
+        "depositAmount": { "type": "number", "description": "The security deposit amount for a rental property." },
+        "agreementYears": { "type": "number", "description": "The duration of the rental agreement in years." },
         "sqft": { "type": "number" },
         "parking": { "type": "number" },
         "imageUrl": { "type": "string" },
@@ -371,7 +374,7 @@
         "listingType": { "type": "string", "enum": ["sale", "rent"], "description": "Whether the property is for sale or for rent." },
         "vastuScore": { "type": "number", "description": "Vastu compliance score from 0 to 10." }
       },
-      "required": ["propertyId", "ownerId", "title", "location", "price", "priceUnit", "sqft", "parking", "listingType"]
+      "required": ["propertyId", "ownerId", "title", "location", "sqft", "parking", "listingType"]
     },
     "Deal": {
         "$schema": "http://json-schema.org/draft-07/schema#",

@@ -137,8 +137,11 @@ export interface Property {
         latitude: number;
         longitude: number;
     };
-    price: number; // Price in a numerical format (e.g., 4.20 for crores).
-    priceUnit: string; // Unit for the price, e.g., 'Cr'.
+    price?: number; // Price in a numerical format (e.g., 4.20 for crores).
+    priceUnit?: string; // Unit for the price, e.g., 'Cr'.
+    rentAmount?: number;
+    depositAmount?: number;
+    agreementYears?: number;
     sqft: number;
     parking: number;
     imageUrl?: string;
