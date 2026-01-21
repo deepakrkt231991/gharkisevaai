@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -446,7 +447,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
                         <Link href="/marketplace"><ArrowLeft/></Link>
                     </Button>
                     <Avatar>
-                        <AvatarImage src={otherUser?.photoURL} />
+                        <AvatarImage src={otherUser?.photoURL || `https://picsum.photos/seed/${otherUser?.id}/150/150`} />
                         <AvatarFallback>{otherUser?.displayName?.charAt(0) || '?'}</AvatarFallback>
                     </Avatar>
                     <div>

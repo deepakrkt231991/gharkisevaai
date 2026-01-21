@@ -1,3 +1,4 @@
+
 // src/app/rent-tools/page.tsx
 'use client';
 
@@ -38,7 +39,7 @@ function ToolCard({ tool }: { tool: Tool & { id: string } }) {
                 />
                  <Badge className="absolute top-2 left-2 bg-green-500/80 border-green-400 text-white">VERIFIED</Badge>
                  <Avatar className="absolute top-2 right-2 h-8 w-8 border-2 border-background">
-                    <AvatarImage src={owner?.photoURL || `https://i.pravatar.cc/150?u=${tool.ownerId}`} />
+                    <AvatarImage src={owner?.photoURL || `https://picsum.photos/seed/${tool.ownerId}/150/150`} />
                     <AvatarFallback>{owner?.name?.charAt(0) || 'O'}</AvatarFallback>
                 </Avatar>
             </div>
@@ -96,7 +97,7 @@ function ToolLibraryHeader() {
                         </span>
                     </Button>
                     <Avatar className="h-9 w-9">
-                        <AvatarImage src={user?.photoURL || "https://i.pravatar.cc/150"} />
+                        <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/150/150`} />
                         <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                 </div>

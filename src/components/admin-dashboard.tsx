@@ -70,7 +70,7 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
          <Card className="flex flex-col md:flex-row items-center justify-between p-4">
             <div className="flex items-center gap-4 mb-4 md:mb-0">
                 <Avatar className="h-12 w-12">
-                    <AvatarImage src={`https://i.pravatar.cc/150?u=${worker.workerId}`} alt={(worker as any).name} />
+                    <AvatarImage src={`https://picsum.photos/seed/${worker.workerId}/150/150`} alt={(worker as any).name} />
                     <AvatarFallback>{(worker as any).name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>

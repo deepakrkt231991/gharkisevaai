@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React from 'react';
@@ -177,7 +178,7 @@ export function ProductDetailPage() {
             <CardContent className="p-3 flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <Avatar>
-                  <AvatarImage src={seller?.photoURL || `https://i.pravatar.cc/150?u=${seller?.uid}`} />
+                  <AvatarImage src={seller?.photoURL || `https://picsum.photos/seed/${seller?.uid}/150/150`} />
                   <AvatarFallback>{seller?.name?.charAt(0) || 'S'}</AvatarFallback>
                 </Avatar>
                 <div>

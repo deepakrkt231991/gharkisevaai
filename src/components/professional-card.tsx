@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -22,7 +23,7 @@ export function ProfessionalCard({ worker }: ProfessionalCardProps) {
   const rating = worker.rating?.toFixed(1) || 'New';
   const reviews = (worker as any).reviews || (worker as Worker).successfulOrders || 0;
   const startingPrice = (worker as any).startingPrice || 199; // Default price
-  const imageUrl = (worker as any).imageUrl || `https://i.pravatar.cc/150?u=${worker.id}`;
+  const imageUrl = (worker as any).imageUrl || `https://picsum.photos/seed/${worker.id}/150/150`;
   const phone = (worker as any).phone;
 
 

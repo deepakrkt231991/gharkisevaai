@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -18,7 +19,7 @@ function HubHeader() {
         <header className="sticky top-0 z-50 flex items-center justify-between bg-background/80 p-4 backdrop-blur-md">
             <div className="flex items-center gap-3">
                 <Avatar>
-                    <AvatarImage src={user?.photoURL || "https://i.pravatar.cc/150"} />
+                    <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/150/150`} />
                     <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div>
