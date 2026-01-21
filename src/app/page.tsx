@@ -2,7 +2,6 @@
 
 import { HomeHeader } from '@/components/home-header';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
-import { SeasonCheckCard } from '@/components/season-check-card';
 import { TrendingNow } from '@/components/trending-now';
 import { AiServiceGrid } from '@/components/ai-service-grid';
 import { UserStats } from '@/components/user-stats';
@@ -17,7 +16,6 @@ export default function Home() {
         <HomeHeader />
         <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-32">
           <DynamicBanner />
-          <SeasonCheckCard />
           <TrendingNow />
           <AiServiceGrid />
           <UserStats />
@@ -27,5 +25,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

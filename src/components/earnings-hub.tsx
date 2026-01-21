@@ -82,9 +82,11 @@ const TransactionRow = ({ tx }: { tx: Transaction & {id: string} }) => {
     
     const isPayout = tx.type === 'payout';
     const completedAt = tx.jobCompletedAt ? (tx.jobCompletedAt as any).toDate() : null;
-    const oneHour = 60 * 60 * 1000;
-    const isWithdrawalReady = completedAt ? (new Date().getTime() - completedAt.getTime()) > oneHour : false;
-    const timeRemaining = completedAt ? Math.max(0, oneHour - (new Date().getTime() - completedAt.getTime())) : 0;
+    const twelveHours = 12 * 60 * 60 * 1000;
+    const isWithdrawalReady = completedAt ? (new Date().getTime() - completedAt.getTime()) > twelveHours : false;
+    const timeRemaining = completedAt ? Math.max(0, twelveHours - (new Date().getTime() - completedAt.getTime())) : 0;
+    const hoursRemaining = Math.ceil(timeRemaining / (1000 * 60 * 60));
+
 
     const handleWithdraw = () => {
         setIsWithdrawing(true);
@@ -114,7 +116,7 @@ const TransactionRow = ({ tx }: { tx: Transaction & {id: string} }) => {
                                 Withdraw
                             </Button>
                         ) : (
-                             <p className="text-xs text-yellow-400">Ready in ~{Math.ceil(timeRemaining / 60000)} min</p>
+                             <p className="text-xs text-yellow-400">Ready in ~{hoursRemaining} hours</p>
                         )
                     )}
                 </div>
