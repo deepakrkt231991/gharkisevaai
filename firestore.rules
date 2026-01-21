@@ -2,8 +2,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // PUBLIC READ, AUTHENTICATED WRITE
-    // Collections that are publicly readable but require login to create/edit.
+    // --- PUBLIC-READABLE COLLECTIONS ---
+    // Anyone can read (get/list) these collections.
+    // Writes are restricted to authenticated users.
+
     match /properties/{propertyId} {
       allow read: if true;
       allow write: if request.auth != null;
@@ -21,6 +23,7 @@ service cloud.firestore {
 
     match /workers/{workerId} {
       allow read: if true;
+      // Only the worker can update their own profile.
       allow write: if request.auth != null && request.auth.uid == workerId;
     }
     
@@ -29,50 +32,61 @@ service cloud.firestore {
       allow write: if false; // Admin-only writes
     }
     
-     match /app_settings/{docId} {
+    match /app_settings/{docId} {
       allow read: if true;
       allow write: if false; // Admin-only writes
     }
 
-    // USER-SPECIFIC DATA
-    // Data that should only be accessible by the owner.
+    // --- USER-OWNED DATA ---
+    // A user can only access their own documents.
+
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-
-    // TRANSACTION DATA
-    // Highly secure, immutable records. Users can only see their own.
-    match /transactions/{transactionId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null; // Created by server functions/actions
-      allow update, delete: if false;
-    }
-
-    // TWO-PARTY DATA
-    // Data accessible by the two parties involved in the transaction.
-    match /jobs/{jobId} {
-      allow read, write: if request.auth != null && (request.auth.uid == resource.data.customerId || request.auth.uid == resource.data.workerId);
-    }
-    
-    match /deals/{dealId} {
-      allow read, write: if request.auth != null && (request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId);
-    }
-    
-    match /legal_agreements/{agreementId} {
-      allow read, write: if request.auth != null && (request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId);
-    }
-    
-    match /rentals/{rentalId} {
-      // Assumes ownerId is denormalized onto the rental document for rule checking.
-      allow read, write: if request.auth != null && (request.auth.uid == resource.data.renterId || request.auth.uid == resource.data.ownerId);
-    }
     
     match /health/{healthId} {
-       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+       // On create, check the incoming document's userId.
+       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+       // On read/update, check the existing document's userId.
+       allow read, update: if request.auth != null && resource.data.userId == request.auth.uid;
     }
     
     match /sos_alerts/{alertId} {
-       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+       allow read, update: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // --- TRANSACTION DATA (MOSTLY IMMUTABLE) ---
+    match /transactions/{transactionId} {
+      // User can only read their own transactions.
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Transactions are created by server-side logic (actions).
+      allow create: if request.auth != null;
+      // Transactions should never be updated or deleted by clients.
+      allow update, delete: if false;
+    }
+
+    // --- TWO-PARTY DATA (DEALS, JOBS, etc.) ---
+    // Only the two parties involved in the transaction can access these documents.
+    
+    match /jobs/{jobId} {
+      allow create: if request.auth != null && (request.resource.data.customerId == request.auth.uid || request.resource.data.workerId == request.auth.uid);
+      allow read, update, delete: if request.auth != null && (resource.data.customerId == request.auth.uid || resource.data.workerId == request.auth.uid);
+    }
+    
+    match /deals/{dealId} {
+      allow create: if request.auth != null && (request.resource.data.buyerId == request.auth.uid || request.resource.data.sellerId == request.auth.uid);
+      allow read, update, delete: if request.auth != null && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid);
+    }
+    
+    match /legal_agreements/{agreementId} {
+       allow create: if request.auth != null && (request.resource.data.buyerId == request.auth.uid || request.resource.data.sellerId == request.auth.uid);
+       allow read, update, delete: if request.auth != null && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid);
+    }
+    
+    match /rentals/{rentalId} {
+       allow create: if request.auth != null && (request.resource.data.renterId == request.auth.uid || request.resource.data.ownerId == request.auth.uid);
+       allow read, update, delete: if request.auth != null && (resource.data.renterId == request.auth.uid || resource.data.ownerId == request.auth.uid);
     }
   }
 }
