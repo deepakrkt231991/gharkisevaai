@@ -1,37 +1,65 @@
-const CACHE_NAME = 'grihseva-ai-pwa-cache-v1';
+const CACHE_NAME = 'grihseva-ai-cache-v1';
+const urlsToCache = [
+  '/',
+  '/manifest.json'
+];
 
-// On install, we don't pre-cache anything to keep it simple and avoid caching old data.
-// The app will be cached on first visit.
-self.addEventListener('install', (e) => {
-  console.log('[Service Worker] Install');
-});
-
-// On fetch, use a cache-then-network strategy
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((r) => {
-      return r || fetch(e.request).then((response) => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          // Do not cache API calls from genkit or other dynamic resources
-          if (!e.request.url.includes('/genkit.dev') && e.request.method === 'GET') {
-            cache.put(e.request, response.clone());
-          }
-          return response;
-        });
-      });
-    })
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
   );
 });
 
-// On activate, clean up old caches
-self.addEventListener('activate', (e) => {
-    e.waitUntil(
-        caches.keys().then((keyList) => {
-            return Promise.all(keyList.map((key) => {
-                if(key !== CACHE_NAME) {
-                    return caches.delete(key);
-                }
-            }));
-        })
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+
+        return fetch(event.request).then(
+          response => {
+            // Check if we received a valid response
+            if(!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+
+            // IMPORTANT: Clone the response. A response is a stream
+            // and because we want the browser to consume the response
+            // as well as the cache consuming the response, we need
+            // to clone it so we have two streams.
+            const responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+
+            return response;
+          }
+        );
+      })
     );
+});
+
+
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
 });
