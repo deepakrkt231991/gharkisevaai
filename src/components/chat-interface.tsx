@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee, FileText, Download, Info, Bot, X, Truck, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee, FileText, Download, Info, Bot, X, Truck, AlertTriangle, CheckCircle, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useDoc, useCollection, useMemoFirebase, useUser, useFirestore } from '@/firebase';
 import { doc, collection, query, orderBy, serverTimestamp, addDoc, updateDoc } from 'firebase/firestore';
@@ -34,7 +34,68 @@ const AiSuggestions = () => (
     </div>
 );
 
-const InvoiceCard = ({ job, contextType }: { job: Job, contextType: string }) => {
+const WarrantyCertificateCard = ({ job, worker }: { job: Job, worker: OtherUser | null }) => {
+    if (!job || job.status !== 'completed') {
+        return null;
+    }
+
+    const completionDate = job.completedAt ? (job.completedAt as any).toDate().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : 'N/A';
+
+    return (
+        <Card className="glass-card border-l-4 border-l-yellow-400 bg-gradient-to-br from-yellow-900/30 to-background">
+            <CardHeader className="p-4">
+                <CardTitle className="flex items-center gap-2 font-headline text-yellow-300">
+                    <ShieldCheck size={24}/>
+                    CERTIFICATE OF ASSURED SERVICE
+                </CardTitle>
+                <CardDescription className="text-yellow-400/80">
+                    Order ID: #GKS-{job.id.substring(0, 6).toUpperCase()} | Date: {completionDate}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4 text-sm">
+                 <div>
+                    <p className="text-xs text-muted-foreground font-bold uppercase">Service</p>
+                    <p className="font-semibold text-white">{job.ai_diagnosis || 'Service'}</p>
+                </div>
+                 <div>
+                    <p className="text-xs text-muted-foreground font-bold uppercase">Worker</p>
+                    <p className="font-semibold text-white flex items-center gap-2">{worker?.displayName || 'N/A'} <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-900/30 text-xs">AI Verified ID</Badge></p>
+                </div>
+                 <div>
+                    <p className="text-xs text-muted-foreground font-bold uppercase">Warranty Period</p>
+                    <p className="font-semibold text-white">15 days (Labor & Finish)</p>
+                </div>
+                
+                <Separator className="bg-yellow-400/20 my-4"/>
+
+                <div>
+                    <h4 className="font-bold text-white mb-2">Covered Benefits:</h4>
+                    <ul className="space-y-2 text-white/90">
+                        <li className="flex items-start gap-2">
+                            <CheckCircle size={16} className="text-yellow-400 mt-0.5 flex-shrink-0"/>
+                            <span><strong>Free Fix:</strong> If any defect appears in the work within 15 days, Ghar Ki Seva will get it fixed for free.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                             <CheckCircle size={16} className="text-yellow-400 mt-0.5 flex-shrink-0"/>
+                            <span><strong>Verified Professional:</strong> This work was performed by one of our top-rated and certified workers.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <CheckCircle size={16} className="text-yellow-400 mt-0.5 flex-shrink-0"/>
+                            <span><strong>Payment Protection:</strong> Your full payment was securely transferred through the Ghar Ki Seva 'Safe Vault'.</span>
+                        </li>
+                    </ul>
+                </div>
+            </CardContent>
+            <CardFooter className="bg-black/20 p-3">
+                 <p className="text-xs text-center text-yellow-500/80 w-full">
+                    Note: This warranty is only valid as the payment and booking were made through the Ghar Ki Seva app.
+                 </p>
+            </CardFooter>
+        </Card>
+    );
+};
+
+const InvoiceCard = ({ job, contextType }: { job: Job | null, contextType: string }) => {
     const { toast } = useToast();
 
     if (!job || contextType !== 'job' || job.status !== 'completed') {
@@ -178,6 +239,17 @@ const ProductDealFlowControls = ({ deal }: { deal: Deal }) => {
     );
 };
 
+const PaymentSafetyNotice = () => (
+    <div className="flex items-start gap-3 text-xs text-muted-foreground p-3 rounded-lg bg-black/20 border border-primary/30">
+        <Shield size={28} className="flex-shrink-0 mt-0.5 text-primary"/>
+        <div>
+            <p className="font-bold text-white">Always pay through the app.</p>
+            <p>Paying outside the app voids your 15-day service warranty and 100% refund protection. Our AI monitors this chat for your safety.</p>
+        </div>
+    </div>
+);
+
+
 export function ChatInterface({ chatId }: { chatId: string }) {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
@@ -312,8 +384,11 @@ export function ChatInterface({ chatId }: { chatId: string }) {
 
             <main className="flex-1 overflow-y-auto p-4 space-y-6">
                 {contextType === 'deal' && <ProductDealFlowControls deal={contextDoc as Deal} />}
-                {contextType === 'job' && <InvoiceCard job={contextDoc as Job} contextType={contextType} />}
+                {contextType === 'job' && <InvoiceCard job={contextDoc as Job | null} contextType={contextType} />}
+                {contextType === 'job' && <WarrantyCertificateCard job={contextDoc as Job} worker={otherUser} />}
                 
+                <PaymentSafetyNotice />
+
                 <div className="text-center text-xs text-muted-foreground font-medium">TODAY</div>
                 {initialMessages.map((msg) => (
                     <div key={msg.id} className={`flex flex-col ${msg.sender === user?.uid ? 'items-end' : 'items-start'}`}>
@@ -346,4 +421,6 @@ export function ChatInterface({ chatId }: { chatId: string }) {
         </div>
     );
 }
+    
+
     
