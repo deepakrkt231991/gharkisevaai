@@ -2,7 +2,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 1. Properties, Products और Workers की लिस्ट कोई भी देख सके (Read)
+    // PUBLIC READ, AUTHENTICATED WRITE
+    // Collections that are publicly readable but require login to create/edit.
     match /properties/{propertyId} {
       allow read: if true;
       allow write: if request.auth != null;
@@ -25,41 +26,51 @@ service cloud.firestore {
     
     match /banners/{bannerId} {
       allow read: if true;
-      allow write: if false; // Should be admin-only
+      allow write: if false; // Admin-only writes
     }
+    
      match /app_settings/{docId} {
       allow read: if true;
-      allow write: if false; // Should be admin-only
+      allow write: if false; // Admin-only writes
     }
 
-    // User-specific data
+    // USER-SPECIFIC DATA
+    // Data that should only be accessible by the owner.
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Transaction data - private and secure
+    // TRANSACTION DATA
+    // Highly secure, immutable records. Users can only see their own.
     match /transactions/{transactionId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null; // Server actions create these
+      allow create: if request.auth != null; // Created by server functions/actions
       allow update, delete: if false;
     }
 
-    // Data related to deals between two parties
+    // TWO-PARTY DATA
+    // Data accessible by the two parties involved in the transaction.
     match /jobs/{jobId} {
       allow read, write: if request.auth != null && (request.auth.uid == resource.data.customerId || request.auth.uid == resource.data.workerId);
     }
+    
     match /deals/{dealId} {
       allow read, write: if request.auth != null && (request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId);
     }
+    
     match /legal_agreements/{agreementId} {
       allow read, write: if request.auth != null && (request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId);
     }
+    
     match /rentals/{rentalId} {
+      // Assumes ownerId is denormalized onto the rental document for rule checking.
       allow read, write: if request.auth != null && (request.auth.uid == resource.data.renterId || request.auth.uid == resource.data.ownerId);
     }
+    
     match /health/{healthId} {
        allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
     }
+    
     match /sos_alerts/{alertId} {
        allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
     }
