@@ -59,6 +59,11 @@ const MarketplaceHeader = () => (
                 <Button variant="ghost" size="icon">
                     <Bell className="h-6 w-6 text-white" />
                 </Button>
+                <Button variant="ghost" size="icon" asChild>
+                    <Link href="/list-item">
+                        <Plus className="h-6 w-6 text-white" />
+                    </Link>
+                </Button>
                  <Button variant="ghost" size="icon">
                     <ShoppingBag className="h-6 w-6 text-white" />
                 </Button>
@@ -134,9 +139,6 @@ export default function MarketplacePage() {
                         )) : <p className="col-span-2 text-center text-muted-foreground">No products found.</p>}
                     </div>
                 </main>
-                <Button size="icon" className="fixed bottom-24 right-6 h-16 w-16 rounded-full bg-primary shadow-lg z-50">
-                    <Plus className="h-8 w-8" />
-                </Button>
                 <MarketplaceBottomNav />
             </div>
         </div>

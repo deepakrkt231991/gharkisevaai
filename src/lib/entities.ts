@@ -147,3 +147,17 @@ export interface Property {
     listingType: "sale" | "rent"; // Whether the property is for sale or for rent.
     vastuScore?: number; // Vastu compliance score from 0 to 10.
 }
+
+export interface Product {
+    productId: string;
+    ownerId: string;
+    name: string;
+    category?: string;
+    price: number;
+    description?: string;
+    location?: string;
+    imageUrls?: string[];
+    isReserved?: boolean;
+    isReservedEnabled?: boolean;
+    createdAt?: any; // Firestore Timestamp
+}

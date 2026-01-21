@@ -317,6 +317,29 @@
       },
       "required": ["agreementId", "dealId", "buyerId", "sellerId", "itemName", "finalPrice", "status", "createdAt"]
     },
+    "Product": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Product",
+      "type": "object",
+      "description": "Represents a used item for sale in the marketplace.",
+      "properties": {
+        "productId": { "type": "string" },
+        "ownerId": { "type": "string", "description": "The user ID of the seller." },
+        "name": { "type": "string" },
+        "category": { "type": "string", "enum": ["Furniture", "Electronics", "Appliances", "Other"] },
+        "price": { "type": "number" },
+        "description": { "type": "string" },
+        "location": { "type": "string" },
+        "imageUrls": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "isReserved": { "type": "boolean", "description": "Whether an advance has been paid to reserve the item." },
+        "isReservedEnabled": { "type": "boolean", "description": "Whether the seller allows reserving the item." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["productId", "ownerId", "name", "category", "price"]
+    },
     "Property": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Property",
@@ -436,6 +459,14 @@
           "entityName": "LegalAgreement",
           "schema": { "$ref": "#/backend/entities/LegalAgreement" },
           "description": "Stores all generated legal agreements for deals."
+        }
+      },
+      {
+        "path": "/products/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": { "$ref": "#/backend/entities/Product" },
+          "description": "Stores used products for sale in the marketplace."
         }
       },
       {
