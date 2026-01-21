@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,9 +37,11 @@ const IntelligenceSuite = () => (
                 <h4 className="font-bold text-lg font-headline text-white">AI Interior Designer</h4>
             </div>
             <p className="text-sm text-muted-foreground">Instant Vastu-compliant layouts from a single photo.</p>
-            <Button className="w-fit">
-                <Camera className="mr-2" />
-                Upload Room
+            <Button asChild className="w-fit">
+                <Link href="/interior-analysis">
+                    <Camera className="mr-2" />
+                    Upload Room
+                </Link>
             </Button>
             <div className="absolute -right-8 -bottom-4 w-32 h-32 opacity-10">
                 <Image src="https://picsum.photos/seed/sofa-icon/200" alt="sofa" fill className="object-contain" />
