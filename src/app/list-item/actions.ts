@@ -13,6 +13,7 @@ const ListItemSchema = z.object({
   description: z.string().optional(),
   location: z.string().min(3, "Location is required."),
   imageUrls: z.array(z.string().url()).min(1, "Please upload at least one photo."),
+  videoUrl: z.string().url().optional().or(z.literal('')),
   isReservedEnabled: z.boolean().default(false),
 });
 
@@ -34,6 +35,7 @@ export async function listItem(
     description: formData.get('description'),
     location: formData.get('location'),
     imageUrls: formData.getAll('imageUrls[]'),
+    videoUrl: formData.get('videoUrl') || '',
     isReservedEnabled: formData.get('isReservedEnabled') === 'on',
   });
 

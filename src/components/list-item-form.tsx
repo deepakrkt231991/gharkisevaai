@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState, ChangeEvent } from 'react';
 import Image from 'next/image';
 import { useFormStatus } from 'react-dom';
-import { Loader2, AlertCircle, Upload, Sparkles, MapPin, IndianRupee, X } from 'lucide-react';
+import { Loader2, AlertCircle, Upload, Sparkles, MapPin, IndianRupee, X, Video } from 'lucide-react';
 import { listItem } from '@/app/list-item/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +39,7 @@ export function ListItemForm() {
     const router = useRouter();
 
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+    const [videoPreview, setVideoPreview] = useState<string | null>(null);
 
     useEffect(() => {
         if (state.success) {
@@ -86,6 +87,17 @@ export function ListItemForm() {
         setImagePreviews(prev => prev.filter((_, i) => i !== index));
     }
 
+    const handleVideoChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setVideoPreview(event.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const getError = (path: string) => state.errors?.find(e => e.path.includes(path))?.message;
 
     return (
@@ -128,6 +140,27 @@ export function ListItemForm() {
                         <input key={i} type="hidden" name="imageUrls[]" value={url} />
                     ))}
                      {getError('imageUrls') && <p className="text-sm text-destructive">{getError('imageUrls')}</p>}
+                </div>
+
+                <div className="space-y-2">
+                    <Label className="text-muted-foreground">Add Video (Optional)</Label>
+                     <label className="relative flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-input/50 border-border hover:border-primary">
+                        <input id="video" name="video" type="file" className="sr-only" accept="video/*" onChange={handleVideoChange} />
+                        {videoPreview ? (
+                            <>
+                                <video src={videoPreview} controls className="w-full h-full rounded-lg object-contain" />
+                                <Button size="icon" variant="destructive" type="button" className="absolute -top-2 -right-2 h-6 w-6 rounded-full z-10" onClick={(e) => { e.preventDefault(); setVideoPreview(null); }}>
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </>
+                        ) : (
+                            <div className="text-center text-muted-foreground">
+                                <Video className="mx-auto h-8 w-8" />
+                                <p className="text-xs mt-1">Upload Video</p>
+                            </div>
+                        )}
+                    </label>
+                    {videoPreview && <input type="hidden" name="videoUrl" value={videoPreview} />}
                 </div>
 
                 <div className="space-y-2">

@@ -157,6 +157,7 @@ export interface Product {
     description?: string;
     location?: string;
     imageUrls?: string[];
+    videoUrl?: string;
     isReserved?: boolean;
     isReservedEnabled?: boolean;
     reservedUntil?: any; // Firestore Timestamp
@@ -182,6 +183,3 @@ export interface Deal {
     reservationExpiresAt?: any; // Firestore Timestamp
     shippedAt?: any; // Firestore Timestamp
 }
-
-    
-    

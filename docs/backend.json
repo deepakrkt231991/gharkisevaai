@@ -334,6 +334,7 @@
           "type": "array",
           "items": { "type": "string" }
         },
+        "videoUrl": { "type": "string", "description": "URL of the product video." },
         "isReserved": { "type": "boolean", "description": "Whether an advance has been paid to reserve the item." },
         "isReservedEnabled": { "type": "boolean", "description": "Whether the seller allows reserving the item." },
         "reservedUntil": { "type": "string", "format": "date-time", "description": "Timestamp until which the product is reserved." },
@@ -518,6 +519,3 @@
     ]
   }
 }
-
-    
-    
