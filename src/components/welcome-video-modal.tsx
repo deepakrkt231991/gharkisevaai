@@ -30,7 +30,7 @@ export function WelcomeVideoModal() {
           <DialogTitle className="font-headline text-2xl text-white flex items-center gap-2">
             <Home /> नमस्ते! Ghar Ki Seva में आपका स्वागत है। 🏠✨
           </DialogTitle>
-          <DialogDescription className="pt-4 text-muted-foreground space-y-4">
+          <div className="pt-4 text-sm text-muted-foreground space-y-4">
             <p>
                 अब आपकी हर घर-सेवा और खरीद-बिक्री 100% सुरक्षित है। हमने आपके लिए AI Consultant और Safe Vault तैयार कर दिया है।
             </p>
@@ -39,7 +39,7 @@ export function WelcomeVideoModal() {
                 <p className="text-white">हर रेफरल पर 0.05% कमीशन पाएं।</p>
             </div>
             <p>चलिए, अपना पहला अनुभव शुरू करें!</p>
-          </DialogDescription>
+          </div>
         </DialogHeader>
         <div className="mt-4">
             <Button onClick={handleClose} className="w-full">
