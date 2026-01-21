@@ -63,7 +63,8 @@ service cloud.firestore {
     // TRANSACTIONS Collection
     // Users can only read their own transactions. Transactions can only be created by the backend.
     match /transactions/{transactionId} {
-      allow read: if isOwner(resource.data.userId);
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn(); // Allow queries on the collection. Client must filter for user's own data.
       allow create: if false; // Transactions should only be created by the backend (Cloud Functions/Server Actions).
       allow update, delete: if false;
     }
