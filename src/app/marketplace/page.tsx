@@ -13,6 +13,7 @@ import { useCollection, useMemoFirebase, useFirestore } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import type { Product } from '@/lib/entities';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 // --- ProductCard Component ---
 interface ProductCardProps {
@@ -142,8 +143,29 @@ export default function MarketplacePage() {
     }
 
     const filteredProducts = useMemo(() => {
-        if (!products) return [];
-        let tempProducts = products;
+        const demoProducts: (Product & { id: string })[] = PlaceHolderImages
+            .filter(p => p.type === 'product')
+            .map(p => ({
+                id: p.id,
+                productId: p.id,
+                ownerId: 'demo-user-' + p.id,
+                name: p.name || 'Demo Item',
+                category: p.category,
+                price: p.price || 0,
+                description: p.description || 'This is a demo item.',
+                location: p.location || 'Unknown Location',
+                imageUrls: p.imageUrl ? [p.imageUrl] : ['https://placehold.co/400x500?text=No+Image'],
+                isReserved: !!p.isReserved,
+                isReservedEnabled: !!p.isReserved,
+                createdAt: null,
+            }));
+
+        const realProductIds = new Set(products?.map(p => p.id));
+        const uniqueDemoProducts = demoProducts.filter(p => !realProductIds.has(p.id));
+
+        const combinedProducts = [...uniqueDemoProducts, ...(products || [])];
+
+        let tempProducts = combinedProducts;
 
         if (activeFilter !== 'All Items') {
             tempProducts = tempProducts.filter(p => p.category?.toLowerCase() === activeFilter.toLowerCase());
@@ -152,7 +174,7 @@ export default function MarketplacePage() {
         if (searchTerm) {
             tempProducts = tempProducts.filter(p => 
                 p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                p.description?.toLowerCase().includes(searchTerm.toLowerCase())
+                (p.description && p.description.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
@@ -169,6 +191,7 @@ export default function MarketplacePage() {
                         <Button onClick={() => setActiveFilter('All Items')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'All Items' ? 'default' : 'secondary'}>ALL ITEMS</Button>
                         <Button onClick={() => setActiveFilter('Furniture')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Furniture' ? 'default' : 'secondary'}>FURNITURE</Button>
                         <Button onClick={() => setActiveFilter('Electronics')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Electronics' ? 'default' : 'secondary'}>ELECTRONICS</Button>
+                        <Button onClick={() => setActiveFilter('Appliances')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Appliances' ? 'default' : 'secondary'}>APPLIANCES</Button>
                     </div>
                     {isLoading ? (
                         <div className="grid grid-cols-2 gap-4">
@@ -183,7 +206,7 @@ export default function MarketplacePage() {
                     ) : (
                         <div className="grid grid-cols-2 gap-4">
                             {filteredProducts.length > 0 ? filteredProducts.map(product => (
-                                <ProductCard key={product.id} product={product} />
+                                <ProductCard key={product.id} product={product as Product & { id: string }} />
                             )) : <p className="col-span-2 text-center text-muted-foreground py-10">No products found in this category.</p>}
                         </div>
                     )}

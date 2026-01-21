@@ -102,7 +102,7 @@
       "imageHint": "green sofa",
       "name": "Mid-Century Sofa",
       "location": "Brooklyn, NY",
-      "price": 450,
+      "price": 4500,
       "isReserved": true,
       "type": "product",
       "category": "furniture"
@@ -114,7 +114,7 @@
       "imageHint": "vintage grinder",
       "name": "Vintage Grinder",
       "location": "Austin, TX",
-      "price": 85,
+      "price": 850,
       "isReserved": false,
       "type": "product",
       "category": "other"
@@ -126,7 +126,7 @@
       "imageHint": "ergonomic chair",
       "name": "Ergonomic Chair",
       "location": "London, UK",
-      "price": 120,
+      "price": 1200,
       "isReserved": true,
       "type": "product",
       "category": "furniture"
@@ -138,10 +138,58 @@
       "imageHint": "modern lamp",
       "name": "Modern Lamp",
       "location": "San Francisco, CA",
-      "price": 65,
+      "price": 650,
       "isReserved": false,
       "type": "product",
       "category": "electronics"
+    },
+    {
+      "id": "product-tv",
+      "description": "A 55-inch 4K Smart TV.",
+      "imageUrl": "https://images.unsplash.com/photo-1593784944533-2d2cACa071d2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "smart tv",
+      "name": "55-inch 4K Smart TV",
+      "location": "Mumbai, MH",
+      "price": 25000,
+      "isReserved": false,
+      "type": "product",
+      "category": "electronics"
+    },
+    {
+      "id": "product-table",
+      "description": "A solid wood dining table.",
+      "imageUrl": "https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "dining table",
+      "name": "Solid Wood Dining Table",
+      "location": "Delhi, DL",
+      "price": 12000,
+      "isReserved": false,
+      "type": "product",
+      "category": "furniture"
+    },
+    {
+      "id": "product-washing-machine",
+      "description": "A front-load washing machine.",
+      "imageUrl": "https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "washing machine",
+      "name": "Front-Load Washing Machine",
+      "location": "Bangalore, KA",
+      "price": 18000,
+      "isReserved": true,
+      "type": "product",
+      "category": "appliances"
+    },
+    {
+      "id": "product-microwave",
+      "description": "A countertop microwave oven.",
+      "imageUrl": "https://images.unsplash.com/photo-1606584282849-55d3f2081827?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "microwave oven",
+      "name": "Countertop Microwave Oven",
+      "location": "Chennai, TN",
+      "price": 4500,
+      "isReserved": false,
+      "type": "product",
+      "category": "appliances"
     }
   ]
 }
