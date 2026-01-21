@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee, FileText, Download, Info, Bot, X, Truck, AlertTriangle, CheckCircle, Shield } from 'lucide-react';
+import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee, FileText, Download, Info, Bot, X, Truck, AlertTriangle, CheckCircle, Shield, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
 import { confirmProductDelivery, payForShipping, shipItem, cancelDeal, raiseDispute } from '@/app/chat/[chatId]/actions';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 
 
 type OtherUser = Partial<UserEntity> & { id: string, photoURL?: string, displayName?: string };
@@ -203,7 +204,7 @@ const ProductDealFlowControls = ({ deal }: { deal: Deal }) => {
                     </Alert>
                 )}
                 {isBuyer && deal.status === 'reserved' && (
-                    <Button onClick={() => handleAction(payForShipping)} className="w-full h-12">Pay 95% for Courier Delivery</Button>
+                    <Button onClick={() => handleAction(payForShipping)} className="w-full h-12">Pay 93% for Courier Delivery</Button>
                 )}
                 {isSeller && deal.status === 'awaiting_shipment' && (
                     <div className="space-y-2">
@@ -211,7 +212,7 @@ const ProductDealFlowControls = ({ deal }: { deal: Deal }) => {
                              <Input value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} placeholder="Enter Courier Tracking #" className="bg-input"/>
                              <Button onClick={() => handleAction(shipItem, trackingNumber)} disabled={!trackingNumber}><Truck size={16}/></Button>
                          </div>
-                         <p className="text-xs text-muted-foreground">Provide tracking number to release the 95% payment to your wallet.</p>
+                         <p className="text-xs text-muted-foreground">Provide tracking number to release the 93% payment to your wallet.</p>
                     </div>
                 )}
                  {isBuyer && deal.status === 'shipped' && (
@@ -244,10 +245,86 @@ const PaymentSafetyNotice = () => (
         <Shield size={28} className="flex-shrink-0 mt-0.5 text-primary"/>
         <div>
             <p className="font-bold text-white">Always pay through the app.</p>
-            <p>Paying outside the app voids your 15-day service warranty and 100% refund protection. Our AI monitors this chat for your safety.</p>
+            <p>Paying outside the app voids your 15-day service warranty and 100% refund protection. Our AI monitors this chat for any off-platform payment requests.</p>
         </div>
     </div>
 );
+
+const AiHelpDialog = ({ open, onOpenChange, deal, userRole }: { open: boolean, onOpenChange: (open: boolean) => void, deal: Deal | null, userRole: 'buyer' | 'seller' | 'none' }) => {
+    if (!deal) return null;
+
+    let title = "AI Assistant";
+    let description = "How can I help you with this deal?";
+    let suggestion = "Our support team is available 24/7.";
+
+    switch (deal.status) {
+        case 'reserved':
+            if (userRole === 'buyer') {
+                title = "Next Step: Final Payment";
+                description = "You have successfully reserved the item by paying the 7% advance. To proceed, you need to pay the remaining 93% for delivery.";
+                suggestion = "Click 'Pay for Shipping' in the 'Manage Deal' card to complete the payment. The amount is held securely until you confirm delivery.";
+            } else {
+                title = "Item Reserved!";
+                description = "The buyer has paid the 7% advance and this item is now reserved for them for the next 10 days.";
+                suggestion = "Please wait for the buyer to make the final payment. Once they do, you will be notified to ship the item.";
+            }
+            break;
+        case 'awaiting_shipment':
+            if (userRole === 'seller') {
+                title = "Action Required: Ship Item";
+                description = "The buyer has paid the full amount. Please pack the item securely and ship it to the buyer's address.";
+                suggestion = "Once shipped, enter the courier tracking number in the 'Manage Deal' card to release the payment to your wallet.";
+            } else {
+                title = "Awaiting Shipment";
+                description = "You have paid the full amount. The seller has been notified to ship your item.";
+                suggestion = "You will receive a notification with the tracking number as soon as the seller ships it.";
+            }
+            break;
+        case 'shipped':
+             if (userRole === 'buyer') {
+                title = "Confirm Delivery";
+                description = "Your item has been shipped! Once you receive it and are satisfied with the condition, please confirm the delivery.";
+                suggestion = "Click the 'Confirm Product Received' button in the 'Manage Deal' card. This will complete the deal and transfer the payment to the seller.";
+            } else {
+                 title = "Item Shipped";
+                description = "You have marked the item as shipped. We are now waiting for the buyer to confirm that they have received it.";
+                suggestion = "The payment will be released to your wallet as soon as the buyer confirms delivery.";
+            }
+            break;
+        case 'disputed':
+            title = "Dispute in Review";
+            description = "This deal is currently under review by our admin team due to a dispute. All payments are held securely in the Safe Vault.";
+            suggestion = "An admin will contact both parties via this chat shortly to mediate and resolve the issue. Please do not make any further transactions related to this deal.";
+            break;
+        default:
+            title = "Deal Status";
+            description = `The current status of this deal is: ${deal.status?.replace('_', ' ').toUpperCase()}.`;
+            suggestion = "If you have any questions, feel free to ask the other party or raise a dispute if you encounter any issues.";
+            break;
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="glass-card">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl text-white flex items-center gap-2">
+                        <Bot /> {title}
+                    </DialogTitle>
+                    <DialogDescription className="pt-4 text-muted-foreground space-y-4">
+                       <p>{description}</p>
+                       <Alert className="bg-primary/10 border-primary/20">
+                            <Sparkles className="h-4 w-4 text-primary" />
+                            <AlertTitle className="text-white">Suggestion</AlertTitle>
+                            <AlertDescription className="text-primary/90">
+                                {suggestion}
+                            </AlertDescription>
+                        </Alert>
+                    </DialogDescription>
+                </DialogHeader>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 
 export function ChatInterface({ chatId }: { chatId: string }) {
@@ -257,6 +334,8 @@ export function ChatInterface({ chatId }: { chatId: string }) {
     const [contextType, setContextType] = useState<'job' | 'tool' | 'property' | 'product' | 'deal' | 'unknown'>('unknown');
     const [contextDoc, setContextDoc] = useState<ContextDoc | null>(null);
     const [contextLoading, setContextLoading] = useState(true);
+    const [showAiHelpDialog, setShowAiHelpDialog] = useState(false);
+
 
     // Parse chatId to determine context
     useEffect(() => {
@@ -377,9 +456,14 @@ export function ChatInterface({ chatId }: { chatId: string }) {
                         </div>
                     </div>
                 </div>
-                <Button variant="ghost" size="icon">
-                    <Phone className="w-6 h-6 text-white"/>
-                </Button>
+                <div className="flex items-center">
+                    <Button variant="ghost" size="icon" onClick={() => setShowAiHelpDialog(true)}>
+                        <HelpCircle className="w-6 h-6 text-white"/>
+                    </Button>
+                    <Button variant="ghost" size="icon">
+                        <Phone className="w-6 h-6 text-white"/>
+                    </Button>
+                </div>
             </header>
 
             <main className="flex-1 overflow-y-auto p-4 space-y-6">
@@ -418,7 +502,12 @@ export function ChatInterface({ chatId }: { chatId: string }) {
                     </Button>
                  </div>
             </footer>
+             <AiHelpDialog
+                open={showAiHelpDialog}
+                onOpenChange={setShowAiHelpDialog}
+                deal={contextType === 'deal' ? (contextDoc as Deal) : null}
+                userRole={user?.uid === (contextDoc as Deal)?.buyerId ? 'buyer' : user?.uid === (contextDoc as Deal)?.sellerId ? 'seller' : 'none'}
+            />
         </div>
     );
 }
-    

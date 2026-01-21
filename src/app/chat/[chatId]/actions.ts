@@ -1,4 +1,3 @@
-
 'use server';
 import { doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
@@ -22,19 +21,20 @@ const PLATFORM_GST_UID = 'GRIHSEVA_GST_UID'; // For tracking GST amounts.
 
 export async function confirmDelivery(jobId: string): Promise<{success: boolean, message: string}> {
     const { firestore } = initializeFirebase();
+    const jobRef = doc(firestore, 'jobs', jobId);
+    
     try {
-        const jobRef = doc(firestore, 'jobs', jobId);
         const jobSnap = await getDoc(jobRef);
 
         if (!jobSnap.exists()) {
-            return { success: false, message: 'Job not found.' };
+            throw new Error('Job not found.');
         }
 
         const jobData = jobSnap.data();
         const finalCost = jobData.final_cost || 0;
 
         if (finalCost <= 0) {
-             return { success: false, message: 'Final cost not set or is zero.' };
+             throw new Error('Final cost not set or is zero.');
         }
 
         // --- Fee & Tax Calculation ---
@@ -116,7 +116,15 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
         return { success: true, message: 'Deal completed and all payments processed.' };
     } catch(e: any) {
         console.error("Confirm Delivery Error:", e);
-        return { success: false, message: e.message };
+        // Self-Healing: If any step fails, mark the job as 'disputed'
+        try {
+            await updateDoc(jobRef, { status: 'disputed' });
+            revalidatePath(`/chat/${jobId}`);
+            revalidatePath('/admin');
+        } catch (disputeError) {
+             console.error("Failed to mark job as disputed:", disputeError);
+        }
+        return { success: false, message: `An error occurred, and the job has been flagged for admin review. Error: ${e.message}` };
     }
 }
 
@@ -197,14 +205,15 @@ export async function cancelDeal(dealId: string): Promise<{success: boolean; mes
 
 export async function confirmProductDelivery(dealId: string): Promise<{success: boolean; message: string}> {
     const { firestore } = initializeFirebase();
+    const dealRef = doc(firestore, 'deals', dealId);
+
     try {
-        const dealRef = doc(firestore, 'deals', dealId);
         const dealSnap = await getDoc(dealRef);
-        if (!dealSnap.exists()) return { success: false, message: 'Deal not found.' };
+        if (!dealSnap.exists()) throw new Error('Deal not found.');
 
         const dealData = dealSnap.data();
         const finalCost = dealData.totalPrice || 0;
-        if (finalCost <= 0) return { success: false, message: 'Final cost not set.' };
+        if (finalCost <= 0) throw new Error('Final cost not set.');
 
         // --- Fee & Tax Calculation ---
         const platformFeeNet = finalCost * PLATFORM_FEE_PERCENTAGE;
@@ -275,7 +284,15 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
         return { success: true, message: 'Delivery confirmed and all payments processed.' };
     } catch(e: any) {
         console.error("Confirm Product Delivery Error:", e);
-        return { success: false, message: e.message };
+         // Self-Healing: If any step fails, mark the deal as 'disputed'
+        try {
+            await updateDoc(dealRef, { status: 'disputed' });
+            revalidatePath(`/chat/deal-${dealId}`);
+            revalidatePath('/admin');
+        } catch (disputeError) {
+             console.error("Failed to mark deal as disputed:", disputeError);
+        }
+        return { success: false, message: `An error occurred, and this deal has been flagged for admin review. Error: ${e.message}` };
     }
 }
 

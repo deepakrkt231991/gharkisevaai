@@ -4,11 +4,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { PwaLoader } from '@/components/pwa-loader';
 import { PwaUpdateNotifier } from '@/components/pwa-update-notifier';
+import { FloatingAiAssistant } from '@/components/floating-ai-assistant';
 
 
 export const metadata: Metadata = {
   title: 'Ghar Ki Seva (AI Verified)',
-  description: '0% Commission, 100% Trust. The smartest way to Repair, Rent & Sell with AI.',
+  description: '7% Fee, 100% Trust. The smartest way to Repair, Rent & Sell with AI.',
   manifest: '/manifest.json',
 };
 
@@ -34,6 +35,7 @@ export default function RootLayout({
           <PwaLoader />
           <PwaUpdateNotifier />
           {children}
+          <FloatingAiAssistant />
           <Toaster />
         </FirebaseClientProvider>
       </body>
