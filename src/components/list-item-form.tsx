@@ -54,18 +54,31 @@ export function ListItemForm() {
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files) {
-            const newPreviews: string[] = [];
+            const currentCount = imagePreviews.length;
             const filesArray = Array.from(files);
-            filesArray.slice(0, 10 - imagePreviews.length).forEach(file => {
-                 const reader = new FileReader();
-                 reader.onload = (event) => {
+            const remainingSlots = 10 - currentCount;
+
+            if (filesArray.length > remainingSlots) {
+                toast({
+                    title: "Maximum photos reached",
+                    description: `You can only add ${remainingSlots} more photos. Only the first ${remainingSlots} will be added.`,
+                    variant: "destructive"
+                });
+            }
+            
+            const filesToAdd = filesArray.slice(0, remainingSlots);
+            const newPreviews: string[] = [];
+
+            filesToAdd.forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
                     newPreviews.push(event.target?.result as string);
-                    if(newPreviews.length === filesArray.length) {
+                    if (newPreviews.length === filesToAdd.length) {
                         setImagePreviews(prev => [...prev, ...newPreviews]);
                     }
-                 };
-                 reader.readAsDataURL(file);
-            })
+                };
+                reader.readAsDataURL(file);
+            });
         }
     };
     
@@ -94,19 +107,21 @@ export function ListItemForm() {
                             {imagePreviews.map((src, index) => (
                                 <div key={index} className="relative aspect-square">
                                     <Image src={src} alt="Preview" layout="fill" objectFit="cover" className="rounded-md" />
-                                     <Button size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeImage(index)}>
+                                     <Button size="icon" variant="destructive" type="button" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeImage(index)}>
                                         <X className="h-4 w-4" />
                                     </Button>
                                 </div>
                             ))}
                         </div>
-                        <label className="w-full">
-                             <div className="flex items-center justify-center w-full bg-primary text-primary-foreground h-12 rounded-lg cursor-pointer">
-                                <Upload className="mr-2 h-4 w-4"/>
-                                <span>Add Images</span>
-                             </div>
-                             <input id="images" name="images" type="file" className="sr-only" multiple accept="image/*" onChange={handleFileChange} />
-                        </label>
+                        {imagePreviews.length < 10 && (
+                            <label className="w-full">
+                                <div className="flex items-center justify-center w-full bg-primary text-primary-foreground h-12 rounded-lg cursor-pointer">
+                                    <Upload className="mr-2 h-4 w-4"/>
+                                    <span>{imagePreviews.length > 0 ? `Add More (${10 - imagePreviews.length} left)` : 'Add Images'}</span>
+                                </div>
+                                <input id="images" name="images" type="file" className="sr-only" multiple accept="image/*" onChange={handleFileChange} />
+                            </label>
+                        )}
                     </div>
                     {/* Hidden inputs for image URLs */}
                     {imagePreviews.map((url, i) => (

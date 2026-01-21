@@ -3,18 +3,20 @@
 import { Home, Bell, ShoppingBag, Search, SlidersHorizontal, Plus, Heart, MessageSquare, User, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import type { ImagePlaceholder } from '@/lib/placeholder-images';
+import { useCollection, useMemoFirebase, useFirestore } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
+import type { Product } from '@/lib/entities';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // --- ProductCard Component ---
 interface ProductCardProps {
-    product: ImagePlaceholder;
+    product: Product & { id: string };
 }
 
 function ProductCard({ product }: ProductCardProps) {
@@ -24,13 +26,16 @@ function ProductCard({ product }: ProductCardProps) {
                 <CardContent className="p-0 flex flex-col h-full">
                     <div className="relative aspect-[4/5] w-full overflow-hidden">
                         <Image
-                            src={product.imageUrl}
-                            alt={product.description}
+                            src={product.imageUrls?.[0] || 'https://placehold.co/400x500?text=No+Image'}
+                            alt={product.name}
                             fill
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                         />
-                        {product.isReserved && (
+                        {product.isReservedEnabled && !product.isReserved && (
                             <Badge className="absolute top-3 left-3 bg-gray-900/70 text-white backdrop-blur-sm border-none uppercase text-xs tracking-widest">RESERVE AVAILABLE</Badge>
+                        )}
+                         {product.isReserved && (
+                            <Badge className="absolute top-3 left-3 bg-yellow-600/80 text-white backdrop-blur-sm border-none uppercase text-xs tracking-widest">RESERVED</Badge>
                         )}
                         <div className="absolute top-3 right-3 rounded-full h-9 w-9 bg-black/30 backdrop-blur-sm flex items-center justify-center text-white">
                             <Heart className="h-5 w-5" />
@@ -39,7 +44,7 @@ function ProductCard({ product }: ProductCardProps) {
                     <div className="p-4 space-y-1 flex-grow flex flex-col justify-end">
                         <h3 className="font-bold text-white truncate">{product.name}</h3>
                         <p className="text-sm text-muted-foreground flex items-center gap-1"><MapPin size={14}/>{product.location}</p>
-                        <p className="text-lg font-bold text-white pt-1">₹{product.price}</p>
+                        <p className="text-lg font-bold text-white pt-1">₹{product.price.toLocaleString('en-IN')}</p>
                     </div>
                 </CardContent>
             </Card>
@@ -75,6 +80,7 @@ const MarketplaceHeader = () => (
                 type="search"
                 placeholder="Search for home items..."
                 className="w-full rounded-md bg-input pl-10 pr-12 h-12 text-white border-border"
+                onChange={(e) => (window as any).setMarketplaceSearchTerm(e.target.value)}
             />
              <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9">
                 <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
@@ -119,9 +125,40 @@ const MarketplaceBottomNav = () => {
 }
 
 export default function MarketplacePage() {
+    const firestore = useFirestore();
+    
+    const productsQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return query(collection(firestore, 'products'), orderBy('createdAt', 'desc'));
+    }, [firestore]);
+
+    const { data: products, isLoading } = useCollection<Product>(productsQuery);
+    
     const [activeFilter, setActiveFilter] = useState('All Items');
-    const products = PlaceHolderImages.filter(p => p.type === 'product');
-    const filteredProducts = activeFilter === 'All Items' ? products : products.filter(p => p.category?.toLowerCase() === activeFilter.toLowerCase());
+    const [searchTerm, setSearchTerm] = useState('');
+
+    if (typeof window !== 'undefined') {
+        (window as any).setMarketplaceSearchTerm = setSearchTerm;
+    }
+
+    const filteredProducts = useMemo(() => {
+        if (!products) return [];
+        let tempProducts = products;
+
+        if (activeFilter !== 'All Items') {
+            tempProducts = tempProducts.filter(p => p.category?.toLowerCase() === activeFilter.toLowerCase());
+        }
+
+        if (searchTerm) {
+            tempProducts = tempProducts.filter(p => 
+                p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                p.description?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        return tempProducts;
+    }, [products, activeFilter, searchTerm]);
+
 
     return (
         <div className="dark bg-background text-foreground">
@@ -133,11 +170,23 @@ export default function MarketplacePage() {
                         <Button onClick={() => setActiveFilter('Furniture')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Furniture' ? 'default' : 'secondary'}>FURNITURE</Button>
                         <Button onClick={() => setActiveFilter('Electronics')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Electronics' ? 'default' : 'secondary'}>ELECTRONICS</Button>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        {filteredProducts.length > 0 ? filteredProducts.map(product => (
-                            <ProductCard key={product.id} product={product} />
-                        )) : <p className="col-span-2 text-center text-muted-foreground">No products found.</p>}
-                    </div>
+                    {isLoading ? (
+                        <div className="grid grid-cols-2 gap-4">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="space-y-2">
+                                    <Skeleton className="h-56 w-full rounded-xl" />
+                                    <Skeleton className="h-4 w-3/4" />
+                                    <Skeleton className="h-4 w-1/2" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-4">
+                            {filteredProducts.length > 0 ? filteredProducts.map(product => (
+                                <ProductCard key={product.id} product={product} />
+                            )) : <p className="col-span-2 text-center text-muted-foreground py-10">No products found in this category.</p>}
+                        </div>
+                    )}
                 </main>
                 <MarketplaceBottomNav />
             </div>
