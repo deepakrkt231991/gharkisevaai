@@ -2,6 +2,7 @@
 import { ListToolForm } from '@/components/list-tool-form';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 function ListToolHeader() {
     return (
@@ -28,6 +29,3 @@ export default function ListToolPage() {
     </div>
   );
 }
-
-// Dummy components to avoid breaking the build, will be replaced by actual components
-import { Button } from '@/components/ui/button';
