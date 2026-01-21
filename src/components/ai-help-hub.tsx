@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -53,7 +52,7 @@ const IntelligenceSuite = () => (
                  <div className="bg-primary/20 p-2 rounded-lg w-fit"><ShieldCheck className="text-primary"/></div>
                  <h4 className="font-bold text-white">Property Verifier</h4>
                  <p className="text-xs text-muted-foreground">AI Legal & Document check.</p>
-                 <Button variant="outline" className="w-full bg-transparent">Scan Docs</Button>
+                 <Button variant="outline" className="w-full bg-transparent" asChild><Link href="/legal-vault">Scan Docs</Link></Button>
             </Card>
             <Card className="glass-card p-4 space-y-4">
                 <div className="bg-primary/20 p-2 rounded-lg w-fit"><Video className="text-primary"/></div>

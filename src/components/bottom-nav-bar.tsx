@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ShoppingBag, History, User, Bot } from 'lucide-react';
+import { Home, ShoppingBag, History, User, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function BottomNavBar() {
@@ -11,7 +11,7 @@ export function BottomNavBar() {
   const navItems = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/book-service', label: 'Book', icon: ShoppingBag },
-    { isCentral: true, href: '/analyze', label: 'AI', icon: Bot },
+    { isCentral: true, href: '/ai-help', label: 'AI', icon: Sparkles },
     { href: '/dashboard/earnings', label: 'History', icon: History },
     { href: '/profile', label: 'Profile', icon: User },
   ];

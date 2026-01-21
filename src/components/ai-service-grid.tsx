@@ -49,8 +49,8 @@ const serviceCategories = [
       { name: 'Sell Home', icon: Home, href: '/explore?tab=sell', description: 'AI valuation & verification' },
       { name: 'Rent Home', icon: BedDouble, href: '/explore?tab=rent', description: 'Verified tenants, smart contracts' },
       { name: 'Sell Product', icon: Package, href: '/marketplace', description: 'Sell old items with AI valuation' },
-      { name: 'Vastu Check', icon: Compass, href: '/interior-analysis', description: 'Improve your home\'s energy' },
-      { name: 'Interior Design', icon: Sofa, href: '/interior-analysis', description: 'Get AI-powered design ideas' },
+      { name: 'Vastu Check', icon: Compass, href: '/ai-help', description: 'Improve your home\'s energy' },
+      { name: 'Interior Design', icon: Sofa, href: '/ai-help', description: 'Get AI-powered design ideas' },
     ],
   },
 ];
