@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -347,5 +346,4 @@ export function ChatInterface({ chatId }: { chatId: string }) {
         </div>
     );
 }
-
     
