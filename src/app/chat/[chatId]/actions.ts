@@ -5,7 +5,7 @@ import { initializeFirebase } from '@/firebase';
 import { revalidatePath } from 'next/cache';
 import type { Product } from '@/lib/entities';
 
-const PLATFORM_FEE_PERCENTAGE = 0.15; // 15% of final cost
+const PLATFORM_FEE_PERCENTAGE = 0.05; // 5% of final cost
 const REFERRAL_COMMISSION_PERCENTAGE = 0.0005; // 0.05% of final cost
 const GST_PERCENTAGE = 0.18; // 18% GST
 
@@ -286,5 +286,4 @@ export async function raiseDispute(dealId: string): Promise<{success: boolean; m
     }
 }
 
-    
     

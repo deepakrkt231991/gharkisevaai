@@ -111,7 +111,7 @@ export interface AppSettings {
     content?: string; // The AI-generated text for the banner, potentially containing multiple languages separated by a newline.
     style?: string; // A style hint for the UI (e.g., 'dynamic_card').
     backgroundColor?: string; // A suggested hex color code for the banner background.
-    lastUpdated?: string;
+    lastUpdated?: any; // Firestore Timestamp
 }
 
 export interface LegalAgreement {
@@ -186,3 +186,5 @@ export interface Deal {
     reservationExpiresAt?: any; // Firestore Timestamp
     shippedAt?: any; // Firestore Timestamp
 }
+
+    
