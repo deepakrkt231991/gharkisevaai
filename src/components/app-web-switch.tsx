@@ -23,7 +23,9 @@ export function AppWebSwitch() {
     }
     
     const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevents the default mini-infobar or install dialog from appearing on mobile
       e.preventDefault();
+      // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
     };
 
@@ -36,8 +38,11 @@ export function AppWebSwitch() {
 
   const handleInstallClick = async () => {
     if (deferredPrompt) {
+      // Show the install prompt
       deferredPrompt.prompt();
     } else {
+        // If the deferred prompt isn't available, show instructions.
+        // This is a fallback for browsers that don't support the prompt or when criteria aren't met.
         toast({ title: 'App Can Be Installed', description: 'Use your browser\'s menu to "Install App" or "Add to Home Screen".' });
     }
   };
@@ -51,12 +56,12 @@ export function AppWebSwitch() {
                 <Globe className="h-5 w-5 text-white" />
                 <span className="sr-only">Open in browser</span>
             </Button>
-          ) : deferredPrompt ? (
+          ) : (
              <Button onClick={handleInstallClick} variant="ghost" size="icon">
                 <Download className="h-5 w-5 text-white" />
                 <span className="sr-only">Install App</span>
             </Button>
-          ) : null}
+          )}
         </TooltipTrigger>
         <TooltipContent>
           {isStandalone ? <p>Open in Browser</p> : <p>Install App</p>}
