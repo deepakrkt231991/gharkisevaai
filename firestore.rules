@@ -1,16 +1,63 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Properties को कोई भी देख सकता है, लेकिन लिख सिर्फ लॉगिन यूजर सकता है
+
+    // Publicly readable collections
     match /properties/{propertyId} {
-      allow read: if true; 
+      allow read: if true;
       allow write: if request.auth != null;
     }
-    
-    // बाकी सभी कलेक्शंस के लिए लॉगिन अनिवार्य है
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /tools/{toolId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /workers/{workerId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == workerId;
+    }
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if false; // Should be admin-only
+    }
+     match /app_settings/{docId} {
+      allow read: if true;
+      allow write: if false; // Should be admin-only
+    }
+
+    // User-specific data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Transaction data - private and secure
+    match /transactions/{transactionId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null; // Server actions create these
+      allow update, delete: if false;
+    }
+
+    // Data related to deals between two parties
+    match /jobs/{jobId} {
+      allow read, write: if request.auth != null && (request.auth.uid == resource.data.customerId || request.auth.uid == resource.data.workerId);
+    }
+    match /deals/{dealId} {
+      allow read, write: if request.auth != null && (request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId);
+    }
+    match /legal_agreements/{agreementId} {
+      allow read, write: if request.auth != null && (request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId);
+    }
+    match /rentals/{rentalId} {
+      allow read, write: if request.auth != null && (request.auth.uid == resource.data.renterId || request.auth.uid == resource.data.ownerId);
+    }
+    match /health/{healthId} {
+       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    match /sos_alerts/{alertId} {
+       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
     }
   }
 }
