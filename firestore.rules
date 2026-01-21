@@ -1,22 +1,87 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Properties और सभी Public Collections के लिए सरल नियम
-    match /properties/{doc} {
-      allow read: if true;
+    
+    // --- Public Read, Authenticated Write Collections ---
+    // Anyone can read documents, but only logged-in users can write.
+    match /properties/{propertyId} {
+      allow get, list: if true;
       allow write: if request.auth != null;
     }
-    match /products/{doc} {
-      allow read: if true;
+    match /products/{productId} {
+      allow get, list: if true;
       allow write: if request.auth != null;
     }
-    match /workers/{doc} {
-      allow read: if true;
+    match /workers/{workerId} {
+      allow get, list: if true;
+      // Workers should only be able to write to their own profile
+      allow write: if request.auth != null && request.auth.uid == workerId;
+    }
+    match /tools/{toolId} {
+      allow get, list: if true;
       allow write: if request.auth != null;
     }
-    // बाकी सभी चीजों के लिए लॉगिन अनिवार्य
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    match /banners/{bannerId} {
+      allow get, list: if true;
+      // Banners are admin-only writes, so deny client writes.
+      allow write: if false; 
+    }
+    
+    // --- User-Owned Private Data ---
+    // Users can only read/write their own data.
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    match /health/{healthId} {
+      allow read, write: if request.auth.uid == resource.data.userId;
+    }
+
+    // --- Two-Party Transactional Data ---
+    // Only the parties involved in a transaction can access it.
+    function isJobParty() {
+      return request.auth.uid == resource.data.customerId || request.auth.uid == resource.data.workerId;
+    }
+    match /jobs/{jobId} {
+        allow read, update: if request.auth != null && isJobParty();
+        allow create: if request.auth != null && request.resource.data.customerId == request.auth.uid;
+    }
+    
+    function isDealParty() {
+      return request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId;
+    }
+    match /deals/{dealId} {
+        allow read, update: if request.auth != null && isDealParty();
+        allow create: if request.auth != null && request.resource.data.buyerId == request.auth.uid;
+    }
+    
+    function isRentalParty() {
+        return request.auth.uid == resource.data.renterId || request.auth.uid == resource.data.ownerId;
+    }
+    match /rentals/{rentalId} {
+        allow read, write: if request.auth != null && isRentalParty();
+    }
+    
+    match /legal_agreements/{agreementId} {
+        allow read: if request.auth != null && (request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId);
+        // Only allow trusted server-side code to create/update agreements
+        allow write: if false;
+    }
+
+    // --- High-Security & Admin Data ---
+    // Users can only read their own transactions. Writes should be server-side.
+    match /transactions/{transactionId} {
+      allow read: if request.auth.uid == resource.data.userId;
+      allow write: if false;
+    }
+    
+    match /sos_alerts/{alertId} {
+        allow read, write: if request.auth.uid == resource.data.userId;
+    }
+    
+    match /app_settings/{docId} {
+        // Public read for settings, no client writes.
+        allow read: if true;
+        allow write: if false;
     }
   }
 }
