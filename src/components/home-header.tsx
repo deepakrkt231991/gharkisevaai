@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Bell, ChevronDown, MapPin } from 'lucide-react';
+import { AppWebSwitch } from './app-web-switch';
 
 export function HomeHeader() {
   return (
@@ -13,13 +14,16 @@ export function HomeHeader() {
           <p className="font-bold text-foreground">Hauz Khas, New Delhi</p>
         </div>
       </div>
-      <Button variant="ghost" size="icon" className="relative">
-        <Bell className="h-6 w-6" />
-        <span className="absolute right-1 top-1 flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
-        </span>
-      </Button>
+      <div className="flex items-center">
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-6 w-6" />
+          <span className="absolute right-1 top-1 flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
+          </span>
+        </Button>
+        <AppWebSwitch />
+      </div>
     </header>
   );
 }
