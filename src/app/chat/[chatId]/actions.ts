@@ -272,4 +272,18 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
     }
 }
 
+export async function raiseDispute(dealId: string): Promise<{success: boolean; message: string}> {
+    if (!dealId) return { success: false, message: 'Deal ID is required.' };
+    const { firestore } = initializeFirebase();
+    try {
+        const dealRef = doc(firestore, 'deals', dealId);
+        await updateDoc(dealRef, { status: 'disputed' });
+        revalidatePath(`/chat/deal-${dealId}`);
+        revalidatePath('/admin');
+        return { success: true, message: 'Dispute has been raised. An admin will review the case.' };
+    } catch (e: any) {
+        return { success: false, message: e.message };
+    }
+}
+
     

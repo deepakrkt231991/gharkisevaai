@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useTransition, useActionState } from "react";
@@ -14,7 +15,7 @@ import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapP
 import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, where, orderBy } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
-import type { SOSAlert, Worker, Transaction } from "@/lib/entities";
+import type { SOSAlert, Worker, Transaction, Deal } from "@/lib/entities";
 import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds } from "@/app/admin/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
@@ -226,9 +227,15 @@ export function AdminDashboard() {
     return query(collection(firestore, 'transactions'), orderBy('timestamp', 'desc'));
   }, [firestore]);
 
+  const disputedDealsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'deals'), where('status', '==', 'disputed'));
+  }, [firestore]);
+
   const { data: sosAlerts, isLoading: sosLoading } = useCollection<SOSAlert>(sosAlertsQuery);
   const { data: pendingVerifications, isLoading: pendingLoading } = useCollection<Worker>(pendingVerificationsQuery);
   const { data: transactions, isLoading: transactionsLoading } = useCollection<Transaction>(transactionsQuery);
+  const { data: disputedDeals, isLoading: disputesLoading } = useCollection<Deal>(disputedDealsQuery);
 
   const { totalVolume, platformFees, referralPayouts, netProfit } = useMemo(() => {
     if (!transactions) return { totalVolume: 0, platformFees: 0, referralPayouts: 0, netProfit: 0 };
@@ -321,7 +328,7 @@ export function AdminDashboard() {
       <RevenueWithdrawalCard netProfit={netProfit} />
 
       <Tabs defaultValue="verification">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
            <TabsTrigger value="verification">
             <CheckCircle className="mr-2 h-4 w-4" /> Verification
              {pendingVerifications && pendingVerifications.length > 0 && (
@@ -334,6 +341,12 @@ export function AdminDashboard() {
             <AlertTriangle className="mr-2 h-4 w-4" /> SOS Alerts
              {sosAlerts && sosAlerts.length > 0 && (
                 <Badge variant="destructive" className="ml-2">{sosAlerts.length}</Badge>
+            )}
+          </TabsTrigger>
+           <TabsTrigger value="disputes">
+            <AlertTriangle className="mr-2 h-4 w-4" /> Disputes
+             {disputedDeals && disputedDeals.length > 0 && (
+                <Badge variant="destructive" className="ml-2">{disputedDeals.length}</Badge>
             )}
           </TabsTrigger>
         </TabsList>
@@ -444,7 +457,51 @@ export function AdminDashboard() {
             </CardContent>
           </Card>
         </TabsContent>
+
+         <TabsContent value="disputes">
+          <Card>
+            <CardHeader>
+              <CardTitle>Marketplace Disputes</CardTitle>
+              <CardDescription>Review and resolve disputes between buyers and sellers.</CardDescription>
+            </CardHeader>
+            <CardContent>
+               <Table>
+                  <TableHeader>
+                      <TableRow>
+                          <TableHead>Deal ID</TableHead>
+                          <TableHead>Product</TableHead>
+                          <TableHead>Buyer ID</TableHead>
+                          <TableHead>Seller ID</TableHead>
+                          <TableHead>Actions</TableHead>
+                      </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                      {disputesLoading && <TableRow><TableCell colSpan={5} className="text-center">Loading disputes...</TableCell></TableRow>}
+                      {disputedDeals && disputedDeals.length > 0 ? (
+                          disputedDeals.map(deal => (
+                              <TableRow key={deal.id}>
+                                  <TableCell className="font-mono text-xs">{deal.id}</TableCell>
+                                  <TableCell>{deal.productName}</TableCell>
+                                  <TableCell className="font-mono text-xs">{deal.buyerId}</TableCell>
+                                  <TableCell className="font-mono text-xs">{deal.sellerId}</TableCell>
+                                  <TableCell>
+                                      <Button asChild variant="outline" size="sm">
+                                         <Link href={`/chat/deal-${deal.id}`}>View Chat</Link>
+                                      </Button>
+                                  </TableCell>
+                              </TableRow>
+                          ))
+                      ) : !disputesLoading && (
+                          <TableRow><TableCell colSpan={5} className="text-center">No active disputes.</TableCell></TableRow>
+                      )}
+                  </TableBody>
+               </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
 }
+
+    

@@ -387,7 +387,7 @@
             "totalPrice": { "type": "number" },
             "status": {
             "type": "string",
-            "enum": ["negotiating", "reserved", "awaiting_shipment_payment", "awaiting_shipment", "shipped", "delivery_confirmed", "completed", "cancelled", "refunded"]
+            "enum": ["negotiating", "reserved", "awaiting_shipment_payment", "awaiting_shipment", "shipped", "delivery_confirmed", "completed", "cancelled", "refunded", "disputed"]
             },
             "advancePaid": { "type": "number" },
             "finalPaymentPaid": { "type": "number" },

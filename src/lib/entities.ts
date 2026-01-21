@@ -172,7 +172,7 @@ export interface Deal {
     productName?: string;
     productImage?: string;
     totalPrice: number;
-    status: "negotiating" | "reserved" | "awaiting_shipment_payment" | "awaiting_shipment" | "shipped" | "delivery_confirmed" | "completed" | "cancelled" | "refunded";
+    status: "negotiating" | "reserved" | "awaiting_shipment_payment" | "awaiting_shipment" | "shipped" | "delivery_confirmed" | "completed" | "cancelled" | "refunded" | "disputed";
     advancePaid?: number;
     finalPaymentPaid?: number;
     deliveryMethod?: "pickup" | "courier";

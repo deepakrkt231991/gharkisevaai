@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee, FileText, Download, Info, Bot, X, Truck } from 'lucide-react';
+import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee, FileText, Download, Info, Bot, X, Truck, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,8 @@ import React, { useState, useEffect } from 'react';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
-import { confirmProductDelivery, payForShipping, shipItem, cancelDeal } from '@/app/chat/[chatId]/actions';
+import { confirmProductDelivery, payForShipping, shipItem, cancelDeal, raiseDispute } from '@/app/chat/[chatId]/actions';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 
 type OtherUser = Partial<UserEntity> & { id: string, photoURL?: string, displayName?: string };
@@ -124,9 +125,23 @@ const ProductDealFlowControls = ({ deal }: { deal: Deal }) => {
                     <Handshake size={20}/>
                     Manage Deal
                 </CardTitle>
-                <Badge variant="outline" className="text-yellow-300 border-yellow-400/50 bg-yellow-900/40">{deal.status?.replace('_', ' ').toUpperCase()}</Badge>
+                <Badge variant="outline" className={cn(
+                    "text-yellow-300 border-yellow-400/50 bg-yellow-900/40",
+                    deal.status === 'completed' && "text-green-300 border-green-400/50 bg-green-900/40",
+                    deal.status === 'disputed' && "text-red-300 border-red-400/50 bg-red-900/40",
+                    deal.status === 'cancelled' && "text-gray-300 border-gray-400/50 bg-gray-900/40",
+                )}>
+                    {deal.status?.replace('_', ' ').toUpperCase()}
+                </Badge>
             </CardHeader>
             <CardContent className="p-4 space-y-4">
+                 {deal.status === 'disputed' && (
+                     <Alert variant="destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>Dispute Active</AlertTitle>
+                        <AlertDescription>An admin is reviewing this deal and will contact you shortly. Please do not make any further payments.</AlertDescription>
+                    </Alert>
+                )}
                 {isBuyer && deal.status === 'reserved' && (
                     <Button onClick={() => handleAction(payForShipping)} className="w-full h-12">Pay 95% for Courier Delivery</Button>
                 )}
@@ -140,7 +155,17 @@ const ProductDealFlowControls = ({ deal }: { deal: Deal }) => {
                     </div>
                 )}
                  {isBuyer && deal.status === 'shipped' && (
-                    <Button onClick={() => handleAction(confirmProductDelivery)} className="w-full h-12 bg-green-600 hover:bg-green-700">Confirm Product Received</Button>
+                     <div className="space-y-3">
+                        <Button onClick={() => handleAction(confirmProductDelivery)} className="w-full h-12 bg-green-600 hover:bg-green-700">Confirm Product Received</Button>
+                        <Button onClick={() => handleAction(raiseDispute)} variant="destructive" className="w-full">
+                            <AlertTriangle className="mr-2 h-4 w-4" /> I have an issue (Raise Dispute)
+                        </Button>
+                    </div>
+                )}
+                 {isSeller && deal.status === 'shipped' && (
+                     <Button onClick={() => handleAction(raiseDispute)} variant="destructive" className="w-full">
+                        <AlertTriangle className="mr-2 h-4 w-4" /> Raise Dispute (e.g. Buyer not confirming)
+                    </Button>
                 )}
                 {(isBuyer || isSeller) && ['reserved', 'awaiting_shipment_payment'].includes(deal.status) && (
                     <Button onClick={() => handleAction(cancelDeal)} variant="destructive" className="w-full h-12">Cancel Deal &amp; Refund Advance</Button>
