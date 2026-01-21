@@ -29,7 +29,7 @@ export function Header() {
           <span>GrihSeva AI</span>
         </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
-          <Link href="/dashboard/earnings" className="transition-colors hover:text-primary">Dashboard</Link>
+          <Link href="/features" className="transition-colors hover:text-primary">Features</Link>
           <Link href="/find-a-worker" className="transition-colors hover:text-primary">Find a Worker</Link>
           <Link href="/rent-tools" className="transition-colors hover:text-primary">Rent a Tool</Link>
           <Link href="/promote" className="transition-colors hover:text-primary">Promote & Earn</Link>
