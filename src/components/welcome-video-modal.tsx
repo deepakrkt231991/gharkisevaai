@@ -9,16 +9,16 @@ export function WelcomeVideoModal() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Check if running in standalone mode (PWA) and if welcome has been shown
-    const isPwa = window.matchMedia('(display-mode: standalone)').matches;
+    // Show the modal if the user hasn't seen it before.
     const hasSeenWelcome = localStorage.getItem('hasSeenPwaWelcome');
     
-    if (isPwa && !hasSeenWelcome) {
+    if (!hasSeenWelcome) {
       setIsOpen(true);
     }
   }, []);
 
   const handleClose = () => {
+    // Set the flag in localStorage so it doesn't show again.
     localStorage.setItem('hasSeenPwaWelcome', 'true');
     setIsOpen(false);
   };
