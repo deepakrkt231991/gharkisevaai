@@ -1,9 +1,74 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // WARNING: This is a temporary, insecure rule for debugging only.
-    match /{document=**} {
-      allow read, write: if true;
+
+    // --- PUBLIC-READ, AUTH-WRITE COLLECTIONS ---
+    // Anyone can read these, but only logged-in users can write.
+    match /properties/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /products/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /workers/{workerId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /tools/{toolId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if false; // Managed via Firebase Console
+    }
+    
+    // --- USER-OWNED COLLECTIONS ---
+    // Users can only access their own documents.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // --- TRANSACTION & SENSITIVE DATA ---
+    // Only the user involved in a transaction can read it. No one can create/update directly.
+    match /transactions/{transactionId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create, update, delete: if false; // Created via server actions only
+    }
+    
+    // --- TWO-PARTY DATA (DEALS, JOBS, RENTALS) ---
+    // Only the parties involved in a transaction can access the data.
+    function isParty(resource) {
+      return request.auth != null && (
+        request.auth.uid == resource.data.buyerId ||
+        request.auth.uid == resource.data.sellerId ||
+        request.auth.uid == resource.data.customerId ||
+        request.auth.uid == resource.data.workerId ||
+        request.auth.uid == resource.data.renterId ||
+        request.auth.uid == resource.data.ownerId
+      );
+    }
+
+    match /deals/{dealId} {
+      allow read, update: if isParty(resource);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.buyerId;
+    }
+
+    match /jobs/{jobId} {
+      allow read, update: if isParty(resource);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.customerId;
+    }
+
+    match /rentals/{rentalId} {
+      allow read, update: if isParty(resource);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.renterId;
+    }
+    
+    match /legal_agreements/{agreementId} {
+      allow read: if isParty(resource);
+      allow create: if request.auth != null;
     }
   }
 }
