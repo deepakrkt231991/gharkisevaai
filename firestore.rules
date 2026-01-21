@@ -4,19 +4,20 @@ service cloud.firestore {
 
     // =====================================================================
     // PUBLIC-READ COLLECTIONS
-    // Anyone can read or list these collections, even without being logged in.
+    // Anyone can read or list these collections. Writes require authentication.
     // =====================================================================
-    match /properties/{docId} {
+    match /properties/{propertyId} {
       allow get, list: if true;
       allow write: if request.auth != null;
     }
-    match /products/{docId} {
+    match /products/{productId} {
       allow get, list: if true;
       allow write: if request.auth != null;
     }
     match /workers/{workerId} {
       allow get, list: if true;
-      allow write: if request.auth != null;
+      // Allow workers to create/update their own profile
+      allow write: if request.auth != null && request.auth.uid == workerId;
     }
     match /tools/{toolId} {
       allow get, list: if true;
@@ -43,6 +44,7 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
      match /health/{healthId} {
+       // Assuming health data has a 'userId' field
        allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
     }
 
@@ -50,7 +52,7 @@ service cloud.firestore {
     // Only the user involved can read. No one can create/update directly.
     match /transactions/{transactionId} {
       allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create, update, delete: if false; // Created via server actions
+      allow create, update, delete: if false; // Created via trusted server actions
     }
      match /sos_alerts/{alertId} {
        allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
@@ -58,35 +60,40 @@ service cloud.firestore {
 
 
     // --- TWO-PARTY DATA (DEALS, JOBS, RENTALS) ---
-    // Only the parties involved can access the data.
+    // A shared function to check if the requesting user is part of the transaction.
     function isParty(resource) {
+      let data = resource.data;
       return request.auth != null && (
-        request.auth.uid == resource.data.buyerId ||
-        request.auth.uid == resource.data.sellerId ||
-        request.auth.uid == resource.data.customerId ||
-        request.auth.uid == resource.data.workerId ||
-        request.auth.uid == resource.data.renterId ||
-        request.auth.uid == resource.data.ownerId
+        request.auth.uid == data.buyerId ||
+        request.auth.uid == data.sellerId ||
+        request.auth.uid == data.customerId ||
+        request.auth.uid == data.workerId ||
+        request.auth.uid == data.renterId ||
+        request.auth.uid == data.ownerId
       );
     }
 
     match /deals/{dealId} {
       allow read, update: if isParty(resource);
+      // Only the buyer can initiate a deal
       allow create: if request.auth != null && request.auth.uid == request.resource.data.buyerId;
     }
 
     match /jobs/{jobId} {
       allow read, update: if isParty(resource);
+      // Only the customer can create a job
       allow create: if request.auth != null && request.auth.uid == request.resource.data.customerId;
     }
 
     match /rentals/{rentalId} {
       allow read, update: if isParty(resource);
+      // Only the renter can create a rental request
       allow create: if request.auth != null && request.auth.uid == request.resource.data.renterId;
     }
     
     match /legal_agreements/{agreementId} {
       allow read: if isParty(resource);
+      // Allow any authenticated user to create an agreement (triggered by an action)
       allow create: if request.auth != null;
     }
   }
