@@ -5,6 +5,11 @@ import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { WelcomeVideoModal } from '@/components/welcome-video-modal';
 import { HomeCarouselBanner } from '@/components/home-carousel-banner';
 import { LiveFeed } from '@/components/live-feed';
+import { AiServiceGrid } from '@/components/ai-service-grid';
+import { SmartHub } from '@/components/smart-hub';
+import { TrendingNow } from '@/components/trending-now';
+import { UserStats } from '@/components/user-stats';
+
 
 export default function Home() {
   return (
@@ -13,7 +18,11 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
         <HomeHeader />
         <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-32">
+          <UserStats />
           <HomeCarouselBanner />
+          <AiServiceGrid />
+          <SmartHub />
+          <TrendingNow />
           <LiveFeed />
         </main>
         <BottomNavBar />
