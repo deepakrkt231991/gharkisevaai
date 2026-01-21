@@ -46,11 +46,13 @@ export function LiveFeed() {
     const { latitude: userLat, longitude: userLon, isLoading: isGeoLoading } = useGeolocation();
 
     // --- Data Fetching ---
-    const propertiesQuery = useMemoFirebase(() => !firestore ? null : query(collection(firestore, 'properties'), orderBy('createdAt', 'desc'), limit(20)), [firestore]);
-    const productsQuery = useMemoFirebase(() => !firestore ? null : query(collection(firestore, 'products'), orderBy('createdAt', 'desc'), limit(20)), [firestore]);
-    const workersQuery = useMemoFirebase(() => !firestore ? null : query(collection(firestore, 'workers'), where('isVerified', '==', true), limit(20)), [firestore]);
+    const salePropertiesQuery = useMemoFirebase(() => !firestore ? null : query(collection(firestore, 'properties'), where('listingType', '==', 'sale'), orderBy('createdAt', 'desc'), limit(10)), [firestore]);
+    const rentPropertiesQuery = useMemoFirebase(() => !firestore ? null : query(collection(firestore, 'properties'), where('listingType', '==', 'rent'), orderBy('createdAt', 'desc'), limit(10)), [firestore]);
+    const productsQuery = useMemoFirebase(() => !firestore ? null : query(collection(firestore, 'products'), orderBy('createdAt', 'desc'), limit(10)), [firestore]);
+    const workersQuery = useMemoFirebase(() => !firestore ? null : query(collection(firestore, 'workers'), where('isVerified', '==', true), limit(10)), [firestore]);
 
-    const { data: allProperties, isLoading: isPropertiesLoading } = useCollection<Property>(propertiesQuery);
+    const { data: allSaleProperties, isLoading: isSaleLoading } = useCollection<Property>(salePropertiesQuery);
+    const { data: allRentProperties, isLoading: isRentLoading } = useCollection<Property>(rentPropertiesQuery);
     const { data: allProducts, isLoading: isProductsLoading } = useCollection<Product>(productsQuery);
     const { data: allWorkers, isLoading: isWorkersLoading } = useCollection<Worker>(workersQuery);
 
@@ -76,21 +78,38 @@ export function LiveFeed() {
     };
     
     // --- Merging and Filtering Data ---
-    const { displayItems: propertiesToShow, isNearby: propertiesAreNearby } = useMemo(() => {
-        const demoData = PlaceHolderImages.filter(p => p.type === 'property').map(p => ({
+    const { displayItems: salePropertiesToShow, isNearby: salePropertiesAreNearby } = useMemo(() => {
+        const demoData = PlaceHolderImages.filter(p => p.type === 'property' && p.listingType === 'sale').map(p => ({
              ...p,
              id: p.id,
              propertyId: p.id,
              ownerId: `demo-user-${p.id}`,
-             listingType: p.listingType as any || 'sale',
-             geo: { latitude: 0, longitude: 0 }, // Add placeholder geo
+             listingType: 'sale' as const,
+             geo: { latitude: 0, longitude: 0 },
              createdAt: null,
         }));
-        const realIds = new Set(allProperties?.map(p => p.id));
+        const realIds = new Set(allSaleProperties?.map(p => p.id));
         const uniqueDemos = demoData.filter(p => !realIds.has(p.id));
-        const combined = [...(allProperties || []), ...uniqueDemos];
+        const combined = [...(allSaleProperties || []), ...uniqueDemos];
         return getFilteredAndSortedItems(combined as any);
-    }, [allProperties, userLat, userLon, isGeoLoading]);
+    }, [allSaleProperties, userLat, userLon, isGeoLoading]);
+
+    const { displayItems: rentPropertiesToShow, isNearby: rentPropertiesAreNearby } = useMemo(() => {
+        const demoData = PlaceHolderImages.filter(p => p.type === 'property' && p.listingType === 'rent').map(p => ({
+             ...p,
+             id: p.id,
+             propertyId: p.id,
+             ownerId: `demo-user-${p.id}`,
+             listingType: 'rent' as const,
+             geo: { latitude: 0, longitude: 0 },
+             createdAt: null,
+        }));
+        const realIds = new Set(allRentProperties?.map(p => p.id));
+        const uniqueDemos = demoData.filter(p => !realIds.has(p.id));
+        const combined = [...(allRentProperties || []), ...uniqueDemos];
+        return getFilteredAndSortedItems(combined as any);
+    }, [allRentProperties, userLat, userLon, isGeoLoading]);
+
 
     const { displayItems: productsToShow, isNearby: productsAreNearby } = useMemo(() => {
         const demoData = PlaceHolderImages.filter(p => p.type === 'product').map(p => ({
@@ -122,8 +141,16 @@ export function LiveFeed() {
     
     return (
         <div className="space-y-8">
-            <LiveFeedSection title={propertiesAreNearby ? "Homes Near You" : "Latest Homes"} link="/explore" isLoading={isPropertiesLoading} count={propertiesToShow.length}>
-                {propertiesToShow.map(prop => (
+            <LiveFeedSection title={salePropertiesAreNearby ? "Homes for Sale Near You" : "Latest Homes for Sale"} link="/explore?tab=buy" isLoading={isSaleLoading} count={salePropertiesToShow.length}>
+                {salePropertiesToShow.map(prop => (
+                    <div key={prop.id} className="w-80 flex-shrink-0">
+                        <PropertyCard property={prop as any} />
+                    </div>
+                ))}
+            </LiveFeedSection>
+
+            <LiveFeedSection title={rentPropertiesAreNearby ? "Homes for Rent Near You" : "Latest Homes for Rent"} link="/explore?tab=rent" isLoading={isRentLoading} count={rentPropertiesToShow.length}>
+                {rentPropertiesToShow.map(prop => (
                     <div key={prop.id} className="w-80 flex-shrink-0">
                         <PropertyCard property={prop as any} />
                     </div>
