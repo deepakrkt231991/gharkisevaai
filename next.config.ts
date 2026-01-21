@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: true,
   /* config options here */
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   images: {
     remotePatterns: [
