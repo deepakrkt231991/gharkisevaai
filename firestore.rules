@@ -30,7 +30,7 @@ service cloud.firestore {
 
     // WORKERS Collection
     match /workers/{workerId} {
-      allow read: if true;
+      allow get, list: if true;
       allow create, update: if isOwner(workerId);
     }
 
@@ -43,7 +43,7 @@ service cloud.firestore {
 
     // TOOLS Collection
     match /tools/{toolId} {
-        allow read: if true;
+        allow get, list: if true;
         allow create, update: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
         allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
@@ -95,14 +95,14 @@ service cloud.firestore {
     
     // PRODUCTS Collection
     match /products/{productId} {
-      allow read: if true;
+      allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
 
     // PROPERTIES Collection
     match /properties/{propertyId} {
-      allow read: if true;
+      allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
