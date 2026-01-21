@@ -84,6 +84,13 @@ service cloud.firestore {
         allow get, list: if true;
         allow write: if false; // Should only be written by a backend process/Cloud Function
     }
+    
+    // BANNERS Collection
+    // All users can read the banners. Only backend should write.
+    match /banners/{bannerId} {
+        allow get, list: if true;
+        allow write: if false; // Should only be written by a backend process/Cloud Function
+    }
 
     // LEGAL_AGREEMENTS Collection
     // The buyer or seller can read the agreement. Listing is open to signed in users.
@@ -119,5 +126,3 @@ service cloud.firestore {
     }
   }
 }
-
-    

@@ -6,7 +6,7 @@ import { TrendingNow } from '@/components/trending-now';
 import { AiServiceGrid } from '@/components/ai-service-grid';
 import { UserStats } from '@/components/user-stats';
 import { WelcomeVideoModal } from '@/components/welcome-video-modal';
-import { DynamicBanner } from '@/components/dynamic-banner';
+import { HomeCarouselBanner } from '@/components/home-carousel-banner';
 
 export default function Home() {
   return (
@@ -15,7 +15,7 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
         <HomeHeader />
         <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-32">
-          <DynamicBanner />
+          <HomeCarouselBanner />
           <TrendingNow />
           <AiServiceGrid />
           <UserStats />

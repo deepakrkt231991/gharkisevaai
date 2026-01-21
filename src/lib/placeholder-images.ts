@@ -18,11 +18,12 @@ export type ImagePlaceholder = {
   sqft?: number;
   parking?: number;
   isAiVerified?: boolean;
-  type?: 'product' | 'worker' | 'property';
+  type?: 'product' | 'worker' | 'property' | 'banner';
   category?: 'furniture' | 'electronics' | 'other';
   isReserved?: boolean;
+  title?: string;
+  subtitle?: string;
+  link?: string;
 };
 
 export const PlaceHolderImages: ImagePlaceholder[] = data.placeholderImages;
-
-    

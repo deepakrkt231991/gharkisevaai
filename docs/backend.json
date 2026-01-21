@@ -289,13 +289,23 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "App Settings",
       "type": "object",
-      "description": "Stores global app settings, like dynamic banner content.",
+      "description": "Stores global app settings.",
       "properties": {
-        "content": { "type": "string", "description": "लाइफटाइम कमाई! हर रेफरल पर 0.05% कमीशन पाएं।\\nLifetime Earnings! Get 0.05% commission on every referral." },
-        "style": { "type": "string", "description": "dynamic_card" },
-        "backgroundColor": { "type": "string", "description": "#FFD700" },
         "lastUpdated": { "type": "string", "format": "date-time" }
       }
+    },
+    "Banner": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Banner",
+      "type": "object",
+      "description": "Represents a single rotating banner slide on the home page.",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "imageUrl": { "type": "string", "description": "URL of the banner's background image." },
+        "link": { "type": "string", "description": "The destination URL when the banner is clicked." }
+      },
+      "required": ["title", "subtitle", "imageUrl", "link"]
     },
     "LegalAgreement": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -484,7 +494,15 @@
         "definition": {
           "entityName": "AppSettings",
           "schema": { "$ref": "#/backend/entities/AppSettings" },
-          "description": "Stores global app settings, like dynamic content for banners. The docId 'top_banner' is used for the main promotional banner."
+          "description": "Stores global app settings. This is now separate from the rotating banners."
+        }
+      },
+      {
+        "path": "/banners/{bannerId}",
+        "definition": {
+          "entityName": "Banner",
+          "schema": { "$ref": "#/backend/entities/Banner" },
+          "description": "Stores the rotating banners for the home page."
         }
       },
       {
@@ -522,5 +540,3 @@
     ]
   }
 }
-
-    

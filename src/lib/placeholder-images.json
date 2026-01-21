@@ -254,6 +254,36 @@
       "price": 3000,
       "isReserved": false,
       "category": "Furniture"
+    },
+    {
+      "id": "banner-ai-design",
+      "type": "banner",
+      "description": "A futuristic living room with holographic design elements.",
+      "imageUrl": "https://images.unsplash.com/photo-1631679706909-1844bbd07221?q=80&w=1992&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "AI interior design",
+      "title": "AI Home Consultant",
+      "subtitle": "अपने घर को AI से डिजाइन करवाएं",
+      "link": "/ai-help"
+    },
+    {
+      "id": "banner-marketplace",
+      "type": "banner",
+      "description": "A stylish marketplace with various home goods on display.",
+      "imageUrl": "https://images.unsplash.com/photo-1586798271654-0471bb1b2183?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "marketplace home goods",
+      "title": "Sell & Buy Securely",
+      "subtitle": "पुराना सामान बेचें या नया घर खोजें",
+      "link": "/marketplace"
+    },
+    {
+      "id": "banner-safety",
+      "type": "banner",
+      "description": "A shield icon overlaying a picture of a house, symbolizing security.",
+      "imageUrl": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "home security",
+      "title": "100% Secure Deals",
+      "subtitle": "5% एडवांस और 100% सुरक्षा के साथ डील करें",
+      "link": "/legal-vault"
     }
   ]
 }
