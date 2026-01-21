@@ -14,6 +14,7 @@ import { useGeolocation } from '@/hooks/use-geolocation';
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 // Helper function to calculate distance (Haversine formula)
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -63,14 +64,61 @@ export function ExploreMarketplace() {
                  const distB = calculateDistance(userLat, userLon, geoB.latitude, geoB.longitude);
                  return distA - distB;
             }
-            if(geoA) return -1; // properties with geo info first
-            if(geoB) return 1;
+            if(a.geo) return -1; // properties with geo info first
+            if(b.geo) return 1;
             return 0; // no geo info on both
         });
     }
 
-    const sortedSaleProperties = useMemo(() => sortPropertiesByDistance(saleProperties), [saleProperties, userLat, userLon]);
-    const sortedRentProperties = useMemo(() => sortPropertiesByDistance(rentProperties), [rentProperties, userLat, userLon]);
+    const combinedSaleProperties = useMemo(() => {
+        const demoProperties: Property[] = PlaceHolderImages
+            .filter(p => p.type === 'property' && p.listingType === 'sale')
+            .map(p => ({
+                id: p.id,
+                propertyId: p.id,
+                ownerId: `demo-user-${p.id}`,
+                title: p.title || 'Demo Sale Property',
+                location: p.location || 'Unknown Location',
+                price: p.price || 0,
+                priceUnit: p.priceUnit || 'Cr',
+                sqft: p.sqft || 0,
+                parking: p.parking || 0,
+                listingType: 'sale',
+                imageUrl: p.imageUrl,
+                isAiVerified: p.isAiVerified || false,
+                vastuScore: p.vastuScore,
+            } as Property & { id: string }));
+
+        const realPropertyIds = new Set(saleProperties?.map(p => p.id));
+        const uniqueDemoProperties = demoProperties.filter(p => !realPropertyIds.has(p.id));
+
+        return sortPropertiesByDistance([...uniqueDemoProperties, ...(saleProperties || [])]);
+    }, [saleProperties, userLat, userLon]);
+
+    const combinedRentProperties = useMemo(() => {
+        const demoProperties: Property[] = PlaceHolderImages
+            .filter(p => p.type === 'property' && p.listingType === 'rent')
+            .map(p => ({
+                id: p.id,
+                propertyId: p.id,
+                ownerId: `demo-user-${p.id}`,
+                title: p.title || 'Demo Rent Property',
+                location: p.location || 'Unknown Location',
+                price: p.price || 0,
+                priceUnit: p.priceUnit || 'L',
+                sqft: p.sqft || 0,
+                parking: p.parking || 0,
+                listingType: 'rent',
+                imageUrl: p.imageUrl,
+                isAiVerified: p.isAiVerified || false,
+                vastuScore: p.vastuScore,
+            } as Property & { id: string }));
+
+        const realPropertyIds = new Set(rentProperties?.map(p => p.id));
+        const uniqueDemoProperties = demoProperties.filter(p => !realPropertyIds.has(p.id));
+
+        return sortPropertiesByDistance([...uniqueDemoProperties, ...(rentProperties || [])]);
+    }, [rentProperties, userLat, userLon]);
 
 
     const AiPriceEstimatorCard = () => (
@@ -96,7 +144,7 @@ export function ExploreMarketplace() {
             </div>
             
             <div className="space-y-6">
-                {isLoading && (
+                {isLoading && combinedSaleProperties.length === 0 && combinedRentProperties.length === 0 && (
                     <>
                         {[...Array(2)].map((_, i) => (
                              <div className="space-y-3" key={i}>
@@ -164,14 +212,14 @@ export function ExploreMarketplace() {
                 
                 <TabsContent value="buy" className="pt-6 space-y-6">
                     <AiPriceEstimatorCard />
-                    <PropertyList properties={sortedSaleProperties} isLoading={isSaleLoading} />
+                    <PropertyList properties={combinedSaleProperties} isLoading={isSaleLoading} />
                 </TabsContent>
                 <TabsContent value="sell" className="pt-6 space-y-6">
                     <AiPriceEstimatorCard />
                     <ListPropertyCtaCard />
                 </TabsContent>
                 <TabsContent value="rent" className="pt-6 space-y-6">
-                    <PropertyList properties={sortedRentProperties} isLoading={isRentLoading} />
+                    <PropertyList properties={combinedRentProperties} isLoading={isRentLoading} />
                     <ListPropertyCtaCard forRent />
                 </TabsContent>
             </Tabs>
