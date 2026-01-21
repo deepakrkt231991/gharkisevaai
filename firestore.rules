@@ -13,10 +13,9 @@ service cloud.firestore {
     }
 
     // USERS Collection
-    // Any signed-in user can view a profile, but only the owner can write.
+    // Public profiles can be viewed by anyone. Only owner can write.
     match /users/{userId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn(); // Allow listing users for seller info
+      allow get, list: if true;
       allow write: if isOwner(userId);
     }
 
@@ -31,10 +30,10 @@ service cloud.firestore {
     }
 
     // WORKERS Collection
-    // Signed-in users can view worker profiles.
+    // Public worker profiles can be viewed by anyone.
     // Only the owner can create/update their own profile.
     match /workers/{workerId} {
-      allow get, list: if isSignedIn();
+      allow get, list: if true;
       allow create, update: if isOwner(workerId);
     }
 
@@ -46,9 +45,9 @@ service cloud.firestore {
     }
 
     // TOOLS Collection
-    // Signed-in users can see available tools. Workers can add/update their own tools.
+    // Anyone can see available tools. Workers can add/update their own tools.
     match /tools/{toolId} {
-        allow get, list: if isSignedIn();
+        allow get, list: if true;
         allow create, update: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
         allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
@@ -101,19 +100,19 @@ service cloud.firestore {
     }
     
     // PRODUCTS Collection
-    // Signed-in users can view products.
+    // Anyone can view products.
     // Authenticated users can create their own products.
     // Owners can update/delete their products.
     match /products/{productId} {
-      allow get, list: if isSignedIn();
+      allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
 
     // PROPERTIES Collection
-    // Any signed-in user can view property listings and create their own.
+    // Anyone can view property listings. Authenticated users can create their own.
     match /properties/{propertyId} {
-      allow get, list: if isSignedIn();
+      allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update, delete: if resource.data.ownerId == request.auth.uid;
     }
