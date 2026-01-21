@@ -47,9 +47,9 @@ Your response MUST be in the user's requested language (default to English if no
 
 Follow this structure for your analysis to create the world's best report:
 
-1.  **The Problem (The 'What', in simple language):** Identify the core issue in simple, human-like terms. Instead of "P-trap seal degradation," say "There is a leak under your sink, likely from a worn-out pipe seal." Put this in the 'defect' field.
+1.  **The Problem (The 'What', in simple language):** Identify the core issue in simple, human-like terms. Instead of "P-trap seal degradation," say "There is a leak under your sink, likely from a worn-out pipe seal." If you see a crack in a wall, identify it as "Wall Crack". If you see dampness, call it "Wall Dampness". Put this in the 'defect' field.
 
-2.  **Micro-Level Analysis (The 'Why' and 'Where'):** Perform an advanced visual scan.
+2.  **Micro-Level Analysis (The 'Why' and 'Where'):** Perform an advanced visual scan using your computer vision capabilities.
     -   **Root Cause:** Explain the likely root cause (e.g., "This is likely due to 5-year-old rust and corrosion on the pipe joint.").
     -   **Visual Proof Description:** Describe exactly where the problem is in the image (e.g., "The leak is visible on the U-shaped pipe directly under the drain, marked by a dark, wet patch.").
     -   **Severity Assessment:** Analyze the severity. Mention details like wall dampness levels ("moderate dampness detected"), crack depth ("hairline crack, approx. 1mm deep"), or paint quality ("low-quality paint with visible peeling").
@@ -62,9 +62,9 @@ Follow this structure for your analysis to create the world's best report:
     -   List specific parts needed (e.g., "1/2 inch faucet washer", "M-Seal sealant") in the 'requiredParts' field.
     -   List tools a professional might need in the 'requiredTools' field.
 
-5.  **'Zero-Cost' DIY Guide:** If the repair is simple and safe, provide a list of step-by-step DIY instructions. Each step should be a clear action. For example: "1. Turn off the water supply below the sink. 2. Apply M-Seal of about ₹50 around the joint (Watch video for guide).". Put this in the 'diySteps' array. For complex or dangerous repairs, this array **must** be empty.
+5.  **'Zero-Cost' DIY Guide (The Guide):** If the repair is simple and safe, provide a list of step-by-step DIY instructions. Each step should be a clear action, like a guide. For example: "1. First, turn off the water supply below the sink. 2. Next, apply M-Seal of about ₹50 around the joint. 3. Finally, wait for it to dry.". Put this in the 'diySteps' array. For complex or dangerous repairs, this array **must** be empty.
 
-6.  **Recommend Worker Type:** Identify the single, most relevant professional for this job (e.g., 'plumber', 'electrician') and put it in the 'recommendedWorkerType' field.
+6.  **Recommend Worker Type (The Deal Maker):** Identify the single, most relevant professional for this job (e.g., 'plumber', 'electrician') and put it in the 'recommendedWorkerType' field. Your recommendation should be based on finding the most cost-effective and skilled professional for the identified problem.
 
 Analyze the following:
 Media: {{media url=mediaDataUri}}

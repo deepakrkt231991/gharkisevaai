@@ -21,7 +21,7 @@ const InteriorRenderInputSchema = z.object({
     title: z.string(),
     description: z.string(),
     impact: z.enum(['High', 'Medium', 'Low']),
-    category: z.enum(['Vastu', 'Aesthetic', 'Lighting']),
+    category: z.enum(['Vastu', 'Aesthetic', 'Lighting', 'Exterior', 'Landscaping']),
   })).describe("A list of improvement suggestions."),
   style: z.string().optional().describe("The desired interior design style, e.g., 'Modern', 'Classic', 'Minimalist'."),
 });
@@ -58,7 +58,9 @@ const interiorRenderFlow = ai.defineFlow(
       model: 'googleai/gemini-1.5-flash-latest',
       prompt: [
         { media: { url: roomPhotoUri } },
-        { text: `Based on the provided image of a room and the following design suggestions, generate a new, photorealistic 3D render of the improved room. The render should look like a professionally designed space, incorporating the suggested changes.
+        { text: `Based on the provided image of a room and the following design suggestions, generate a new, photorealistic 3D render of the improved space. The render should look like a professionally designed space, incorporating the suggested changes realistically.
+
+        For example, if the original room is small, the new render should respect those dimensions. Adjust furniture size (sofa, bed) and lighting placement according to the room's actual size to create a realistic and achievable design.
 
         ${styleText}
 
