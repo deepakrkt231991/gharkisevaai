@@ -7,33 +7,33 @@ import { Copy, Linkedin, Facebook } from 'lucide-react';
 import Image from "next/image";
 
 const linkedinTemplate = {
-    headline: "🚀 Join India’s First AI-Powered Home Service Platform – 0% Commission Forever!",
-    content: `Are you a professional worker or service provider? Join 'Ghar Ki Seva' (घर की सेवा) and connect directly with customers.
+    headline: "🚀 Join India’s First AI-Powered Home Service Platform – 0% Commission & Instant Payouts!",
+    content: `Are you a professional service provider? Join 'Ghar Ki Seva' and take full control of your earnings.
 
-✅ Zero Platform Fees: We don't charge any commission from you.
-✅ Direct Payments: Talk directly to the customer and get the full payment for your hard work.
-✅ AI Verification: Get your skills and certificates verified by our AI and earn a 'Trust Badge'.
-✅ World-Class Tech: Get the best jobs near your location through AI analysis.
+✅ **0% Commission, Forever:** You keep 100% of what you earn. We don't charge any fees from your hard-earned money.
+✅ **Immediate Withdrawal:** Get your earnings transferred to your bank account instantly after job completion. No more waiting!
+✅ **Direct Customer Chat:** Talk directly to the customer to understand the job and agree on the price.
+✅ **AI-Verified Trust Badge:** Stand out from the competition. Get your skills and certificates verified by our AI to earn a 'Trusted Professional' badge.
 
-Upload your Live Selfie and Certificates today and become a 'Verified Global Professional'!
+Stop paying commissions. Start earning more.
 
-👉 Register Now: https://app.gharkiseva.com/worker-signup`,
+👉 Register Now & Become a Verified Pro: https://app.gharkiseva.com/worker-signup`,
     image: "https://picsum.photos/seed/linkedin-ad/1200/628",
     imageHint: "professional tools layout"
 };
 
 const facebookTemplate = {
-    headline: "🏠 घर की सेवा (Ghar Ki Seva) से जुड़ें – बिना किसी कमीशन के काम पाएं! 🛠️",
-    content: `Ab kaam dhundne ke liye bhatakna band! 'Ghar Ki Seva' app par aayein aur apne hunar ki poori keemat paayein.
+    headline: "🛠️ घर की सेवा (Ghar Ki Seva) से जुड़ें – 0% कमीशन और तुरंत पेमेंट! 💰",
+    content: `अब कमीशन देने का झंझट खत्म! 'Ghar Ki Seva' ऐप पर रजिस्टर करें और अपनी मेहनत की पूरी कमाई घर ले जाएं।
 
-✨ 0% Commission: Hum aapke kaam se ek rupaya bhi nahi kaatte.
-✨ Saccha Bharosa: Apni photo aur ID card daalein aur grahakon ka bharosa jeetein.
-✨ Aasan Kaam: Aapke ghar ke paas ke orders seedhe aapke phone par.
-✨ Muft Registration: Abhi judein aur apni dukaan ya service ko digital banayein.
+✨ **0% कमीशन:** हम आपके काम से एक भी रुपया नहीं काटते।
+✨ **तुरंत पेमेंट:** काम खत्म होते ही पैसा सीधे आपके बैंक खाते में। कोई इंतजार नहीं!
+✨ **सीधी ग्राहक बातचीत:** ग्राहक से सीधे चैट करें और काम की सही कीमत तय करें।
+✨ **AI वेरिफाइड बनें:** अपनी फोटो और ID कार्ड से वेरिफिकेशन कराएं और 'भरोसेमंद वर्कर' का टैग पाएं।
 
-Mehnat aapki, kamai bhi aapki! Aaj hi judein.
+मेहनत आपकी, कमाई भी पूरी आपकी! आज ही जुड़ें।
 
-👇 Neeche diye link se app download karein aur apni selfie upload karein!
+👇 अभी रजिस्टर करने के लिए नीचे दिए गए लिंक पर क्लिक करें!
 https://app.gharkiseva.com/worker-signup`,
     image: "https://picsum.photos/seed/facebook-ad/1080/1080",
     imageHint: "happy worker tools"
