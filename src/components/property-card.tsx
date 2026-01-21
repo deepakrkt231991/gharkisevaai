@@ -6,6 +6,7 @@ import { Heart, ShieldCheck, ParkingCircle, Scale, Scaling } from 'lucide-react'
 import { Button } from './ui/button';
 import Link from 'next/link';
 import type { Property } from '@/lib/entities';
+import { timeAgo } from '@/lib/time-helpers';
 
 interface PropertyCardProps {
     property: Property & {id: string};
@@ -13,22 +14,27 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property }: PropertyCardProps) {
     return (
-        <Link href={`/property-detail?id=${'\'\''}${property.id}`} className="block space-y-3">
+        <Link href={`/property-detail?id=${property.id}`} className="block space-y-3">
              <Card className="relative h-60 w-full overflow-hidden rounded-2xl group border-2 border-transparent hover:border-primary transition-all duration-300">
                 <Image
-                    src={property.imageUrl || `https://picsum.photos/seed/${'\'\''}${property.id}/800/600`}
+                    src={property.imageUrl || `https://picsum.photos/seed/${property.id}/800/600`}
                     alt={property.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent p-4 flex flex-col justify-between">
-                    <div>
+                    <div className="flex items-center gap-2">
                          {property.isAiVerified && (
                              <Badge className="bg-black/50 text-white border-white/20 backdrop-blur-sm">
                                 <ShieldCheck className="w-3 h-3 mr-1 text-yellow-400" />
                                 AI VERIFIED
                             </Badge>
                          )}
+                         {property.createdAt && (
+                            <Badge variant="secondary" className="bg-black/50 text-white backdrop-blur-sm border-none text-xs">
+                                {timeAgo(property.createdAt)}
+                            </Badge>
+                        )}
                     </div>
                     <div>
                         <h3 className="text-2xl font-bold text-white">₹{property.price} {property.priceUnit}</h3>

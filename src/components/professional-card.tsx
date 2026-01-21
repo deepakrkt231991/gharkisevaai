@@ -6,15 +6,25 @@ import { Star, MessageSquare, Calendar, CheckCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { ImagePlaceholder } from '@/lib/placeholder-images';
+import type { Worker } from '@/lib/entities';
+
 
 interface ProfessionalCardProps {
-  worker: ImagePlaceholder;
+  worker: ImagePlaceholder | (Worker & { id: string });
 }
 
 export function ProfessionalCard({ worker }: ProfessionalCardProps) {
-  if (!worker.name || !worker.specialty) {
-    return null;
-  }
+  // Data normalization
+  const id = worker.id;
+  const name = worker.name || 'Verified Worker';
+  const specialty = (worker as any).specialty || (worker as Worker).skills?.[0] || 'Professional';
+  const experience = (worker as any).experience || `${(worker as Worker).successfulOrders || 0}+ jobs`;
+  const rating = worker.rating?.toFixed(1) || 'New';
+  const reviews = (worker as any).reviews || (worker as Worker).successfulOrders || 0;
+  const startingPrice = (worker as any).startingPrice || 199; // Default price
+  const imageUrl = (worker as any).imageUrl || `https://i.pravatar.cc/150?u=${worker.id}`;
+  const phone = (worker as any).phone;
+
 
   return (
     <Card className="overflow-hidden bg-card/80 glass-card">
@@ -23,8 +33,8 @@ export function ProfessionalCard({ worker }: ProfessionalCardProps) {
           <div className="flex items-start gap-3">
             <div className="relative h-16 w-16 flex-shrink-0">
               <Image
-                src={worker.imageUrl}
-                alt={worker.description}
+                src={imageUrl}
+                alt={name}
                 fill
                 className="rounded-full object-cover"
                 sizes="64px"
@@ -34,18 +44,18 @@ export function ProfessionalCard({ worker }: ProfessionalCardProps) {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">{worker.name}</h3>
-              <p className="text-sm text-muted-foreground">{worker.specialty} • {worker.experience}</p>
+              <h3 className="text-lg font-bold text-white">{name}</h3>
+              <p className="text-sm text-muted-foreground">{specialty} • {experience}</p>
               <div className="mt-1 flex items-center gap-1.5">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm font-bold text-white">{worker.rating?.toFixed(1)}</span>
-                <span className="text-xs text-muted-foreground">({worker.reviews} reviews)</span>
+                <span className="text-sm font-bold text-white">{rating}</span>
+                <span className="text-xs text-muted-foreground">({reviews} reviews)</span>
               </div>
             </div>
           </div>
           <div className="text-right">
             <p className="text-xs text-muted-foreground">STARTING FROM</p>
-            <p className="text-xl font-bold text-white">₹{worker.startingPrice}</p>
+            <p className="text-xl font-bold text-white">₹{startingPrice}</p>
           </div>
         </div>
         <div className="flex gap-3">
@@ -56,7 +66,7 @@ export function ProfessionalCard({ worker }: ProfessionalCardProps) {
             </Link>
           </Button>
           <Button asChild variant="secondary" size="icon" className="h-10 w-10 flex-shrink-0 bg-card hover:bg-card/70">
-            <Link href={`/chat/job-temp-${worker.id}`}>
+            <Link href={`/chat/job-temp-${id}`}>
               <MessageSquare className="h-5 w-5 text-muted-foreground" />
             </Link>
           </Button>

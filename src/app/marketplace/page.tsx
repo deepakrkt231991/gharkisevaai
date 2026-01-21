@@ -6,53 +6,12 @@ import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { useCollection, useMemoFirebase, useFirestore } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import type { Product } from '@/lib/entities';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-
-// --- ProductCard Component ---
-interface ProductCardProps {
-    product: Product & { id: string };
-}
-
-function ProductCard({ product }: ProductCardProps) {
-    return (
-        <Link href={`/product-detail?id=${product.id}`}>
-            <Card className="rounded-xl overflow-hidden glass-card border-border group h-full">
-                <CardContent className="p-0 flex flex-col h-full">
-                    <div className="relative aspect-[4/5] w-full overflow-hidden">
-                        <Image
-                            src={product.imageUrls?.[0] || 'https://placehold.co/400x500?text=No+Image'}
-                            alt={product.name}
-                            fill
-                            className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        {product.isReservedEnabled && !product.isReserved && (
-                            <Badge className="absolute top-3 left-3 bg-gray-900/70 text-white backdrop-blur-sm border-none uppercase text-xs tracking-widest">RESERVE AVAILABLE</Badge>
-                        )}
-                         {product.isReserved && (
-                            <Badge className="absolute top-3 left-3 bg-yellow-600/80 text-white backdrop-blur-sm border-none uppercase text-xs tracking-widest">RESERVED</Badge>
-                        )}
-                        <div className="absolute top-3 right-3 rounded-full h-9 w-9 bg-black/30 backdrop-blur-sm flex items-center justify-center text-white">
-                            <Heart className="h-5 w-5" />
-                        </div>
-                    </div>
-                    <div className="p-4 space-y-1 flex-grow flex flex-col justify-end">
-                        <h3 className="font-bold text-white truncate">{product.name}</h3>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1"><MapPin size={14}/>{product.location}</p>
-                        <p className="text-lg font-bold text-white pt-1">₹{product.price.toLocaleString('en-IN')}</p>
-                    </div>
-                </CardContent>
-            </Card>
-        </Link>
-    );
-}
-// --- End ProductCard Component ---
+import { ProductCard } from '@/components/product-card';
 
 const MarketplaceHeader = () => (
      <header className="sticky top-0 z-40 flex flex-col gap-4 bg-background/80 p-4 backdrop-blur-md border-b border-border">
