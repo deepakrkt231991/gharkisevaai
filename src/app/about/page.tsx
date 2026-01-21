@@ -2,7 +2,7 @@
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bot, Shield, Handshake, Users, IndianRupee, Goal } from 'lucide-react';
+import { Bot, Shield, Handshake, Users, IndianRupee, Goal, Banknote, FileText } from 'lucide-react';
 
 export default function AboutUsPage() {
   const ourMission = {
@@ -16,11 +16,12 @@ export default function AboutUsPage() {
         { feature: "AI Defect Analysis", description: "Get instant, accurate cost estimates and repair solutions by uploading a photo.", icon: <Bot/> },
         { feature: "Verified Professionals", description: "Connect with AI-verified workers whose backgrounds are checked for your safety.", icon: <Shield/> },
         { feature: "Secure Escrow Payment", description: "Your payment is held securely and only released when you confirm the job is done.", icon: <Handshake/> },
-        { feature: "Lifetime Referral Income", description: "Earn a lifetime commission of 0.05% from every transaction made by users you refer.", icon: <IndianRupee/> }
+        { feature: "Lifetime Referral Income", description: "Earn a lifetime commission of 0.05% from every transaction made by users you refer.", icon: <IndianRupee/> },
+        { feature: "Transparent Pricing", description: "A small platform fee is included for AI verification, secure payments, and support. No surprises.", icon: <FileText /> }
     ],
     workers: [
-      { feature: "0% Commission", description: "Keep 100% of your earnings. We charge no commission from your hard work.", icon: <Users/> },
-      { feature: "Instant Payouts", description: "Withdraw your earnings directly to your bank account just 1 hour after job completion.", icon: <IndianRupee/> },
+      { feature: "Fair & Transparent Fees", description: "No hidden charges. A small fee is included in the final bill to cover security, AI tools, and support, ensuring you get paid reliably.", icon: <IndianRupee/> },
+      { feature: "Instant Payouts", description: "Withdraw your earnings directly to your bank account just 1 hour after job completion.", icon: <Banknote/> },
       { feature: "AI Legal Agreements", description: "Create legally sound digital agreements for high-value deals directly within the app.", icon: <Bot/> },
       { feature: "Build Your Team", description: "Refer other workers to build your own team and earn a passive income from their jobs.", icon: <Users/> }
     ]

@@ -5,12 +5,19 @@ import { initializeFirebase } from '@/firebase';
 import { revalidatePath } from 'next/cache';
 import type { Product } from '@/lib/entities';
 
-const PLATFORM_FEE_PERCENTAGE = 0.05; // 5% of final cost
-const REFERRAL_COMMISSION_PERCENTAGE = 0.0005; // 0.05% of final cost
-const GST_PERCENTAGE = 0.18; // 18% GST
+// --- PLATFORM FEE & COMMISSION STRUCTURE ---
+// The final cost paid by the customer is the basis for all calculations.
+// A 5% platform fee is charged on the final cost. This fee is inclusive of GST.
+// The referral commission is 0.05% of the final cost, paid out to the referrer.
 
-const PLATFORM_ADMIN_UID = 'GRIHSEVA_ADMIN_UID';
-const PLATFORM_GST_UID = 'GRIHSEVA_GST_UID';
+const PLATFORM_FEE_PERCENTAGE = 0.05; // 5% fee on the total transaction value.
+const REFERRAL_COMMISSION_PERCENTAGE = 0.0005; // 0.05% of the total transaction value.
+const GST_PERCENTAGE = 0.18; // 18% GST applied on the net platform fee.
+
+// --- PLATFORM ACCOUNT UIDs ---
+// These are special UIDs to track funds for the platform itself.
+const PLATFORM_ADMIN_UID = 'GRIHSEVA_ADMIN_UID'; // For collecting the net platform fee.
+const PLATFORM_GST_UID = 'GRIHSEVA_GST_UID'; // For tracking GST amounts.
 
 
 export async function confirmDelivery(jobId: string): Promise<{success: boolean, message: string}> {
