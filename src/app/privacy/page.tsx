@@ -2,29 +2,29 @@
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, FileLock, Camera, Share2, Shield, Mail } from 'lucide-react';
+import { Database, Shield, Bot, Annoyed } from 'lucide-react';
 
 export default function PrivacyPolicyPage() {
   const policySections = [
     {
-      title: "Data Vault & Encryption",
-      icon: <FileLock className="h-6 w-6" />,
-      content: "हम यूजर के ID प्रूफ और डॉक्यूमेंट्स को AES-256 Bank-Grade Encryption में स्टोर करते हैं। यह 'Legal Vault' से बाहर कभी नहीं जाएगा।",
+      title: "Data Collection",
+      icon: <Database className="h-6 w-6" />,
+      content: "हम यूजर का नाम, लोकेशन और सेल्फी वेरिफिकेशन डेटा स्टोर करते हैं ताकि 'Verified Worker' सिस्टम को सुरक्षित रखा जा सके।",
     },
     {
-      title: "Live Selfie & ID Usage",
-      icon: <Camera className="h-6 w-6" />,
-      content: "वर्कर्स की सेल्फी और ID का उपयोग केवल AI Verification के लिए किया जाता है ताकि प्लेटफॉर्म को सुरक्षित रखा जा सके और फ्रॉड को रोका जा सके।",
-    },
-    {
-      title: "No-Sharing Policy",
-      icon: <Share2 className="h-6 w-6" />,
-      content: "हम आपका पर्सनल नंबर या कोई भी संवेदनशील जानकारी किसी तीसरे पक्ष (Third Party) को मार्केटिंग के लिए नहीं बेचते या शेयर नहीं करते। आपका डेटा सिर्फ आप और आपके वेरिफाइड पार्टनर के बीच रहता है।",
-    },
-    {
-      title: "AI & Data",
+      title: "Payment Safety",
       icon: <Shield className="h-6 w-6" />,
-      content: "जब आप किसी खराबी की फोटो अपलोड करते हैं, तो हमारा AI उसे विश्लेषण करने के लिए उपयोग करता है। यह डेटा हमारे AI मॉडल को बेहतर बनाने में मदद करता है, लेकिन आपकी व्यक्तिगत पहचान से जुड़ा नहीं होता है।",
+      content: "हम स्ट्राइप/रेज़रपे और 'Safe Vault' का उपयोग करते हैं। बायर का 5% बुकिंग अमाउंट और 95% वर्क-डन पेमेंट पूरी तरह सुरक्षित रहता है।",
+    },
+    {
+      title: "Third-Party Ads",
+      icon: <Annoyed className="h-6 w-6" />,
+      content: "हम विज्ञापन दिखाने के लिए Google AdSense का उपयोग करते हैं। Google यूजर की रुचियों के आधार पर विज्ञापन दिखाने के लिए कुकीज़ (Cookies) का उपयोग कर सकता है।",
+    },
+    {
+      title: "AI Usage",
+      icon: <Bot className="h-6 w-6" />,
+      content: "हमारा AI आपके अपलोड किए गए रूम डिज़ाइन और पुराने सामान की फोटो को केवल सर्विस सुझाव देने और फ्रॉड रोकने के लिए इस्तेमाल करता है।",
     },
   ];
 
@@ -37,14 +37,10 @@ export default function PrivacyPolicyPage() {
             <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">
               Privacy Policy for Ghar Ki Seva
             </h1>
-            <p className="mt-2 text-muted-foreground">Last Updated: January 15, 2026</p>
+            <p className="mt-2 text-muted-foreground">Last Updated: October 26, 2023</p>
           </div>
 
           <div className="space-y-8">
-            <p className="text-center text-muted-foreground">
-             At Ghar Ki Seva, we are committed to protecting your personal data. This policy explains how we handle your information to ensure your privacy and security.
-            </p>
-
             {policySections.map((section) => (
               <Card key={section.title}>
                 <CardHeader>
@@ -58,20 +54,6 @@ export default function PrivacyPolicyPage() {
                 </CardContent>
               </Card>
             ))}
-            
-            <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl flex items-center gap-3">
-                        <Mail className="h-6 w-6" />
-                        Contact Us
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground">
-                        For any privacy concerns, please contact us at: <a href="mailto:gharkisevaai@gmail.com" className="text-primary hover:underline">gharkisevaai@gmail.com</a>
-                    </p>
-                </CardContent>
-            </Card>
           </div>
         </div>
       </main>
