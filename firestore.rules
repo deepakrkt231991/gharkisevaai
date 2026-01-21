@@ -2,116 +2,15 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper functions
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    // USERS Collection
-    match /users/{userId} {
-      allow read: if true;
-      allow write: if isOwner(userId);
-    }
-
-    // JOBS Collection
-    // Customers can create jobs.
-    // The customer who created the job and the assigned worker can read/update it.
-    match /jobs/{jobId} {
-      allow read: if isSignedIn(); 
-      allow create: if isSignedIn() && request.resource.data.customerId == request.auth.uid;
-      allow update: if isSignedIn() && (resource.data.customerId == request.auth.uid || resource.data.workerId == request.auth.uid);
-      allow delete: if isSignedIn() && resource.data.customerId == request.auth.uid;
-    }
-
-    // WORKERS Collection
-    match /workers/{workerId} {
-      allow get, list: if true;
-      allow create, update: if isOwner(workerId);
-    }
-
-    // HEALTH Collection
-    // Users can manage their own health data.
-    match /health/{healthId} {
-      allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-    }
-
-    // TOOLS Collection
-    match /tools/{toolId} {
-        allow get, list: if true;
-        allow create, update: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-        allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
-    }
-
-    // RENTALS Collection
-    // Users can create rentals. The renter and the tool owner can view/update the rental.
-    match /rentals/{rentalId} {
-        allow create: if isSignedIn() && request.resource.data.renterId == request.auth.uid;
-        allow get, list, update: if isSignedIn() && (resource.data.renterId == request.auth.uid || get(/databases/$(database)/documents/tools/$(resource.data.toolId)).data.ownerId == request.auth.uid);
-    }
-
-    // TRANSACTIONS Collection
-    // Users can only read their own transactions. Transactions can only be created by the backend.
-    match /transactions/{transactionId} {
-      allow get: if isOwner(resource.data.userId);
-      allow list: if isSignedIn(); // Allow queries on the collection. Client must filter for user's own data.
-      allow create: if false; // Transactions should only be created by the backend (Cloud Functions/Server Actions).
-      allow update, delete: if false;
-    }
-
-    // SOS_ALERTS Collection
-    // Any signed-in user can create an SOS alert.
-    // Reading/updating should be restricted to admins or the user who created it.
-    match /sos_alerts/{alertId} {
-        allow create: if isSignedIn();
-        allow read, update: if isOwner(resource.data.userId); // Or an admin role
-        allow delete: if false; // Deletes should be handled by an admin/backend process.
-    }
-
-    // APP_SETTINGS Collection
-    match /app_settings/{docId} {
-        allow read: if true;
-        allow write: if false; // Should only be written by a backend process/Cloud Function
-    }
-    
-    // BANNERS Collection
-    match /banners/{bannerId} {
-        allow read: if true;
-        allow write: if false; // Should only be written by a backend process/Cloud Function
-    }
-
-    // LEGAL_AGREEMENTS Collection
-    // The buyer or seller can read the agreement. Listing is open to signed in users.
-    match /legal_agreements/{agreementId} {
-        allow get: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid);
-        allow list: if isSignedIn();
-        allow write: if false; // Should only be written by a backend process/Cloud Function
-    }
-    
-    // PRODUCTS Collection
-    match /products/{productId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
-    }
-
-    // PROPERTIES Collection
+    // Properties को कोई भी देख सकता है, लेकिन लिख सिर्फ लॉगिन यूजर सकता है
     match /properties/{propertyId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow read: if true; 
+      allow write: if request.auth != null;
     }
-
-    // DEALS Collection
-    // Buyer and Seller can get and update their deal.
-    match /deals/{dealId} {
-        allow create: if isSignedIn() && request.resource.data.buyerId == request.auth.uid;
-        allow get, update: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid);
+    
+    // बाकी सभी कलेक्शंस के लिए लॉगिन अनिवार्य है
+    match /{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }
