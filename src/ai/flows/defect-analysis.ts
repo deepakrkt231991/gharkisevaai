@@ -25,11 +25,16 @@ const AnalyzeDefectOutputSchema = z.object({
   defect: z.string().describe('The identified defect (e.g., "Leaky faucet washer") or the item being listed (e.g., "Used 24-inch Television"), explained in simple, human-like language.'),
   analysisDetails: z.string().describe("A micro-level analysis of the issue, detailing things like crack depth, dampness levels, or paint quality."),
   confidence: z.number().describe("A confidence score (from 0 to 100) for the accuracy of the defect identification."),
-  estimatedCost: z.string().describe('The estimated repair cost (e.g., "₹500 - ₹800") or the suggested resale market value if it\'s an item for sale.'),
+  estimatedCost: z.object({
+      total: z.string().describe("The total estimated cost range, e.g., '₹20,000 - ₹25,000'."),
+      material: z.string().describe("The estimated cost for materials, e.g., '₹15,000'."),
+      labor: z.string().describe("The estimated cost for labor, e.g., '₹5,000'.")
+  }).describe("A detailed breakdown of the estimated costs."),
   diySteps: z.array(z.string()).describe('A list of simple, step-by-step DIY instructions for a user to potentially fix the issue themselves. Each step should be a clear action. This should be an empty array if the repair is complex, dangerous, or if it is an item for sale.'),
   requiredTools: z.array(z.string()).describe('A list of tools the worker might need to bring for the repair.'),
   requiredParts: z.array(z.string()).describe('A list of specific parts that might be needed for the repair (e.g., "1/2 inch faucet washer", "TV Capacitor Model 25v 1000uF"). This can also be used to list key components of an item for sale.'),
   recommendedWorkerType: z.string().describe("The single, most relevant type of worker for this job (e.g., 'plumber', 'electrician', 'painter')."),
+  materialSuggestions: z.array(z.string()).describe("Recommendations for specific materials based on the problem, e.g., 'Use waterproof paint for damp areas.'"),
 });
 export type AnalyzeDefectOutput = z.infer<typeof AnalyzeDefectOutputSchema>;
 
@@ -57,9 +62,10 @@ Follow this structure for your analysis to create the world's best report:
 
 3.  **Confidence Score:** Provide a high-precision confidence score (e.g., 99.8) from 0 to 100 representing your certainty in the 'confidence' field.
 
-4.  **Cost & Parts:**
-    -   Provide an estimated cost range for repair in the 'estimatedCost' field.
+4.  **Cost, Parts & Materials (The Budget):**
+    -   Provide a detailed cost breakdown in the 'estimatedCost' object, including the 'total' range, 'material' cost, and 'labor' cost.
     -   List specific parts needed (e.g., "1/2 inch faucet washer", "M-Seal sealant") in the 'requiredParts' field.
+    -   Based on the problem (e.g., dampness), recommend specific materials and techniques (e.g., "Apply a coat of waterproof primer before painting.") in the \`materialSuggestions\` field.
     -   List tools a professional might need in the 'requiredTools' field.
 
 5.  **'Zero-Cost' DIY Guide (The Guide):** If the repair is simple and safe, provide a list of step-by-step DIY instructions. Each step should be a clear action, like a guide. For example: "1. First, turn off the water supply below the sink. 2. Next, apply M-Seal of about ₹50 around the joint. 3. Finally, wait for it to dry.". Put this in the 'diySteps' array. For complex or dangerous repairs, this array **must** be empty.

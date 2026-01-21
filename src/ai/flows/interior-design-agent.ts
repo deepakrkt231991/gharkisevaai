@@ -23,7 +23,7 @@ export type InteriorDesignInput = z.infer<typeof InteriorDesignInputSchema>;
 const InteriorDesignOutputSchema = z.object({
   suggestions: z.array(z.object({
     title: z.string().describe("The title of the suggestion, e.g., 'Directional Alignment', 'Contrast Strategy'."),
-    description: z.string().describe("A detailed description of the suggestion."),
+    description: z.string().describe("A detailed description of the suggestion. If relevant, include advice based on the estimated room size (e.g., 'For this 10x12 room, an L-shaped sofa is ideal.')."),
     impact: z.enum(['High', 'Medium', 'Low']).describe("The estimated impact of implementing this suggestion."),
     category: z.enum(['Vastu', 'Aesthetic', 'Lighting', 'Exterior', 'Landscaping']).describe("The category of the suggestion."),
   })).describe("A list of actionable suggestions for improving the room's layout, color scheme, decor, or the home's exterior and garden based on Vastu and modern design trends."),
@@ -43,9 +43,9 @@ const interiorDesignPrompt = ai.definePrompt({
   prompt: `You are an expert AI interior and exterior designer and Vastu consultant for the Indian and global market. You will be provided with a photo.
 
 Your tasks are:
-1.  **Analyze the Scene:** Determine if the image shows an interior room or an exterior (like a garden or building front).
+1.  **Analyze the Scene:** Determine if the image shows an interior room or an exterior (like a garden or building front). Try to estimate the room's dimensions (e.g., "This looks like a 10x12 foot room.").
 2.  **Provide Suggestions:** Based on your analysis, provide a list of actionable suggestions to improve the space. Each suggestion should have a title, description, impact level, and category.
-    -   **For Interiors:** Focus on making the space look larger, more appealing, incorporating modern design trends, and following basic Vastu principles (e.g., furniture placement, colors).
+    -   **For Interiors:** Focus on making the space look larger, more appealing, incorporating modern design trends, and following basic Vastu principles. Be specific with your suggestions. In the description, provide advice based on the estimated room size. For example, "For this 10x12 room, an L-shaped sofa in the south-west corner would optimize space and flow."
     -   **For Exteriors:** Suggest improvements for the building's facade, landscaping, gardening, flowering, and curb appeal.
     -   Suggestions should be practical and achievable.
 3.  **Identify Required Workers:** Based on your suggestions, list the types of skilled workers required to implement the changes (e.g., 'Painter', 'Carpenter', 'Electrician', 'Gardener').
