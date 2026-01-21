@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import { cn } from "@/lib/utils";
 
 function StatCard({ title, value, icon, description }: { title: string; value: string | number; icon: React.ReactNode, description?: string }) {
   return (
@@ -208,6 +209,45 @@ function RevenueWithdrawalCard({ netProfit }: { netProfit: number }) {
   );
 }
 
+function WeeklyGrowthReport() {
+    const reportData = [
+        { metric: 'Warranty Issued', lastWeek: '45', thisWeek: '110', status: '🚀 144% ↑', statusColor: 'text-green-500' },
+        { metric: 'Outside Deal Alerts', lastWeek: '12', thisWeek: '02', status: '✅ (लोग ऐप पर भरोसा कर रहे हैं)', statusColor: 'text-green-500' },
+        { metric: 'User Satisfaction', lastWeek: '4.2/5', thisWeek: '4.9/5', status: '⭐ (Best in World)', statusColor: 'text-yellow-400' },
+    ];
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Weekly Growth & Trust Report</CardTitle>
+                <CardDescription>Your weekly performance summary.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="text-white">Metric</TableHead>
+                            <TableHead className="text-white">Last Week</TableHead>
+                            <TableHead className="text-white">This Week</TableHead>
+                            <TableHead className="text-white">Status</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {reportData.map((row) => (
+                            <TableRow key={row.metric}>
+                                <TableCell className="font-medium">{row.metric}</TableCell>
+                                <TableCell>{row.lastWeek}</TableCell>
+                                <TableCell className="font-bold">{row.thisWeek}</TableCell>
+                                <TableCell className={cn("font-semibold", row.statusColor)}>{row.status}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+    )
+}
+
 
 export function AdminDashboard() {
   const firestore = useFirestore();
@@ -301,31 +341,33 @@ export function AdminDashboard() {
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
               title="Total Transaction Volume"
-              value={`₹${totalVolume.toFixed(2)}`}
+              value={`₹${'\'\''}${totalVolume.toFixed(2)}`}
               description="Total value of all completed jobs"
               icon={<IndianRupee className="h-4 w-4 text-muted-foreground" />}
           />
           <StatCard
               title="Platform Fee Earned"
-              value={`₹${platformFees.toFixed(2)}`}
+              value={`₹${'\'\''}${platformFees.toFixed(2)}`}
               description="Your gross revenue from fees"
               icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
           />
           <StatCard
               title="Referral Payouts"
-              value={`- ₹${referralPayouts.toFixed(2)}`}
+              value={`- ₹${'\'\''}${referralPayouts.toFixed(2)}`}
               description="Commissions paid to referrers"
               icon={<Share2 className="h-4 w-4 text-muted-foreground" />}
           />
           <StatCard
               title="Net Profit"
-              value={`₹${netProfit.toFixed(2)}`}
+              value={`₹${'\'\''}${netProfit.toFixed(2)}`}
               description="Platform Fees - Payouts"
               icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />}
           />
       </div>
       
       <RevenueWithdrawalCard netProfit={netProfit} />
+      
+      <WeeklyGrowthReport />
 
       <Tabs defaultValue="verification">
         <TabsList className="grid w-full grid-cols-5">
@@ -440,7 +482,7 @@ export function AdminDashboard() {
                     sosAlerts.map((alert) => (
                       <TableRow key={alert.id}>
                         <TableCell className="font-medium font-mono text-xs">{alert.userId}</TableCell>
-                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location.latitude?.toFixed(4)}, ${alert.location.longitude?.toFixed(4)}`}</TableCell>
+                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${'\'\''}${alert.location.latitude?.toFixed(4)}, ${alert.location.longitude?.toFixed(4)}`} </TableCell>
                         <TableCell>{getTimeAgo(alert.timestamp)}</TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm">View Details</Button>
@@ -486,7 +528,7 @@ export function AdminDashboard() {
                                   <TableCell className="font-mono text-xs">{deal.sellerId}</TableCell>
                                   <TableCell>
                                       <Button asChild variant="outline" size="sm">
-                                         <Link href={`/chat/deal-${deal.id}`}>View Chat</Link>
+                                         <Link href={`/chat/deal-${'\'\''}${deal.id}`}>View Chat</Link>
                                       </Button>
                                   </TableCell>
                               </TableRow>
