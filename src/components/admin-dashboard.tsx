@@ -341,25 +341,25 @@ export function AdminDashboard() {
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
               title="Total Transaction Volume"
-              value={`₹${'\'\''}${totalVolume.toFixed(2)}`}
+              value={`₹${totalVolume.toFixed(2)}`}
               description="Total value of all completed jobs"
               icon={<IndianRupee className="h-4 w-4 text-muted-foreground" />}
           />
           <StatCard
               title="Platform Fee Earned"
-              value={`₹${'\'\''}${platformFees.toFixed(2)}`}
+              value={`₹${platformFees.toFixed(2)}`}
               description="Your gross revenue from fees"
               icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
           />
           <StatCard
               title="Referral Payouts"
-              value={`- ₹${'\'\''}${referralPayouts.toFixed(2)}`}
+              value={`- ₹${referralPayouts.toFixed(2)}`}
               description="Commissions paid to referrers"
               icon={<Share2 className="h-4 w-4 text-muted-foreground" />}
           />
           <StatCard
               title="Net Profit"
-              value={`₹${'\'\''}${netProfit.toFixed(2)}`}
+              value={`₹${netProfit.toFixed(2)}`}
               description="Platform Fees - Payouts"
               icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />}
           />
@@ -482,7 +482,7 @@ export function AdminDashboard() {
                     sosAlerts.map((alert) => (
                       <TableRow key={alert.id}>
                         <TableCell className="font-medium font-mono text-xs">{alert.userId}</TableCell>
-                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${'\'\''}${alert.location.latitude?.toFixed(4)}, ${alert.location.longitude?.toFixed(4)}`} </TableCell>
+                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location.latitude?.toFixed(4)}, ${alert.location.longitude?.toFixed(4)}`} </TableCell>
                         <TableCell>{getTimeAgo(alert.timestamp)}</TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm">View Details</Button>
@@ -528,7 +528,7 @@ export function AdminDashboard() {
                                   <TableCell className="font-mono text-xs">{deal.sellerId}</TableCell>
                                   <TableCell>
                                       <Button asChild variant="outline" size="sm">
-                                         <Link href={`/chat/deal-${'\'\''}${deal.id}`}>View Chat</Link>
+                                         <Link href={`/chat/deal-${deal.id}`}>View Chat</Link>
                                       </Button>
                                   </TableCell>
                               </TableRow>

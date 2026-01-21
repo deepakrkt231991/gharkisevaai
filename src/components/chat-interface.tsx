@@ -422,5 +422,3 @@ export function ChatInterface({ chatId }: { chatId: string }) {
     );
 }
     
-
-    
