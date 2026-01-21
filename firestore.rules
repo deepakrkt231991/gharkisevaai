@@ -110,5 +110,14 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update, delete: if resource.data.ownerId == request.auth.uid;
     }
+
+    // DEALS Collection
+    // Buyer and Seller can get and update their deal.
+    match /deals/{dealId} {
+        allow create: if isSignedIn() && request.resource.data.buyerId == request.auth.uid;
+        allow get, update: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid);
+    }
   }
 }
+
+    

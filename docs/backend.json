@@ -336,6 +336,8 @@
         },
         "isReserved": { "type": "boolean", "description": "Whether an advance has been paid to reserve the item." },
         "isReservedEnabled": { "type": "boolean", "description": "Whether the seller allows reserving the item." },
+        "reservedUntil": { "type": "string", "format": "date-time", "description": "Timestamp until which the product is reserved." },
+        "activeDealId": { "type": "string", "description": "ID of the active deal if the item is reserved or sold." },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["productId", "ownerId", "name", "category", "price"]
@@ -369,6 +371,34 @@
         "vastuScore": { "type": "number", "description": "Vastu compliance score from 0 to 10." }
       },
       "required": ["propertyId", "ownerId", "title", "location", "price", "priceUnit", "sqft", "parking", "listingType"]
+    },
+    "Deal": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Deal",
+        "description": "Represents a marketplace transaction for a product.",
+        "type": "object",
+        "properties": {
+            "dealId": { "type": "string", "description": "Unique ID for the deal." },
+            "productId": { "type": "string" },
+            "sellerId": { "type": "string" },
+            "buyerId": { "type": "string" },
+            "productName": { "type": "string" },
+            "productImage": { "type": "string" },
+            "totalPrice": { "type": "number" },
+            "status": {
+            "type": "string",
+            "enum": ["negotiating", "reserved", "awaiting_shipment_payment", "awaiting_shipment", "shipped", "delivery_confirmed", "completed", "cancelled", "refunded"]
+            },
+            "advancePaid": { "type": "number" },
+            "finalPaymentPaid": { "type": "number" },
+            "deliveryMethod": { "type": "string", "enum": ["pickup", "courier"] },
+            "trackingNumber": { "type": "string" },
+            "createdAt": { "type": "string", "format": "date-time" },
+            "reservedAt": { "type": "string", "format": "date-time" },
+            "reservationExpiresAt": { "type": "string", "format": "date-time" },
+            "shippedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["dealId", "productId", "sellerId", "buyerId", "totalPrice", "status"]
     }
   },
   "auth": {
@@ -476,7 +506,17 @@
           "schema": { "$ref": "#/backend/entities/Property" },
           "description": "Stores property listings for the marketplace."
         }
+      },
+      {
+        "path": "/deals/{dealId}",
+        "definition": {
+          "entityName": "Deal",
+          "schema": { "$ref": "#/backend/entities/Deal" },
+          "description": "Stores all marketplace deals and their statuses."
+        }
       }
     ]
   }
 }
+
+    

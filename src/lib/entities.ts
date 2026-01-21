@@ -159,5 +159,28 @@ export interface Product {
     imageUrls?: string[];
     isReserved?: boolean;
     isReservedEnabled?: boolean;
+    reservedUntil?: any; // Firestore Timestamp
+    activeDealId?: string;
     createdAt?: any; // Firestore Timestamp
 }
+
+export interface Deal {
+    dealId: string;
+    productId: string;
+    sellerId: string;
+    buyerId: string;
+    productName?: string;
+    productImage?: string;
+    totalPrice: number;
+    status: "negotiating" | "reserved" | "awaiting_shipment_payment" | "awaiting_shipment" | "shipped" | "delivery_confirmed" | "completed" | "cancelled" | "refunded";
+    advancePaid?: number;
+    finalPaymentPaid?: number;
+    deliveryMethod?: "pickup" | "courier";
+    trackingNumber?: string;
+    createdAt?: any; // Firestore Timestamp
+    reservedAt?: any; // Firestore Timestamp
+    reservationExpiresAt?: any; // Firestore Timestamp
+    shippedAt?: any; // Firestore Timestamp
+}
+
+    
