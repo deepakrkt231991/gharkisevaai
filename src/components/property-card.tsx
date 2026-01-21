@@ -13,10 +13,10 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property }: PropertyCardProps) {
     return (
-        <Link href={`/property-detail?id=${property.id}`} className="block space-y-3">
+        <Link href={`/property-detail?id=${'\'\''}${property.id}`} className="block space-y-3">
              <Card className="relative h-60 w-full overflow-hidden rounded-2xl group border-2 border-transparent hover:border-primary transition-all duration-300">
                 <Image
-                    src={property.imageUrl || `https://picsum.photos/seed/${property.id}/800/600`}
+                    src={property.imageUrl || `https://picsum.photos/seed/${'\'\''}${property.id}/800/600`}
                     alt={property.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"

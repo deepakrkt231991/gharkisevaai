@@ -1,4 +1,3 @@
-
 'use client';
 import { useCollection, useMemoFirebase } from '@/firebase';
 import { useFirestore } from '@/firebase/provider';
@@ -71,12 +70,12 @@ export function ExploreMarketplace() {
     }
 
     const combinedSaleProperties = useMemo(() => {
-        const demoProperties: Property[] = PlaceHolderImages
+        const demoProperties: (Property & { id: string })[] = PlaceHolderImages
             .filter(p => p.type === 'property' && p.listingType === 'sale')
             .map(p => ({
                 id: p.id,
                 propertyId: p.id,
-                ownerId: `demo-user-${p.id}`,
+                ownerId: `demo-user-${'\'\''}${p.id}`,
                 title: p.title || 'Demo Sale Property',
                 location: p.location || 'Unknown Location',
                 price: p.price || 0,
@@ -96,12 +95,12 @@ export function ExploreMarketplace() {
     }, [saleProperties, userLat, userLon]);
 
     const combinedRentProperties = useMemo(() => {
-        const demoProperties: Property[] = PlaceHolderImages
+        const demoProperties: (Property & { id: string })[] = PlaceHolderImages
             .filter(p => p.type === 'property' && p.listingType === 'rent')
             .map(p => ({
                 id: p.id,
                 propertyId: p.id,
-                ownerId: `demo-user-${p.id}`,
+                ownerId: `demo-user-${'\'\''}${p.id}`,
                 title: p.title || 'Demo Rent Property',
                 location: p.location || 'Unknown Location',
                 price: p.price || 0,
@@ -136,7 +135,7 @@ export function ExploreMarketplace() {
         </Card>
     );
     
-    const PropertyList = ({properties, isLoading}: {properties: Property[], isLoading: boolean}) => (
+    const PropertyList = ({properties, isLoading}: {properties: (Property & { id: string })[], isLoading: boolean}) => (
         <div>
             <div className="flex justify-between items-center my-4">
                 <h2 className="text-xl font-bold font-headline text-white">Curated for You</h2>
@@ -217,6 +216,7 @@ export function ExploreMarketplace() {
                 <TabsContent value="sell" className="pt-6 space-y-6">
                     <AiPriceEstimatorCard />
                     <ListPropertyCtaCard />
+                    <PropertyList properties={combinedSaleProperties} isLoading={isSaleLoading} />
                 </TabsContent>
                 <TabsContent value="rent" className="pt-6 space-y-6">
                     <PropertyList properties={combinedRentProperties} isLoading={isRentLoading} />
