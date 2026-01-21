@@ -6,9 +6,9 @@ import { revalidatePath } from 'next/cache';
 import type { Product } from '@/lib/entities';
 
 // --- PLATFORM FEE & COMMISSION STRUCTURE ---
-// The final cost paid by the customer is the basis for all calculations.
-// A 7% platform fee is charged on the final cost. This fee is inclusive of GST.
-// The referral commission is 0.05% of the final cost, paid out to the referrer.
+// A 7% platform fee is charged on the final cost.
+// GST (18%) is calculated on top of the platform fee.
+// The referral commission is 0.05% of the final cost, paid out from the platform's earnings.
 
 const PLATFORM_FEE_PERCENTAGE = 0.07; // 7% fee on the total transaction value.
 const REFERRAL_COMMISSION_PERCENTAGE = 0.0005; // 0.05% of the total transaction value.
@@ -38,9 +38,9 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
         }
 
         // --- Fee & Tax Calculation ---
-        const platformFeeGross = finalCost * PLATFORM_FEE_PERCENTAGE;
-        const platformFeeNet = platformFeeGross / (1 + GST_PERCENTAGE);
-        const gstAmount = platformFeeGross - platformFeeNet;
+        const platformFeeNet = finalCost * PLATFORM_FEE_PERCENTAGE;
+        const gstAmount = platformFeeNet * GST_PERCENTAGE;
+        const platformFeeGross = platformFeeNet + gstAmount;
         const workerPayout = finalCost - platformFeeGross;
         const completionTimestamp = serverTimestamp();
 
@@ -207,9 +207,9 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
         if (finalCost <= 0) return { success: false, message: 'Final cost not set.' };
 
         // --- Fee & Tax Calculation ---
-        const platformFeeGross = finalCost * PLATFORM_FEE_PERCENTAGE;
-        const platformFeeNet = platformFeeGross / (1 + GST_PERCENTAGE);
-        const gstAmount = platformFeeGross - platformFeeNet;
+        const platformFeeNet = finalCost * PLATFORM_FEE_PERCENTAGE;
+        const gstAmount = platformFeeNet * GST_PERCENTAGE;
+        const platformFeeGross = platformFeeNet + gstAmount;
         const sellerPayout = finalCost - platformFeeGross;
         const completionTimestamp = serverTimestamp();
 

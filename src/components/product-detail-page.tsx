@@ -37,7 +37,7 @@ function ReserveButton({ product, isReserved } : { product: Product, isReserved?
   return (
     <Button type="submit" disabled={pending || isReserved} className="w-full">
       {pending ? <Loader2 className="mr-2 animate-spin" /> : <Lock className="mr-2"/>}
-      Pay ₹{(product.price * 0.20).toLocaleString('en-IN')} to Reserve (10 Days)
+      Pay ₹{(product.price * 0.07).toLocaleString('en-IN')} to Reserve (10 Days)
     </Button>
   )
 }
@@ -228,5 +228,3 @@ export function ProductDetailPage() {
     </div>
   );
 }
-
-    

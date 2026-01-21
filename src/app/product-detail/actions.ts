@@ -26,7 +26,7 @@ export async function reserveProduct(productId: string, product: Product, userId
             productName: product.name,
             productImage: product.imageUrls?.[0] || '',
             totalPrice: product.price,
-            advancePaid: product.price * 0.20,
+            advancePaid: product.price * 0.07,
             status: 'reserved',
             createdAt: serverTimestamp(),
             reservedAt: serverTimestamp(),
@@ -48,6 +48,3 @@ export async function reserveProduct(productId: string, product: Product, userId
         return { success: false, message: e.message };
     }
 }
-
-    
-    

@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
     {
       title: "Payment Safety",
       icon: <Shield className="h-6 w-6" />,
-      content: "हम स्ट्राइप/रेज़रपे और 'Safe Vault' का उपयोग करते हैं। बायर का 5% बुकिंग अमाउंट और 95% वर्क-डन पेमेंट पूरी तरह सुरक्षित रहता है।",
+      content: "हम स्ट्राइप/रेज़रपे और 'Safe Vault' का उपयोग करते हैं। बायर का 7% बुकिंग अमाउंट और 93% वर्क-डन पेमेंट पूरी तरह सुरक्षित रहता है।",
     },
     {
       title: "Third-Party Ads",
