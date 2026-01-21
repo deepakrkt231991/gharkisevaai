@@ -2,8 +2,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- PUBLIC-READ COLLECTIONS ---
+    // =====================================================================
+    // PUBLIC-READ COLLECTIONS
     // Anyone can read or list these collections, even without being logged in.
+    // =====================================================================
     match /properties/{docId} {
       allow get, list: if true;
       allow write: if request.auth != null;
@@ -24,6 +26,16 @@ service cloud.firestore {
       allow get, list: if true;
       allow write: if false; // Managed via Firebase Console
     }
+     match /app_settings/{docId} {
+        allow read: if true;
+        allow write: if false; // Managed via Firebase Console
+    }
+
+
+    // =====================================================================
+    // USER-OWNED & PROTECTED COLLECTIONS
+    // Access is restricted based on authentication and ownership.
+    // =====================================================================
 
     // --- USER-OWNED COLLECTIONS ---
     // Users can only access their own documents.
@@ -76,12 +88,6 @@ service cloud.firestore {
     match /legal_agreements/{agreementId} {
       allow read: if isParty(resource);
       allow create: if request.auth != null;
-    }
-
-     // --- App settings should be admin-only or read-only ---
-    match /app_settings/{docId} {
-        allow read: if true;
-        allow write: if false; // Managed via Firebase Console
     }
   }
 }
