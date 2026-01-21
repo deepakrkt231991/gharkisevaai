@@ -2,7 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Bell, Palette, Moon } from 'lucide-react';
+import { Bell, Palette, Moon, Smartphone } from 'lucide-react';
+import { AppWebSwitch } from './app-web-switch';
 
 export function AppSettings() {
   return (
@@ -50,6 +51,25 @@ export function AppSettings() {
           </div>
         </CardContent>
       </Card>
+
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="font-headline text-white flex items-center gap-2">
+            <Smartphone />
+            App Mode
+          </CardTitle>
+          <CardDescription>Install the app or open it in your browser.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+           <div className="flex items-center justify-between p-3 bg-black/20 rounded-lg border border-border">
+            <Label htmlFor="app-mode" className="font-semibold text-white flex items-center gap-2">
+              Install / Open in Browser
+            </Label>
+            <AppWebSwitch />
+          </div>
+        </CardContent>
+      </Card>
+
     </div>
   );
 }

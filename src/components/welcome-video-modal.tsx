@@ -3,43 +3,37 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from './ui/button';
-import { PlayCircle } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 export function WelcomeVideoModal() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const hasSeenVideo = localStorage.getItem('hasSeenWelcomeVideo');
-    if (!hasSeenVideo) {
+    // Check if running in standalone mode (PWA) and if welcome has been shown
+    const isPwa = window.matchMedia('(display-mode: standalone)').matches;
+    const hasSeenWelcome = localStorage.getItem('hasSeenPwaWelcome');
+    
+    if (isPwa && !hasSeenWelcome) {
       setIsOpen(true);
     }
   }, []);
 
   const handleClose = () => {
-    localStorage.setItem('hasSeenWelcomeVideo', 'true');
+    localStorage.setItem('hasSeenPwaWelcome', 'true');
     setIsOpen(false);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-xl glass-card">
+      <DialogContent className="max-w-md glass-card">
         <DialogHeader>
-          <DialogTitle className="font-headline text-2xl text-white flex items-center gap-2"><PlayCircle /> Welcome to Ghar Ki Seva AI!</DialogTitle>
-          <DialogDescription>
-            Watch this quick 1-minute guide to understand how our secure marketplace works.
+          <DialogTitle className="font-headline text-2xl text-white flex items-center gap-2">
+            <Home /> नमस्ते! Ghar Ki Seva में आपका स्वागत है। 🏠✨
+          </DialogTitle>
+          <DialogDescription className="pt-2 text-muted-foreground">
+            अब आपकी हर घर-सेवा और खरीद-बिक्री 100% सुरक्षित है। हमने आपके लिए AI Consultant और Safe Vault तैयार कर दिया है। चलिए, अपना पहला अनुभव शुरू करें!
           </DialogDescription>
         </DialogHeader>
-        <div className="aspect-video w-full rounded-lg overflow-hidden bg-black mt-4">
-          {/* In a real app, replace this with your actual video file or an embed */}
-          <video
-            src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" // Placeholder video
-            controls
-            autoPlay
-            muted
-            loop
-            className="w-full h-full"
-          />
-        </div>
         <div className="mt-4">
             <Button onClick={handleClose} className="w-full">
                 Get Started
