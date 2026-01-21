@@ -1,8 +1,85 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+    // --- Public Collections ---
+    // Anyone can view properties, products, tools, and workers.
+    match /properties/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /products/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /tools/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /workers/{docId} {
+      // Anyone can read worker profiles
+      allow read: if true;
+      // Only the worker themselves can edit their profile.
+      allow update: if request.auth != null && request.auth.uid == docId;
+      // Disallow direct creation/deletion from client for safety. This should be an admin/server function.
+      allow create, delete: if false; 
+    }
+    match /banners/{docId} {
+      allow read: if true;
+      allow write: if false; // Admin-only
+    }
+    match /app_settings/{docId} {
+      allow read: if true;
+      allow write: if false; // Admin-only
+    }
+
+    // --- Private & User-Specific Collections ---
+    match /users/{userId} {
+      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+    match /health/{healthId} {
+      // Only the user who owns the health record can access it
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // --- Transaction & SOS (Admin/System readable but client-secured) ---
+    match /transactions/{transactionId} {
+      // Only the user associated with the transaction can read it. Writing is server-side.
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow write, delete: if false;
+    }
+    match /sos_alerts/{alertId} {
+        // Only the user who created it can access it.
+        allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // --- Two-Party & Multi-Party Rules ---
+    function isPartyToDeal(resource) {
+        return request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId;
+    }
+    function isPartyToJob(resource) {
+        return request.auth.uid == resource.data.customerId || request.auth.uid == resource.data.workerId;
+    }
+     function isPartyToRental(resource) {
+        return request.auth.uid == resource.data.renterId || request.auth.uid == resource.data.ownerId;
+    }
+
+    match /deals/{dealId} {
+      allow read, update: if request.auth != null && isPartyToDeal(resource);
+      // Only the buyer can create the initial deal document when reserving
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.buyerId;
+    }
+    match /rentals/{rentalId} {
+       allow read, update: if request.auth != null && isPartyToRental(resource);
+       allow create: if request.auth != null && request.auth.uid == request.resource.data.renterId;
+    }
+    match /jobs/{jobId} {
+        allow read, update: if request.auth != null && isPartyToJob(resource);
+        allow create: if request.auth != null && request.auth.uid == request.resource.data.customerId;
+    }
+    match /legal_agreements/{agreementId} {
+         allow read: if request.auth != null && isPartyToDeal(resource); // Assumes dealId is present
+         allow create, update: if request.auth != null; 
     }
   }
 }
