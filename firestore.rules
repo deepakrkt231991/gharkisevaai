@@ -15,7 +15,7 @@ service cloud.firestore {
     // USERS Collection
     // Public profiles can be viewed by anyone. Only owner can write.
     match /users/{userId} {
-      allow get, list: if true;
+      allow read: if true;
       allow write: if isOwner(userId);
     }
 
@@ -33,7 +33,7 @@ service cloud.firestore {
     // Public worker profiles can be viewed by anyone.
     // Only the owner can create/update their own profile.
     match /workers/{workerId} {
-      allow get, list: if true;
+      allow read: if true;
       allow create, update: if isOwner(workerId);
     }
 
@@ -47,7 +47,7 @@ service cloud.firestore {
     // TOOLS Collection
     // Anyone can see available tools. Workers can add/update their own tools.
     match /tools/{toolId} {
-        allow get, list: if true;
+        allow read: if true;
         allow create, update: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
         allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
@@ -80,14 +80,14 @@ service cloud.firestore {
     // APP_SETTINGS Collection
     // Anyone can read app settings. Only backend should write.
     match /app_settings/{docId} {
-        allow get, list: if true;
+        allow read: if true;
         allow write: if false; // Should only be written by a backend process/Cloud Function
     }
     
     // BANNERS Collection
     // All users can read the banners. Only backend should write.
     match /banners/{bannerId} {
-        allow get, list: if true;
+        allow read: if true;
         allow write: if false; // Should only be written by a backend process/Cloud Function
     }
 
@@ -104,7 +104,7 @@ service cloud.firestore {
     // Authenticated users can create their own products.
     // Owners can update/delete their products.
     match /products/{productId} {
-      allow get, list: if true;
+      allow read: if true;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
@@ -112,7 +112,7 @@ service cloud.firestore {
     // PROPERTIES Collection
     // Anyone can view property listings. Authenticated users can create their own.
     match /properties/{propertyId} {
-      allow get, list: if true;
+      allow read: if true;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update, delete: if resource.data.ownerId == request.auth.uid;
     }
