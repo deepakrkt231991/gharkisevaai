@@ -16,7 +16,7 @@ service cloud.firestore {
     // Any signed-in user can view a profile, but only the owner can write.
     match /users/{userId} {
       allow get: if isSignedIn();
-      allow list: if false; // Do not allow listing all users for security.
+      allow list: if isSignedIn(); // Allow listing users for seller info
       allow write: if isOwner(userId);
     }
 
@@ -120,4 +120,5 @@ service cloud.firestore {
   }
 }
 
+    
     
