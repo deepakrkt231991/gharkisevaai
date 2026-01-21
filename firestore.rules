@@ -2,8 +2,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- PUBLIC-READ, AUTH-WRITE COLLECTIONS ---
-    // Anyone can read these, but only logged-in users can write.
+    // --- PUBLIC-READ COLLECTIONS ---
+    // Anyone can read these collections.
     match /properties/{docId} {
       allow read: if true;
       allow write: if request.auth != null;
@@ -24,22 +24,29 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false; // Managed via Firebase Console
     }
-    
+
     // --- USER-OWNED COLLECTIONS ---
     // Users can only access their own documents.
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-    
+     match /health/{healthId} {
+       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
     // --- TRANSACTION & SENSITIVE DATA ---
-    // Only the user involved in a transaction can read it. No one can create/update directly.
+    // Only the user involved can read. No one can create/update directly.
     match /transactions/{transactionId} {
       allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create, update, delete: if false; // Created via server actions only
+      allow create, update, delete: if false; // Created via server actions
     }
-    
+     match /sos_alerts/{alertId} {
+       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+
     // --- TWO-PARTY DATA (DEALS, JOBS, RENTALS) ---
-    // Only the parties involved in a transaction can access the data.
+    // Only the parties involved can access the data.
     function isParty(resource) {
       return request.auth != null && (
         request.auth.uid == resource.data.buyerId ||
@@ -69,6 +76,12 @@ service cloud.firestore {
     match /legal_agreements/{agreementId} {
       allow read: if isParty(resource);
       allow create: if request.auth != null;
+    }
+
+     // --- App settings should be admin-only or read-only ---
+    match /app_settings/{docId} {
+        allow read: if true;
+        allow write: if false; // Managed via Firebase Console
     }
   }
 }
