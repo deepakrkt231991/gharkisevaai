@@ -7,10 +7,10 @@ import type { Product } from '@/lib/entities';
 
 // --- PLATFORM FEE & COMMISSION STRUCTURE ---
 // The final cost paid by the customer is the basis for all calculations.
-// A 5% platform fee is charged on the final cost. This fee is inclusive of GST.
+// A 7% platform fee is charged on the final cost. This fee is inclusive of GST.
 // The referral commission is 0.05% of the final cost, paid out to the referrer.
 
-const PLATFORM_FEE_PERCENTAGE = 0.05; // 5% fee on the total transaction value.
+const PLATFORM_FEE_PERCENTAGE = 0.07; // 7% fee on the total transaction value.
 const REFERRAL_COMMISSION_PERCENTAGE = 0.0005; // 0.05% of the total transaction value.
 const GST_PERCENTAGE = 0.18; // 18% GST applied on the net platform fee.
 
