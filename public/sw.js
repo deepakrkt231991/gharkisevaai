@@ -1,23 +1,37 @@
-'use strict';
+const CACHE_NAME = 'grihseva-ai-pwa-cache-v1';
 
-self.addEventListener('install', (event) => {
-  console.log('Service Worker: Install');
-  // Skip waiting to activate new service worker immediately.
-  event.waitUntil(self.skipWaiting());
+// On install, we don't pre-cache anything to keep it simple and avoid caching old data.
+// The app will be cached on first visit.
+self.addEventListener('install', (e) => {
+  console.log('[Service Worker] Install');
 });
 
-self.addEventListener('activate', (event) => {
-  console.log('Service Worker: Activate');
-  // Take control of all clients immediately.
-  event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('fetch', (event) => {
-  // Basic network-first strategy
-  event.respondWith(
-    fetch(event.request).catch(() => {
-      // You can add an offline page fallback here
-      // For now, just let the browser handle the error
+// On fetch, use a cache-then-network strategy
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    caches.match(e.request).then((r) => {
+      return r || fetch(e.request).then((response) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          // Do not cache API calls from genkit or other dynamic resources
+          if (!e.request.url.includes('/genkit.dev') && e.request.method === 'GET') {
+            cache.put(e.request, response.clone());
+          }
+          return response;
+        });
+      });
     })
   );
+});
+
+// On activate, clean up old caches
+self.addEventListener('activate', (e) => {
+    e.waitUntil(
+        caches.keys().then((keyList) => {
+            return Promise.all(keyList.map((key) => {
+                if(key !== CACHE_NAME) {
+                    return caches.delete(key);
+                }
+            }));
+        })
+    );
 });
