@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { cn } from '@/lib/utils';
 import { useDoc, useCollection, useMemoFirebase, useUser, useFirestore } from '@/firebase';
 import { doc, collection, query, orderBy, serverTimestamp, addDoc, updateDoc } from 'firebase/firestore';
-import type { Job, User as UserEntity, Tool, Rental, Property } from '@/lib/entities';
+import type { Job, User as UserEntity, Tool, Rental, Property, Product } from '@/lib/entities';
 import React, { useState, useEffect } from 'react';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +18,7 @@ import { Separator } from './ui/separator';
 
 
 type OtherUser = Partial<UserEntity> & { id: string, photoURL?: string, displayName?: string };
-type ContextDoc = (Job | Tool | Property | Rental) & { id: string };
+type ContextDoc = (Job | Tool | Property | Rental | Product) & { id: string };
 
 const AiSuggestions = () => (
     <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
@@ -100,7 +100,7 @@ const InvoiceCard = ({ job, contextType }: { job: Job, contextType: string }) =>
 };
 
 
-const DealFlowControls = ({ context, docId, contextType }: { context: ContextDoc | null, docId: string, contextType: 'job' | 'tool' | 'property' | 'unknown' }) => {
+const DealFlowControls = ({ context, docId, contextType }: { context: ContextDoc | null, docId: string, contextType: 'job' | 'tool' | 'property' | 'product' | 'unknown' }) => {
     const { user } = useUser();
     const firestore = useFirestore();
     const { toast } = useToast();
@@ -171,7 +171,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
     const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
-    const [contextType, setContextType] = useState<'job' | 'tool' | 'property' | 'unknown'>('unknown');
+    const [contextType, setContextType] = useState<'job' | 'tool' | 'property' | 'product' | 'unknown'>('unknown');
     const [contextDoc, setContextDoc] = useState<ContextDoc | null>(null);
     const [contextLoading, setContextLoading] = useState(true);
 
@@ -179,22 +179,23 @@ export function ChatInterface({ chatId }: { chatId: string }) {
     useEffect(() => {
         if (!chatId) return;
         setContextLoading(true);
-        const [type, id] = chatId.split('-');
-        if (type === 'job' || type === 'tool' || type === 'property') {
-            setContextType(type as 'job' | 'tool' | 'property');
+        const [type, ...idParts] = chatId.split('-');
+        if (type === 'job' || type === 'tool' || type === 'property' || type === 'product') {
+            setContextType(type as 'job' | 'tool' | 'property' | 'product');
         } else {
             setContextType('unknown');
         }
         setContextLoading(false);
     }, [chatId]);
 
-    // Fetch context document (Job, Tool, Property)
+    // Fetch context document (Job, Tool, Property, Product)
     const contextDocRef = useMemoFirebase(() => {
         if (!firestore || contextLoading || contextType === 'unknown') return null;
         const id = chatId.split('-').slice(1).join('-');
         if (contextType === 'job') return doc(firestore, 'jobs', id);
         if (contextType === 'tool') return doc(firestore, 'tools', id);
         if (contextType === 'property') return doc(firestore, 'properties', id);
+        if (contextType === 'product') return doc(firestore, 'products', id);
         return null;
     }, [firestore, chatId, contextType, contextLoading]);
     const { data: fetchedContextDoc, isLoading: isContextDocLoading } = useDoc<ContextDoc>(contextDocRef);
@@ -223,8 +224,8 @@ export function ChatInterface({ chatId }: { chatId: string }) {
     const otherUserId = useMemoFirebase(() => {
         if (!contextDoc || !user) return null;
         if (contextType === 'job') return (contextDoc as Job).workerId;
-        if (contextType === 'tool' || contextType === 'property') {
-            const ownerId = (contextDoc as Tool | Property).ownerId;
+        if (contextType === 'tool' || contextType === 'property' || contextType === 'product') {
+            const ownerId = (contextDoc as Tool | Property | Product).ownerId;
             // If current user is the owner, other user is the renter/buyer (need to get from chat/rental doc)
             // For now, assume current user is NOT the owner.
             return user.uid === ownerId ? (contextDoc as Rental)?.renterId : ownerId;
@@ -275,6 +276,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
             case 'job': return (otherUser as UserEntity)?.skills?.[0] || 'Worker';
             case 'tool': return 'Tool Owner';
             case 'property': return 'Property Owner';
+            case 'product': return 'Seller';
             default: return 'User';
         }
     }
@@ -284,6 +286,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
             case 'job': return (contextDoc as Job)?.ai_diagnosis || 'Service Request';
             case 'tool': return (contextDoc as Tool)?.name || 'Tool Rental';
             case 'property': return (contextDoc as Property)?.title || 'Property Inquiry';
+            case 'product': return (contextDoc as Product)?.name || 'Product Inquiry';
             default: return 'Conversation';
         }
     }

@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { ImagePlaceholder } from '@/lib/placeholder-images';
+import Link from 'next/link';
 
 const CarouselDots = ({ count, activeIndex }: { count: number, activeIndex: number }) => (
     <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2">
@@ -140,7 +141,11 @@ export function ProductDetailPage() {
           
           <div className="grid grid-cols-2 gap-3">
             <Button variant="outline" className="h-14 text-base border-primary text-primary"><Phone className="mr-2"/> Call Seller</Button>
-            <Button className="h-14 text-base bg-primary text-primary-foreground"><MessageSquare className="mr-2"/> Message</Button>
+            <Button asChild className="h-14 text-base bg-primary text-primary-foreground">
+              <Link href={`/chat/product-${productId}`}>
+                  <MessageSquare className="mr-2"/> Message
+              </Link>
+            </Button>
           </div>
 
            <Card className="glass-card border-primary/50">
@@ -157,47 +162,8 @@ export function ProductDetailPage() {
                 <ArrowRight className="text-muted-foreground"/>
             </CardContent>
            </Card>
-
-           {/* Quick Reply Buttons */}
-           <div className="flex gap-2 overflow-x-auto pb-2">
-                <Button variant="secondary" size="sm" className="rounded-full bg-card h-8 whitespace-nowrap">Is this still available?</Button>
-                <Button variant="secondary" size="sm" className="rounded-full bg-card h-8 whitespace-nowrap">What's the condition?</Button>
-                <Button variant="secondary" size="sm" className="rounded-full bg-card h-8 whitespace-nowrap">Can you deliver?</Button>
-           </div>
-           
-           <div className="text-center text-xs text-muted-foreground font-medium uppercase">TODAY</div>
-        </div>
-        
-        {/* Chat Messages */}
-        <div className="px-4 space-y-6 pb-4">
-            {messages.map((msg) => (
-                <div key={msg.id} className={`flex flex-col ${msg.sender === 'me' ? 'items-end' : 'items-start'}`}>
-                    <div className={`max-w-xs lg:max-w-md p-3 rounded-2xl ${msg.sender === 'me' ? 'bg-primary text-white rounded-br-none' : 'bg-card rounded-bl-none'}`}>
-                        <p>{msg.text}</p>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground mt-1 px-1">{msg.time}</p>
-                </div>
-            ))}
         </div>
       </main>
-
-      {/* Chat Input Footer */}
-      <footer className="sticky bottom-0 z-10 p-4 bg-background/90 backdrop-blur-md border-t border-border">
-        <div className="flex items-center gap-2">
-          <Button size="icon" variant="secondary" className="rounded-full h-12 w-12 bg-card">
-              <Plus className="w-6 h-6"/>
-          </Button>
-          <div className="relative flex-1">
-              <Input placeholder={`Message ${seller.name}...`} className="pr-12 bg-card h-12 rounded-full"/>
-              <Button size="icon" variant="ghost" className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10">
-                  <Smile className="w-6 h-6 text-muted-foreground"/>
-              </Button>
-          </div>
-            <Button size="icon" variant="default" className="rounded-full h-12 w-12 bg-primary">
-              <Send className="w-6 h-6"/>
-          </Button>
-        </div>
-      </footer>
     </div>
   );
 }
