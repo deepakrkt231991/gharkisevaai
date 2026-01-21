@@ -38,7 +38,7 @@ const AiSuggestions = () => (
 const InvoiceCard = ({ job, contextType }: { job: Job, contextType: string }) => {
     const { toast } = useToast();
 
-    if (contextType !== 'job' || job.status !== 'completed') {
+    if (!job || contextType !== 'job' || job.status !== 'completed') {
         return null;
     }
 
