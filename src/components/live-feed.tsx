@@ -55,13 +55,15 @@ export function LiveFeed() {
     const { data: allWorkers, isLoading: isWorkersLoading } = useCollection<Worker>(workersQuery);
 
     // --- Filtering and Fallback Logic ---
-    const getFilteredAndSortedItems = <T extends { geo?: { latitude: number; longitude: number; } } | { location?: { latitude: number; longitude: number; } }>(items: (T & {id: string})[] | null) => {
+    const getFilteredAndSortedItems = <T extends { geo?: { latitude: number; longitude: number; } } | { location?: any }>(items: (T & {id: string})[] | null) => {
         if (!items || isGeoLoading) return { displayItems: items || [], isNearby: false };
         if (!userLat || !userLon) return { displayItems: items, isNearby: false };
 
         const nearby = items.filter(item => {
             const loc = (item as any).geo || (item as any).location;
-            if (!loc?.latitude || !loc?.longitude) return false;
+            if (!loc || typeof loc.latitude !== 'number' || typeof loc.longitude !== 'number') {
+                return false; // Cannot determine distance for this item
+            }
             const dist = calculateDistance(userLat, userLon, loc.latitude, loc.longitude);
             return dist <= DISTANCE_KM;
         });
@@ -72,26 +74,58 @@ export function LiveFeed() {
         
         return { displayItems: items, isNearby: false }; // Fallback to global
     };
+    
+    // --- Merging and Filtering Data ---
+    const { displayItems: propertiesToShow, isNearby: propertiesAreNearby } = useMemo(() => {
+        const demoData = PlaceHolderImages.filter(p => p.type === 'property').map(p => ({
+             ...p,
+             id: p.id,
+             propertyId: p.id,
+             ownerId: `demo-user-${p.id}`,
+             listingType: p.listingType as any || 'sale',
+             geo: { latitude: 0, longitude: 0 }, // Add placeholder geo
+             createdAt: null,
+        }));
+        const realIds = new Set(allProperties?.map(p => p.id));
+        const uniqueDemos = demoData.filter(p => !realIds.has(p.id));
+        const combined = [...(allProperties || []), ...uniqueDemos];
+        return getFilteredAndSortedItems(combined as any);
+    }, [allProperties, userLat, userLon, isGeoLoading]);
 
-    const { displayItems: propertiesToShow, isNearby: propertiesAreNearby } = useMemo(() => getFilteredAndSortedItems(allProperties), [allProperties, userLat, userLon, isGeoLoading]);
-    const { displayItems: productsToShow, isNearby: productsAreNearby } = useMemo(() => getFilteredAndSortedItems(allProducts), [allProducts, userLat, userLon, isGeoLoading]);
-    const { displayItems: workersToShowRaw, isNearby: workersAreNearby } = useMemo(() => getFilteredAndSortedItems(allWorkers), [allWorkers, userLat, userLon, isGeoLoading]);
+    const { displayItems: productsToShow, isNearby: productsAreNearby } = useMemo(() => {
+        const demoData = PlaceHolderImages.filter(p => p.type === 'product').map(p => ({
+             ...p,
+             id: p.id,
+             productId: p.id,
+             ownerId: 'demo-user-' + p.id,
+             imageUrls: p.imageUrl ? [p.imageUrl] : [],
+             createdAt: null,
+        }));
+        const realIds = new Set(allProducts?.map(p => p.id));
+        const uniqueDemos = demoData.filter(p => !realIds.has(p.id));
+        const combined = [...(allProducts || []), ...uniqueDemos];
+        return getFilteredAndSortedItems(combined as any);
+    }, [allProducts, userLat, userLon, isGeoLoading]);
 
-    // Merge workers with placeholders
-    const workersToShow = useMemo(() => {
-        const demoWorkers = PlaceHolderImages.filter(p => p.type === 'worker');
-        const realWorkerIds = new Set(workersToShowRaw?.map(w => w.id));
-        const uniqueDemoWorkers = demoWorkers.filter(p => !realWorkerIds.has(p.id));
-        const combined = [...(workersToShowRaw || []), ...uniqueDemoWorkers];
-        return combined.slice(0, 10);
-    }, [workersToShowRaw]);
+    const { displayItems: workersToShow, isNearby: workersAreNearby } = useMemo(() => {
+        const demoData = PlaceHolderImages.filter(p => p.type === 'worker').map(p => ({
+            ...p,
+            id: p.id,
+            location: { latitude: 0, longitude: 0 }, // Add placeholder location
+            createdAt: null,
+        }));
+        const realIds = new Set(allWorkers?.map(w => w.id));
+        const uniqueDemos = demoData.filter(p => !realIds.has(p.id));
+        const combined = [...(allWorkers || []), ...uniqueDemos];
+        return getFilteredAndSortedItems(combined as any);
+    }, [allWorkers, userLat, userLon, isGeoLoading]);
     
     return (
         <div className="space-y-8">
             <LiveFeedSection title={propertiesAreNearby ? "Homes Near You" : "Latest Homes"} link="/explore" isLoading={isPropertiesLoading} count={propertiesToShow.length}>
                 {propertiesToShow.map(prop => (
                     <div key={prop.id} className="w-80 flex-shrink-0">
-                        <PropertyCard property={prop} />
+                        <PropertyCard property={prop as any} />
                     </div>
                 ))}
             </LiveFeedSection>
@@ -99,7 +133,7 @@ export function LiveFeed() {
             <LiveFeedSection title={productsAreNearby ? "Products Near You" : "Latest Products"} link="/marketplace" isLoading={isProductsLoading} count={productsToShow.length}>
                 {productsToShow.map(prod => (
                     <div key={prod.id} className="w-56 flex-shrink-0">
-                        <ProductCard product={prod} />
+                        <ProductCard product={prod as any} />
                     </div>
                 ))}
             </LiveFeedSection>
