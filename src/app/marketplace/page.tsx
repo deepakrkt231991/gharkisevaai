@@ -220,18 +220,18 @@ export default function MarketplacePage() {
                                 <Button
                                     onClick={scrollPrev}
                                     disabled={prevBtnDisabled}
-                                    variant="ghost"
+                                    variant="outline"
                                     size="icon"
-                                    className="absolute -left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/50 hover:bg-background"
+                                    className="absolute -left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background z-10"
                                 >
                                     <ArrowLeft size={16} />
                                 </Button>
                                 <Button
                                     onClick={scrollNext}
                                     disabled={nextBtnDisabled}
-                                    variant="ghost"
+                                    variant="outline"
                                     size="icon"
-                                    className="absolute -right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/50 hover:bg-background"
+                                    className="absolute -right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background z-10"
                                 >
                                     <ArrowRight size={16} />
                                 </Button>

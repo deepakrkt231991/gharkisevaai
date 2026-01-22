@@ -52,7 +52,7 @@ const LiveFeedSection = ({ title, link, items, renderItem, isLoading }: { title:
                 <h3 className="text-xl font-bold font-headline text-white">{title}</h3>
                 <div className="flex items-center gap-2">
                      {items.length > 2 && (
-                        <div className="hidden md:flex items-center gap-1">
+                        <div className="flex items-center gap-1">
                             <Button onClick={scrollPrev} variant="outline" size="icon" className="h-8 w-8 rounded-full" disabled={prevBtnDisabled}>
                                 <ArrowLeft size={16} />
                             </Button>
