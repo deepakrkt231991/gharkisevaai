@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Bell, ShoppingBag, Search, SlidersHorizontal, Plus, Heart, MessageSquare, User, MapPin } from 'lucide-react';
+import { Home, Bell, ShoppingBag, Search, SlidersHorizontal, Plus, Heart, MessageSquare, User, MapPin, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
@@ -12,6 +12,8 @@ import type { Product } from '@/lib/entities';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ProductCard } from '@/components/product-card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
 
 const MarketplaceHeader = () => (
      <header className="sticky top-0 z-40 flex flex-col gap-4 bg-background/80 p-4 backdrop-blur-md border-b border-border">
@@ -84,6 +86,27 @@ const MarketplaceBottomNav = () => {
     )
 }
 
+// New CTA Card component
+const ListItemCtaCard = () => (
+    <Card className="glass-card mt-6">
+        <CardContent className="p-5 space-y-3 text-center">
+             <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit">
+                <Tag className="w-8 h-8 text-primary"/>
+            </div>
+            <h3 className="text-xl font-bold font-headline text-white">Ready to Sell Your Items?</h3>
+            <p className="text-sm text-muted-foreground">
+                List your used furniture, electronics, and appliances on GrihSeva AI to reach thousands of buyers. Our AI tools will help you get the best price.
+            </p>
+            <Button asChild className="mt-2">
+                <Link href="/list-item">
+                    List Your Item Now
+                </Link>
+            </Button>
+        </CardContent>
+    </Card>
+);
+
+
 export default function MarketplacePage() {
     const firestore = useFirestore();
     
@@ -146,29 +169,46 @@ export default function MarketplacePage() {
             <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
                 <MarketplaceHeader />
                 <main className="flex-1 space-y-6 overflow-y-auto p-4 pb-32">
-                    <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-                        <Button onClick={() => setActiveFilter('All Items')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'All Items' ? 'default' : 'secondary'}>ALL ITEMS</Button>
-                        <Button onClick={() => setActiveFilter('Furniture')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Furniture' ? 'default' : 'secondary'}>FURNITURE</Button>
-                        <Button onClick={() => setActiveFilter('Electronics')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Electronics' ? 'default' : 'secondary'}>ELECTRONICS</Button>
-                        <Button onClick={() => setActiveFilter('Appliances')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Appliances' ? 'default' : 'secondary'}>APPLIANCES</Button>
-                    </div>
-                    {isLoading ? (
-                        <div className="grid grid-cols-2 gap-4">
-                            {[...Array(4)].map((_, i) => (
-                                <div key={i} className="space-y-2">
-                                    <Skeleton className="h-56 w-full rounded-xl" />
-                                    <Skeleton className="h-4 w-3/4" />
-                                    <Skeleton className="h-4 w-1/2" />
+                    <Tabs defaultValue="buy" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2 bg-card h-14 rounded-xl p-1">
+                             <TabsTrigger value="buy" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
+                                <ShoppingBag /> Buy Items
+                            </TabsTrigger>
+                            <TabsTrigger value="sell" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
+                                <Tag /> Sell Items
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="buy" className="pt-6 space-y-6">
+                            <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+                                <Button onClick={() => setActiveFilter('All Items')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'All Items' ? 'default' : 'secondary'}>ALL ITEMS</Button>
+                                <Button onClick={() => setActiveFilter('Furniture')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Furniture' ? 'default' : 'secondary'}>FURNITURE</Button>
+                                <Button onClick={() => setActiveFilter('Electronics')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Electronics' ? 'default' : 'secondary'}>ELECTRONICS</Button>
+                                <Button onClick={() => setActiveFilter('Appliances')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Appliances' ? 'default' : 'secondary'}>APPLIANCES</Button>
+                            </div>
+                            {isLoading ? (
+                                <div className="grid grid-cols-2 gap-4">
+                                    {[...Array(4)].map((_, i) => (
+                                        <div key={i} className="space-y-2">
+                                            <Skeleton className="h-56 w-full rounded-xl" />
+                                            <Skeleton className="h-4 w-3/4" />
+                                            <Skeleton className="h-4 w-1/2" />
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-2 gap-4">
-                            {filteredProducts.length > 0 ? filteredProducts.map(product => (
-                                <ProductCard key={product.id} product={product as Product & { id: string }} />
-                            )) : <p className="col-span-2 text-center text-muted-foreground py-10">No products found in this category.</p>}
-                        </div>
-                    )}
+                            ) : (
+                                <div className="grid grid-cols-2 gap-4">
+                                    {filteredProducts.length > 0 ? filteredProducts.map(product => (
+                                        <ProductCard key={product.id} product={product as Product & { id: string }} />
+                                    )) : <p className="col-span-2 text-center text-muted-foreground py-10">No products found in this category.</p>}
+                                </div>
+                            )}
+                        </TabsContent>
+
+                         <TabsContent value="sell" className="pt-6 space-y-6">
+                            <ListItemCtaCard />
+                        </TabsContent>
+                    </Tabs>
                 </main>
                 <MarketplaceBottomNav />
             </div>
