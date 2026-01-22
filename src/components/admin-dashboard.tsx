@@ -22,6 +22,13 @@ import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 
 function StatCard({ title, value, icon, description }: { title: string; value: string | number; icon: React.ReactNode, description?: string }) {
   return (
@@ -248,6 +255,47 @@ function WeeklyGrowthReport() {
     )
 }
 
+function EarningsChart({ totalEarnings, referralPayouts }: { totalEarnings: number, referralPayouts: number }) {
+    const chartData = [
+        { name: "Total", earnings: totalEarnings, payouts: referralPayouts },
+    ];
+
+    const chartConfig: ChartConfig = {
+        earnings: {
+            label: "Platform Fees",
+            color: "hsl(var(--accent))",
+        },
+        payouts: {
+            label: "Referral Payouts",
+            color: "hsl(var(--destructive))",
+        },
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Earnings vs. Payouts</CardTitle>
+                <CardDescription>
+                    A summary of your gross earnings (platform fees) against referral commissions paid out.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="min-h-[150px] w-full">
+                    <BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ left: 10 }}>
+                        <CartesianGrid horizontal={false} />
+                        <XAxis type="number" hide />
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel indicator="line" />}
+                        />
+                        <Bar dataKey="earnings" fill="var(--color-earnings)" radius={4} name="Platform Fees (7%)" />
+                        <Bar dataKey="payouts" fill="var(--color-payouts)" radius={4} name="Referral Payouts (0.05%)" />
+                    </BarChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+    );
+}
 
 export function AdminDashboard() {
   const firestore = useFirestore();
@@ -394,6 +442,8 @@ export function AdminDashboard() {
             </div>
 
              <RevenueWithdrawalCard netProfit={netProfit} />
+
+             <EarningsChart totalEarnings={platformFees} referralPayouts={referralPayouts} />
       
              <WeeklyGrowthReport />
 

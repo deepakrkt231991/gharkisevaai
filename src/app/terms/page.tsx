@@ -2,10 +2,15 @@
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Timer, Network, Gavel } from 'lucide-react';
+import { Timer, Network, Gavel, Banknote } from 'lucide-react';
 
 export default function TermsPage() {
   const terms = [
+    {
+      title: "Platform Fee",
+      icon: <Banknote className="h-6 w-6" />,
+      content: "GrihSevaAI प्लेटफार्म का उपयोग करने पर, वर्कर्स और सेलर्स अपनी कुल कमाई का 7% प्लेटफार्म शुल्क देने के लिए सहमत हैं। ग्राहकों के लिए यह सेवा पूरी तरह 0% शुल्क (मुफ्त) है। सभी भुगतान सुरक्षित ट्रांजेक्शन के माध्यम से ट्रैक किए जाएंगे।",
+    },
     {
       title: "10-Day Rule",
       icon: <Timer className="h-6 w-6" />,

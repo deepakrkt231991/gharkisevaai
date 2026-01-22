@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
     {
       title: "Third-Party Ads",
       icon: <Annoyed className="h-6 w-6" />,
-      content: "हम विज्ञापन दिखाने के लिए Google AdSense का उपयोग करते हैं। Google यूजर की रुचियों के आधार पर विज्ञापन दिखाने के लिए कुकीज़ (Cookies) का उपयोग कर सकता है।",
+      content: "यह ऐप विज्ञापन दिखाने के लिए Google AdSense का उपयोग कर सकता है। Google उपयोगकर्ता की रुचियों के आधार पर विज्ञापन दिखाने के लिए कुकीज़ (Cookies) का उपयोग कर सकता है। हम आपकी सहमति के बिना आपकी व्यक्तिगत जानकारी किसी तीसरे पक्ष को नहीं बेचते हैं।",
     },
     {
       title: "AI Usage",
