@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { collection, query, orderBy, limit, where } from 'firebase/firestore';
@@ -14,32 +14,77 @@ import { ProductCard } from './product-card';
 import { ProfessionalCard } from './professional-card';
 import { Skeleton } from './ui/skeleton';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import useEmblaCarousel from 'embla-carousel-react';
+import { Button } from './ui/button';
+import React from 'react';
 
 const DISTANCE_KM = 10;
 
-const LiveFeedSection = ({ title, link, children, isLoading, count }: { title: string; link: string; children: React.ReactNode; isLoading: boolean; count: number }) => (
-    <div className="space-y-4">
-        <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold font-headline text-white">{title}</h3>
-            {count > 0 && (
-                <Link href={link} className="text-sm font-bold text-primary flex items-center gap-1">
-                    VIEW ALL <ArrowRight size={16} />
-                </Link>
+const LiveFeedSection = ({ title, link, items, renderItem, isLoading }: { title: string; link: string; items: any[]; renderItem: (item: any) => React.ReactNode; isLoading: boolean; }) => {
+    const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
+    const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
+    const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
+
+    const scrollPrev = useCallback(() => {
+        if (emblaApi) emblaApi.scrollPrev();
+    }, [emblaApi]);
+
+    const scrollNext = useCallback(() => {
+        if (emblaApi) emblaApi.scrollNext();
+    }, [emblaApi]);
+
+    const onSelect = useCallback(() => {
+        if (!emblaApi) return;
+        setPrevBtnDisabled(!emblaApi.canScrollPrev());
+        setNextBtnDisabled(!emblaApi.canScrollNext());
+    }, [emblaApi]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        onSelect();
+        emblaApi.on('reInit', onSelect);
+        emblaApi.on('select', onSelect);
+    }, [emblaApi, onSelect]);
+
+    return (
+        <div className="space-y-4">
+            <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold font-headline text-white">{title}</h3>
+                <div className="flex items-center gap-2">
+                     {items.length > 1 && (
+                        <div className="flex items-center gap-1">
+                            <Button onClick={scrollPrev} variant="outline" size="icon" className="h-8 w-8 rounded-full" disabled={prevBtnDisabled}>
+                                <ArrowLeft size={16} />
+                            </Button>
+                            <Button onClick={scrollNext} variant="outline" size="icon" className="h-8 w-8 rounded-full" disabled={nextBtnDisabled}>
+                                <ArrowRight size={16} />
+                            </Button>
+                        </div>
+                    )}
+                    {items.length > 0 && (
+                        <Link href={link} className="text-sm font-bold text-primary flex items-center gap-1">
+                            VIEW ALL
+                        </Link>
+                    )}
+                </div>
+            </div>
+            {isLoading ? (
+                <div className="flex gap-4 overflow-hidden -mx-4 px-4">
+                    {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-56 w-72 rounded-xl" />)}
+                </div>
+            ) : items.length > 0 ? (
+                <div className="overflow-hidden -mx-4" ref={emblaRef}>
+                    <div className="flex px-4">
+                        {items.map((item) => renderItem(item))}
+                    </div>
+                </div>
+            ) : (
+                <div className="text-center text-muted-foreground text-sm py-8">No items to show.</div>
             )}
         </div>
-        {isLoading ? (
-            <div className="flex gap-4 overflow-hidden -mx-4 px-4">
-                {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-56 w-72 rounded-xl" />)}
-            </div>
-        ) : count > 0 ? (
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4">
-                {children}
-            </div>
-        ) : (
-            <div className="text-center text-muted-foreground text-sm py-8">No items to show.</div>
-        )}
-    </div>
-);
+    );
+};
+
 
 export function LiveFeed() {
     const firestore = useFirestore();
@@ -141,37 +186,53 @@ export function LiveFeed() {
     
     return (
         <div className="space-y-8">
-            <LiveFeedSection title={salePropertiesAreNearby ? "Homes for Sale Near You" : "Latest Homes for Sale"} link="/explore?tab=buy" isLoading={isSaleLoading} count={salePropertiesToShow.length}>
-                {salePropertiesToShow.map(prop => (
-                    <div key={prop.id} className="w-80 flex-shrink-0">
+            <LiveFeedSection 
+                title={salePropertiesAreNearby ? "Homes for Sale Near You" : "Latest Homes for Sale"} 
+                link="/explore?tab=buy" 
+                isLoading={isSaleLoading} 
+                items={salePropertiesToShow}
+                renderItem={(prop) => (
+                    <div key={prop.id} className="flex-shrink-0 w-80 pr-4">
                         <PropertyCard property={prop as any} />
                     </div>
-                ))}
-            </LiveFeedSection>
+                )}
+            />
 
-            <LiveFeedSection title={rentPropertiesAreNearby ? "Homes for Rent Near You" : "Latest Homes for Rent"} link="/explore?tab=rent" isLoading={isRentLoading} count={rentPropertiesToShow.length}>
-                {rentPropertiesToShow.map(prop => (
-                    <div key={prop.id} className="w-80 flex-shrink-0">
+            <LiveFeedSection 
+                title={rentPropertiesAreNearby ? "Homes for Rent Near You" : "Latest Homes for Rent"} 
+                link="/explore?tab=rent" 
+                isLoading={isRentLoading} 
+                items={rentPropertiesToShow}
+                renderItem={(prop) => (
+                    <div key={prop.id} className="flex-shrink-0 w-80 pr-4">
                         <PropertyCard property={prop as any} />
                     </div>
-                ))}
-            </LiveFeedSection>
+                )}
+            />
 
-            <LiveFeedSection title={productsAreNearby ? "Products Near You" : "Latest Products"} link="/marketplace" isLoading={isProductsLoading} count={productsToShow.length}>
-                {productsToShow.map(prod => (
-                    <div key={prod.id} className="w-56 flex-shrink-0">
+            <LiveFeedSection 
+                title={productsAreNearby ? "Products Near You" : "Latest Products"} 
+                link="/marketplace" 
+                isLoading={isProductsLoading} 
+                items={productsToShow}
+                renderItem={(prod) => (
+                     <div key={prod.id} className="flex-shrink-0 w-56 pr-4">
                         <ProductCard product={prod as any} />
                     </div>
-                ))}
-            </LiveFeedSection>
+                )}
+            />
              
-            <LiveFeedSection title={workersAreNearby ? "Workers Near You" : "Top Workers"} link="/find-a-worker" isLoading={isWorkersLoading} count={workersToShow.length}>
-                 {workersToShow.map(worker => (
-                    <div key={worker.id} className="w-80 flex-shrink-0">
+            <LiveFeedSection 
+                title={workersAreNearby ? "Workers Near You" : "Top Workers"} 
+                link="/find-a-worker" 
+                isLoading={isWorkersLoading} 
+                items={workersToShow}
+                renderItem={(worker) => (
+                    <div key={worker.id} className="flex-shrink-0 w-80 pr-4">
                        <ProfessionalCard worker={worker as any} />
                     </div>
-                ))}
-            </LiveFeedSection>
+                )}
+            />
         </div>
     );
 }
