@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot } from "lucide-react";
+import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote } from "lucide-react";
 import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, where, orderBy } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
@@ -277,19 +277,18 @@ export function AdminDashboard() {
   const { data: transactions, isLoading: transactionsLoading } = useCollection<Transaction>(transactionsQuery);
   const { data: disputedDeals, isLoading: disputesLoading } = useCollection<Deal>(disputedDealsQuery);
 
-  const { totalVolume, platformFees, referralPayouts, netProfit } = useMemo(() => {
-    if (!transactions) return { totalVolume: 0, platformFees: 0, referralPayouts: 0, netProfit: 0 };
+  const { totalVolume, platformFees, referralPayouts, adminWithdrawals, netProfit } = useMemo(() => {
+    if (!transactions) return { totalVolume: 0, platformFees: 0, referralPayouts: 0, adminWithdrawals: 0, netProfit: 0 };
     
     let volume = 0;
     let fees = 0;
     let referrals = 0;
+    let withdrawals = 0;
     
     const processedJobs = new Set();
 
     transactions.forEach(tx => {
-        // Calculate total volume from payouts and platform fees to avoid double counting
         if ((tx.type === 'payout' || tx.type === 'platform_fee' || tx.type === 'tax') && tx.sourceJobId && !processedJobs.has(tx.sourceJobId)) {
-            // Find all transactions for this job to sum up the total cost
             const jobTransactions = transactions.filter(t => t.sourceJobId === tx.sourceJobId && (t.type === 'payout' || t.type === 'platform_fee' || t.type === 'tax'));
             const jobTotal = jobTransactions.reduce((sum, current) => sum + current.amount, 0);
             volume += jobTotal;
@@ -302,13 +301,17 @@ export function AdminDashboard() {
         if (tx.type === 'referral_commission') {
             referrals += tx.amount;
         }
+        if (tx.type === 'admin_withdrawal') {
+            withdrawals += tx.amount;
+        }
     });
 
     return { 
         totalVolume: volume, 
         platformFees: fees, 
         referralPayouts: referrals,
-        netProfit: fees - referrals
+        adminWithdrawals: withdrawals,
+        netProfit: fees - referrals - withdrawals
     };
   }, [transactions]);
 
@@ -383,10 +386,10 @@ export function AdminDashboard() {
                   icon={<Share2 className="h-4 w-4 text-muted-foreground" />}
               />
               <StatCard
-                  title="Net Profit"
-                  value={`₹${netProfit.toFixed(2)}`}
-                  description="Platform Fees - Payouts"
-                  icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />}
+                  title="Total Withdrawn"
+                  value={`₹${adminWithdrawals.toFixed(2)}`}
+                  description="Total amount paid out to admin"
+                  icon={<Banknote className="h-4 w-4 text-muted-foreground" />}
               />
             </div>
 
@@ -545,5 +548,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-
-    
