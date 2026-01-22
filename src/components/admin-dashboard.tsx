@@ -338,46 +338,15 @@ export function AdminDashboard() {
         <p className="text-muted-foreground">Welcome back! Here's your real-time business overview.</p>
       </div>
 
-       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-              title="Total Transaction Volume"
-              value={`₹${totalVolume.toFixed(2)}`}
-              description="Total value of all completed jobs"
-              icon={<IndianRupee className="h-4 w-4 text-muted-foreground" />}
-          />
-          <StatCard
-              title="Platform Fee Earned"
-              value={`₹${platformFees.toFixed(2)}`}
-              description="Your gross revenue from fees"
-              icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
-          />
-          <StatCard
-              title="Referral Payouts"
-              value={`- ₹${referralPayouts.toFixed(2)}`}
-              description="Commissions paid to referrers"
-              icon={<Share2 className="h-4 w-4 text-muted-foreground" />}
-          />
-          <StatCard
-              title="Net Profit"
-              value={`₹${netProfit.toFixed(2)}`}
-              description="Platform Fees - Payouts"
-              icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />}
-          />
-      </div>
-      
-      <RevenueWithdrawalCard netProfit={netProfit} />
-      
-      <WeeklyGrowthReport />
-
-      <Tabs defaultValue="verification">
+      <Tabs defaultValue="finance">
         <TabsList className="grid w-full grid-cols-5">
+           <TabsTrigger value="finance"><IndianRupee className="mr-2 h-4 w-4" /> Finance</TabsTrigger>
            <TabsTrigger value="verification">
             <CheckCircle className="mr-2 h-4 w-4" /> Verification
              {pendingVerifications && pendingVerifications.length > 0 && (
                 <Badge className="ml-2">{pendingVerifications.length}</Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="transactions"><TrendingUp className="mr-2 h-4 w-4" /> Transactions</TabsTrigger>
            <TabsTrigger value="marketing"><Share2 className="mr-2 h-4 w-4" /> Marketing</TabsTrigger>
           <TabsTrigger value="sos">
             <AlertTriangle className="mr-2 h-4 w-4" /> SOS Alerts
@@ -392,43 +361,74 @@ export function AdminDashboard() {
             )}
           </TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="finance" className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <StatCard
+                  title="Total Transaction Volume"
+                  value={`₹${totalVolume.toFixed(2)}`}
+                  description="Total value of all completed jobs"
+                  icon={<IndianRupee className="h-4 w-4 text-muted-foreground" />}
+              />
+              <StatCard
+                  title="Platform Fee Earned (7%)"
+                  value={`₹${platformFees.toFixed(2)}`}
+                  description="Your gross revenue from commissions"
+                  icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
+              />
+              <StatCard
+                  title="Referral Payouts"
+                  value={`- ₹${referralPayouts.toFixed(2)}`}
+                  description="Commissions paid to referrers"
+                  icon={<Share2 className="h-4 w-4 text-muted-foreground" />}
+              />
+              <StatCard
+                  title="Net Profit"
+                  value={`₹${netProfit.toFixed(2)}`}
+                  description="Platform Fees - Payouts"
+                  icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />}
+              />
+            </div>
 
-        <TabsContent value="transactions">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Transactions</CardTitle>
-              <CardDescription>A log of all financial movements on the platform.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                 <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>User ID</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Job ID</TableHead>
-                            <TableHead>Time</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {transactionsLoading && <TableRow><TableCell colSpan={5} className="text-center">Loading transactions...</TableCell></TableRow>}
-                        {transactions && transactions.length > 0 ? (
-                            transactions.slice(0, 10).map(tx => (
-                                <TableRow key={tx.id}>
-                                    <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
-                                    <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge></TableCell>
-                                    <TableCell className="font-semibold">₹{tx.amount.toFixed(2)}</TableCell>
-                                    <TableCell className="font-mono text-xs">{tx.sourceJobId || 'N/A'}</TableCell>
-                                    <TableCell>{getTimeAgo(tx.timestamp)}</TableCell>
-                                </TableRow>
-                            ))
-                        ) : !transactionsLoading && (
-                            <TableRow><TableCell colSpan={5} className="text-center">No transactions yet.</TableCell></TableRow>
-                        )}
-                    </TableBody>
-                 </Table>
-            </CardContent>
-          </Card>
+             <RevenueWithdrawalCard netProfit={netProfit} />
+      
+             <WeeklyGrowthReport />
+
+             <Card>
+                <CardHeader>
+                <CardTitle>Recent Transactions</CardTitle>
+                <CardDescription>A log of all financial movements on the platform.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>User ID</TableHead>
+                                <TableHead>Type</TableHead>
+                                <TableHead>Amount</TableHead>
+                                <TableHead>Job ID</TableHead>
+                                <TableHead>Time</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {transactionsLoading && <TableRow><TableCell colSpan={5} className="text-center">Loading transactions...</TableCell></TableRow>}
+                            {transactions && transactions.length > 0 ? (
+                                transactions.slice(0, 10).map(tx => (
+                                    <TableRow key={tx.id}>
+                                        <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
+                                        <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge></TableCell>
+                                        <TableCell className="font-semibold">₹{tx.amount.toFixed(2)}</TableCell>
+                                        <TableCell className="font-mono text-xs">{tx.sourceJobId || 'N/A'}</TableCell>
+                                        <TableCell>{getTimeAgo(tx.timestamp)}</TableCell>
+                                    </TableRow>
+                                ))
+                            ) : !transactionsLoading && (
+                                <TableRow><TableCell colSpan={5} className="text-center">No transactions yet.</TableCell></TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </TabsContent>
 
         <TabsContent value="verification">
