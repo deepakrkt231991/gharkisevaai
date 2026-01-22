@@ -5,6 +5,7 @@ service cloud.firestore {
     // =====================================================================
     // PUBLIC-READ COLLECTIONS
     // Anyone can read or list these collections. Writes require authentication.
+    // This section explicitly fixes the "auth: null" error for public data.
     // =====================================================================
     match /properties/{propertyId} {
       allow get, list: if true;
