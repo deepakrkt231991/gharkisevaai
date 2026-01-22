@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee, FileText, Download, Info, Bot, X, Truck, AlertTriangle, CheckCircle, Shield, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Phone, Plus, Send, Smile, Sparkles, Handshake, ShieldCheck, IndianRupee, FileText, Download, Info, Bot, X, Truck, AlertTriangle, CheckCircle, Shield, HelpCircle, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,7 @@ import React, { useState, useEffect } from 'react';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
-import { confirmProductDelivery, payForShipping, shipItem, cancelDeal, raiseDispute } from '@/app/chat/[chatId]/actions';
+import { confirmProductDelivery, payForShipping, shipItem, cancelDeal, raiseDispute, completeToolRental } from '@/app/chat/[chatId]/actions';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 
@@ -241,6 +241,58 @@ const ProductDealFlowControls = ({ deal }: { deal: Deal }) => {
     );
 };
 
+const ToolRentalFlowControls = ({ rental }: { rental: Rental }) => {
+    const { user } = useUser();
+    const { toast } = useToast();
+
+    if (!user || !rental) return null;
+
+    const isRenter = user.uid === rental.renterId;
+    const isOwner = user.uid === rental.ownerId;
+
+    const handleAction = async (action: (rentalId: string) => Promise<{success: boolean; message: string}>) => {
+        toast({ title: 'Processing...' });
+        const result = await action(rental.rentalId);
+        if (result.success) {
+            toast({ title: 'Success!', description: result.message, className: 'bg-green-600 text-white' });
+        } else {
+            toast({ title: 'Error', description: result.message, variant: 'destructive' });
+        }
+    };
+    
+    return (
+        <Card className="glass-card border-l-4 border-l-primary/80">
+            <CardHeader className="p-4 flex-row items-center justify-between">
+                 <CardTitle className="flex items-center gap-2 font-headline text-white">
+                    <Wrench size={20}/>
+                    Manage Tool Rental
+                </CardTitle>
+                <Badge variant="outline" className={cn(
+                    "text-yellow-300 border-yellow-400/50 bg-yellow-900/40",
+                    rental.status === 'completed' && "text-green-300 border-green-400/50 bg-green-900/40",
+                    rental.status === 'disputed' && "text-red-300 border-red-400/50 bg-red-900/40",
+                    rental.status === 'cancelled' && "text-gray-300 border-gray-400/50 bg-gray-900/40",
+                )}>
+                    {rental.status?.replace('_', ' ').toUpperCase()}
+                </Badge>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+                {isRenter && rental.status === 'active' && (
+                    <Button onClick={() => handleAction(completeToolRental)} className="w-full h-12 bg-green-600 hover:bg-green-700">Confirm Tool Returned & End Rental</Button>
+                )}
+                {isOwner && rental.status === 'active' && (
+                    <p className="text-sm text-muted-foreground text-center">Waiting for renter to confirm tool return to end the rental period.</p>
+                )}
+                {rental.status === 'completed' && <p className="text-sm text-green-400 text-center">This rental has been completed.</p>}
+                <div className="flex items-start gap-2 text-xs text-muted-foreground p-2 rounded-lg bg-black/20">
+                    <Bot size={20} className="flex-shrink-0 mt-0.5 text-primary"/>
+                    <p>Upon completion, the rental fee (minus 7% platform fee) will be transferred to the owner's wallet.</p>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
 const PaymentSafetyNotice = () => (
     <div className="flex items-start gap-3 text-xs text-muted-foreground p-3 rounded-lg bg-black/20 border border-primary/30">
         <Shield size={28} className="flex-shrink-0 mt-0.5 text-primary"/>
@@ -332,7 +384,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
     const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
-    const [contextType, setContextType] = useState<'job' | 'tool' | 'property' | 'product' | 'deal' | 'unknown'>('unknown');
+    const [contextType, setContextType] = useState<'job' | 'tool' | 'property' | 'product' | 'deal' | 'rental' | 'unknown'>('unknown');
     const [contextDoc, setContextDoc] = useState<ContextDoc | null>(null);
     const [contextLoading, setContextLoading] = useState(true);
     const [showAiHelpDialog, setShowAiHelpDialog] = useState(false);
@@ -343,7 +395,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
         if (!chatId) return;
         setContextLoading(true);
         const [type] = chatId.split('-');
-        if (['job', 'tool', 'property', 'product', 'deal'].includes(type)) {
+        if (['job', 'tool', 'property', 'product', 'deal', 'rental'].includes(type)) {
             setContextType(type as any);
         } else {
             setContextType('unknown');
@@ -351,7 +403,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
         setContextLoading(false);
     }, [chatId]);
 
-    // Fetch context document (Job, Tool, Property, Product, Deal)
+    // Fetch context document (Job, Tool, Property, Product, Deal, Rental)
     const contextDocRef = useMemoFirebase(() => {
         if (!firestore || contextLoading || contextType === 'unknown') return null;
         const id = chatId.split('-').slice(1).join('-');
@@ -374,6 +426,8 @@ export function ChatInterface({ chatId }: { chatId: string }) {
             case 'job': return (contextDoc as Job).workerId;
             case 'deal':
                 return user.uid === (contextDoc as Deal).buyerId ? (contextDoc as Deal).sellerId : (contextDoc as Deal).buyerId;
+            case 'rental':
+                 return user.uid === (contextDoc as Rental).renterId ? (contextDoc as Rental).ownerId : (contextDoc as Rental).renterId;
             case 'tool':
             case 'property':
             case 'product':
@@ -425,6 +479,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
     const getOtherUserTitle = () => {
         if (contextType === 'job') return (otherUser as UserEntity)?.skills?.[0] || 'Worker';
         if (contextType === 'deal') return user?.uid === (contextDoc as Deal)?.buyerId ? 'Seller' : 'Buyer';
+        if (contextType === 'rental') return user?.uid === (contextDoc as Rental)?.renterId ? 'Tool Owner' : 'Renter';
         return 'User';
     }
 
@@ -432,6 +487,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
          switch(contextType) {
             case 'job': return (contextDoc as Job)?.ai_diagnosis || 'Service Request';
             case 'deal': return (contextDoc as Deal)?.productName || 'Product Deal';
+            case 'rental': return (contextDoc as Tool)?.name || 'Tool Rental';
             case 'tool': return (contextDoc as Tool)?.name || 'Tool Rental';
             case 'property': return (contextDoc as Property)?.title || 'Property Inquiry';
             case 'product': return (contextDoc as Product)?.name || 'Product Inquiry';
@@ -469,6 +525,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
 
             <main className="flex-1 overflow-y-auto p-4 space-y-6">
                 {contextType === 'deal' && <ProductDealFlowControls deal={contextDoc as Deal} />}
+                {contextType === 'rental' && <ToolRentalFlowControls rental={contextDoc as Rental} />}
                 {contextType === 'job' && <InvoiceCard job={contextDoc as Job | null} contextType={contextType} />}
                 {contextType === 'job' && <WarrantyCertificateCard job={contextDoc as Job} worker={otherUser} />}
                 

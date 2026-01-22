@@ -310,3 +310,96 @@ export async function raiseDispute(dealId: string): Promise<{success: boolean; m
         return { success: false, message: e.message };
     }
 }
+
+// --- NEW ACTION FOR TOOL RENTALS ---
+
+export async function completeToolRental(rentalId: string): Promise<{success: boolean, message: string}> {
+    const { firestore } = initializeFirebase();
+    const rentalRef = doc(firestore, 'rentals', rentalId);
+
+    try {
+        const rentalSnap = await getDoc(rentalRef);
+        if (!rentalSnap.exists()) throw new Error('Rental not found.');
+        const rentalData = rentalSnap.data();
+
+        const totalCost = rentalData.totalCost || 0;
+
+        if (totalCost <= 0) throw new Error('Rental cost not set or is zero.');
+
+        // --- Fee & Tax Calculation ---
+        const platformFeeNet = totalCost * PLATFORM_FEE_PERCENTAGE;
+        const gstAmount = platformFeeNet * GST_PERCENTAGE;
+        const platformFeeGross = platformFeeNet + gstAmount;
+        const ownerPayout = totalCost - platformFeeGross;
+        const completionTimestamp = serverTimestamp();
+
+        // Update rental status
+        await updateDoc(rentalRef, {
+            status: 'completed',
+        });
+
+        const transactionsRef = collection(firestore, 'transactions');
+        
+        // 1. Tool Owner Payout
+        await addDoc(transactionsRef, {
+            userId: rentalData.ownerId,
+            amount: ownerPayout,
+            type: 'payout',
+            sourceJobId: rentalId,
+            timestamp: completionTimestamp,
+            jobCompletedAt: completionTimestamp,
+        });
+
+        // 2. Platform Fee
+        await addDoc(transactionsRef, {
+            userId: PLATFORM_ADMIN_UID,
+            amount: platformFeeNet,
+            type: 'platform_fee',
+            sourceJobId: rentalId,
+            timestamp: completionTimestamp,
+        });
+
+        // 3. GST
+        await addDoc(transactionsRef, {
+            userId: PLATFORM_GST_UID,
+            amount: gstAmount,
+            type: 'tax',
+            sourceJobId: rentalId,
+            timestamp: completionTimestamp,
+        });
+
+        // 4. Referral Commission for RENTER's referrer
+        const renterRef = doc(firestore, 'users', rentalData.renterId);
+        const renterSnap = await getDoc(renterRef);
+        if (renterSnap.exists()) {
+            const renterData = renterSnap.data();
+            if (renterData.referredBy) {
+                const commission = totalCost * REFERRAL_COMMISSION_PERCENTAGE;
+                await addDoc(transactionsRef, {
+                    userId: renterData.referredBy,
+                    amount: commission,
+                    type: 'referral_commission',
+                    sourceJobId: rentalId,
+                    timestamp: completionTimestamp,
+                });
+            }
+        }
+
+        revalidatePath(`/chat/rental-${rentalId}`);
+        revalidatePath('/admin');
+        revalidatePath('/dashboard/earnings');
+
+        return { success: true, message: 'Tool rental completed and payments processed.' };
+
+    } catch (e: any) {
+        console.error("Complete Tool Rental Error:", e);
+        try {
+            await updateDoc(rentalRef, { status: 'disputed' });
+            revalidatePath(`/chat/rental-${rentalId}`);
+            revalidatePath('/admin');
+        } catch (disputeError) {
+             console.error("Failed to mark rental as disputed:", disputeError);
+        }
+        return { success: false, message: `An error occurred and the rental has been flagged for review. Error: ${e.message}` };
+    }
+}

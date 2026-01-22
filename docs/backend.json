@@ -241,11 +241,13 @@
         "rentalId": { "type": "string" },
         "toolId": { "type": "string" },
         "renterId": { "type": "string", "description": "The user ID of the person renting the tool." },
+        "ownerId": { "type": "string", "description": "The worker ID of the tool owner." },
         "startDate": { "type": "string", "format": "date-time" },
         "endDate": { "type": "string", "format": "date-time" },
-        "status": { "type": "string", "enum": ["requested", "accepted", "payment_pending", "active", "completed", "cancelled"] }
+        "totalCost": { "type": "number", "description": "Total calculated cost for the rental period." },
+        "status": { "type": "string", "enum": ["requested", "accepted", "payment_pending", "active", "completed", "cancelled", "disputed"] }
       },
-      "required": ["rentalId", "toolId", "renterId", "startDate"]
+      "required": ["rentalId", "toolId", "renterId", "ownerId", "startDate", "totalCost"]
     },
     "Transaction": {
       "$schema": "http://json-schema.org/draft-07/schema#",

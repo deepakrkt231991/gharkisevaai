@@ -80,10 +80,11 @@ export interface Rental {
     rentalId: string;
     toolId: string;
     renterId: string; // The user ID of the person renting the tool.
-    ownerId: string; // The user ID of the tool owner
+    ownerId: string; // The worker ID of the tool owner.
     startDate: any; // Firestore Timestamp
     endDate?: any; // Firestore Timestamp
-    status?: "requested" | "accepted" | "payment_pending" | "active" | "completed" | "cancelled";
+    totalCost?: number;
+    status?: "requested" | "accepted" | "payment_pending" | "active" | "completed" | "cancelled" | "disputed";
 }
 
 export interface Transaction {
