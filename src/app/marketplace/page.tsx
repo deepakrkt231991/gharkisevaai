@@ -1,9 +1,10 @@
+
 'use client';
 
-import { Home, Bell, ShoppingBag, Search, SlidersHorizontal, Plus, Heart, MessageSquare, User, MapPin, Tag } from 'lucide-react';
+import { Home, Bell, ShoppingBag, Search, SlidersHorizontal, Plus, Heart, MessageSquare, User, MapPin, Tag, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useCollection, useMemoFirebase, useFirestore } from '@/firebase';
@@ -14,6 +15,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ProductCard } from '@/components/product-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
+import useEmblaCarousel from 'embla-carousel-react';
 
 const MarketplaceHeader = () => (
      <header className="sticky top-0 z-40 flex flex-col gap-4 bg-background/80 p-4 backdrop-blur-md border-b border-border">
@@ -119,6 +121,32 @@ export default function MarketplacePage() {
     
     const [activeFilter, setActiveFilter] = useState('All Items');
     const [searchTerm, setSearchTerm] = useState('');
+    
+    const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
+    const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
+    const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
+
+    const scrollPrev = useCallback(() => {
+        if (emblaApi) emblaApi.scrollPrev();
+    }, [emblaApi]);
+
+    const scrollNext = useCallback(() => {
+        if (emblaApi) emblaApi.scrollNext();
+    }, [emblaApi]);
+
+    const onSelect = useCallback(() => {
+        if (!emblaApi) return;
+        setPrevBtnDisabled(!emblaApi.canScrollPrev());
+        setNextBtnDisabled(!emblaApi.canScrollNext());
+    }, [emblaApi]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        onSelect();
+        emblaApi.on('reInit', onSelect);
+        emblaApi.on('select', onSelect);
+    }, [emblaApi, onSelect]);
+
 
     if (typeof window !== 'undefined') {
         (window as any).setMarketplaceSearchTerm = setSearchTerm;
@@ -180,11 +208,33 @@ export default function MarketplacePage() {
                         </TabsList>
 
                         <TabsContent value="buy" className="pt-6 space-y-6">
-                            <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-                                <Button onClick={() => setActiveFilter('All Items')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'All Items' ? 'default' : 'secondary'}>ALL ITEMS</Button>
-                                <Button onClick={() => setActiveFilter('Furniture')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Furniture' ? 'default' : 'secondary'}>FURNITURE</Button>
-                                <Button onClick={() => setActiveFilter('Electronics')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Electronics' ? 'default' : 'secondary'}>ELECTRONICS</Button>
-                                <Button onClick={() => setActiveFilter('Appliances')} className="rounded-full h-10 whitespace-nowrap" variant={activeFilter === 'Appliances' ? 'default' : 'secondary'}>APPLIANCES</Button>
+                            <div className="relative">
+                                <div className="overflow-hidden" ref={emblaRef}>
+                                    <div className="flex gap-2 pb-2 -mx-4 px-4">
+                                        <Button onClick={() => setActiveFilter('All Items')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'All Items' ? 'default' : 'secondary'}>ALL ITEMS</Button>
+                                        <Button onClick={() => setActiveFilter('Furniture')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'Furniture' ? 'default' : 'secondary'}>FURNITURE</Button>
+                                        <Button onClick={() => setActiveFilter('Electronics')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'Electronics' ? 'default' : 'secondary'}>ELECTRONICS</Button>
+                                        <Button onClick={() => setActiveFilter('Appliances')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'Appliances' ? 'default' : 'secondary'}>APPLIANCES</Button>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={scrollPrev}
+                                    disabled={prevBtnDisabled}
+                                    variant="ghost"
+                                    size="icon"
+                                    className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/50 hover:bg-background"
+                                >
+                                    <ArrowLeft size={16} />
+                                </Button>
+                                <Button
+                                    onClick={scrollNext}
+                                    disabled={nextBtnDisabled}
+                                    variant="ghost"
+                                    size="icon"
+                                    className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/50 hover:bg-background"
+                                >
+                                    <ArrowRight size={16} />
+                                </Button>
                             </div>
                             {isLoading ? (
                                 <div className="grid grid-cols-2 gap-4">
