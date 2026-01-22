@@ -95,6 +95,19 @@ export function useCollection<T = any>(
           operation: 'list',
           path,
         })
+        
+        const publicCollections = ['properties', 'products', 'workers', 'tools', 'banners', 'app_settings'];
+        // This is a "code guard" to prevent crashes on initial load if rules are not synced.
+        // If an unauthenticated user tries to list public collections and fails, return an empty array
+        // instead of throwing an error. This is a workaround. The correct fix is deploying security rules.
+        if (publicCollections.includes(path) && contextualError.request.auth === null) {
+            console.warn(`Unauthenticated access to '${path}' blocked by Firestore rules. Returning empty data as a fallback. Please verify your security rules are correctly deployed to allow public read access.`);
+            setData([]);
+            setError(null);
+            setIsLoading(false);
+            return; // Exit the error handler
+        }
+
 
         setError(contextualError)
         setData(null)
