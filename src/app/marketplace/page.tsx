@@ -222,7 +222,7 @@ export default function MarketplacePage() {
                                     disabled={prevBtnDisabled}
                                     variant="ghost"
                                     size="icon"
-                                    className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/50 hover:bg-background"
+                                    className="absolute -left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/50 hover:bg-background"
                                 >
                                     <ArrowLeft size={16} />
                                 </Button>
@@ -231,7 +231,7 @@ export default function MarketplacePage() {
                                     disabled={nextBtnDisabled}
                                     variant="ghost"
                                     size="icon"
-                                    className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/50 hover:bg-background"
+                                    className="absolute -right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/50 hover:bg-background"
                                 >
                                     <ArrowRight size={16} />
                                 </Button>

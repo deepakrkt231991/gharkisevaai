@@ -122,7 +122,7 @@ export async function withdrawAdminFunds(amount: number): Promise<{ success: boo
     try {
         await addDoc(transactionsRef, {
             userId: PLATFORM_ADMIN_UID,
-            amount: amount,
+            amount: -Math.abs(amount), // Ensure withdrawal is a negative number
             type: 'admin_withdrawal',
             sourceJobId: `ADMIN_WITHDRAWAL_${new Date().toISOString()}`,
             timestamp: serverTimestamp(),

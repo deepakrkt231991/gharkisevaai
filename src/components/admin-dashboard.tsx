@@ -350,16 +350,18 @@ export function AdminDashboard() {
             referrals += tx.amount;
         }
         if (tx.type === 'admin_withdrawal') {
-            withdrawals += tx.amount;
+            withdrawals += Math.abs(tx.amount); // Show total withdrawn as a positive number
         }
     });
+
+    const totalDeductions = referrals + withdrawals;
 
     return { 
         totalVolume: volume, 
         platformFees: fees, 
         referralPayouts: referrals,
         adminWithdrawals: withdrawals,
-        netProfit: fees - referrals - withdrawals
+        netProfit: fees - totalDeductions
     };
   }, [transactions]);
 
@@ -470,7 +472,9 @@ export function AdminDashboard() {
                                     <TableRow key={tx.id}>
                                         <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
                                         <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge></TableCell>
-                                        <TableCell className="font-semibold">₹{tx.amount.toFixed(2)}</TableCell>
+                                        <TableCell className={cn("font-semibold", tx.amount < 0 ? "text-destructive" : "text-green-500")}>
+                                            {tx.amount < 0 ? `- ₹${Math.abs(tx.amount).toFixed(2)}` : `+ ₹${tx.amount.toFixed(2)}`}
+                                        </TableCell>
                                         <TableCell className="font-mono text-xs">{tx.sourceJobId || 'N/A'}</TableCell>
                                         <TableCell>{getTimeAgo(tx.timestamp)}</TableCell>
                                     </TableRow>
