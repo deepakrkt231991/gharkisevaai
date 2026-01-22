@@ -15,6 +15,9 @@ export function Footer() {
             <Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary">
                 Privacy Policy
             </Link>
+            <Link href="/pricing" className="text-sm text-muted-foreground hover:text-primary">
+                Pricing
+            </Link>
              <Link href="/features" className="text-sm text-muted-foreground hover:text-primary">
                 Features
             </Link>

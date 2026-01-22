@@ -11,7 +11,7 @@ export default function FeaturesPage() {
         { feature: "Verified Professionals", description: "Connect with AI-verified workers whose backgrounds are checked for your safety.", icon: <Shield/> },
         { feature: "Secure Escrow Payment", description: "Your payment is held securely and only released when you confirm the job is done.", icon: <Handshake/> },
         { feature: "Lifetime Referral Income", description: "Earn a lifetime commission of 0.05% from every transaction made by users you refer.", icon: <IndianRupee/> },
-        { feature: "Transparent Pricing", description: "A small platform fee is included for AI verification, secure payments, and support. No surprises.", icon: <FileText /> }
+        { feature: "Zero Fees for Customers", description: "You only pay the price agreed upon with the worker. Our platform fee is transparently charged from the worker's earnings, not from you.", icon: <FileText /> }
     ],
     workers: [
       { feature: "Fair & Transparent Fees", description: "We charge a 7% platform fee on the final bill for our AI tools, secure payments, and support. This helps us run the platform while you keep the majority of your earnings.", icon: <IndianRupee/> },
