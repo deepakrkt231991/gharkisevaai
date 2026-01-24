@@ -13,10 +13,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Bell, Grid, Droplet, Zap, Wrench, IndianRupee, MapPin } from 'lucide-react';
+import { Search, Bell, Grid, Droplet, Zap, Wrench, IndianRupee, MapPin, ArrowLeft, ArrowRight, Hammer, Paintbrush } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { doc } from 'firebase/firestore';
+import { useCallback, useEffect, useState } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 
 
 function ToolCard({ tool }: { tool: Tool & { id: string } }) {
@@ -117,6 +119,32 @@ function ToolLibraryHeader() {
 
 export default function RentToolsPage() {
     const firestore = useFirestore();
+    const [activeFilter, setActiveFilter] = useState('All Tools');
+    
+    const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
+    const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
+    const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
+
+    const scrollPrev = useCallback(() => {
+        if (emblaApi) emblaApi.scrollPrev();
+    }, [emblaApi]);
+
+    const scrollNext = useCallback(() => {
+        if (emblaApi) emblaApi.scrollNext();
+    }, [emblaApi]);
+
+    const onSelect = useCallback(() => {
+        if (!emblaApi) return;
+        setPrevBtnDisabled(!emblaApi.canScrollPrev());
+        setNextBtnDisabled(!emblaApi.canScrollNext());
+    }, [emblaApi]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        onSelect();
+        emblaApi.on('reInit', onSelect);
+        emblaApi.on('select', onSelect);
+    }, [emblaApi, onSelect]);
     
     const toolsQuery = useMemoFirebase(() => {
         if (!firestore) return null;
@@ -131,10 +159,34 @@ export default function RentToolsPage() {
             <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
                 <ToolLibraryHeader />
                 <main className="flex-1 space-y-6 overflow-y-auto p-4 pb-32">
-                    <div className="flex gap-3 overflow-x-auto pb-2">
-                        <Button className="rounded-full bg-primary h-10"><Grid size={16} className="mr-2"/> All Tools</Button>
-                        <Button variant="secondary" className="rounded-full h-10 bg-card text-white"><Droplet size={16} className="mr-2"/> Plumbing</Button>
-                        <Button variant="secondary" className="rounded-full h-10 bg-card text-white"><Zap size={16} className="mr-2"/> Electric</Button>
+                    <div className="relative">
+                        <div className="overflow-hidden -mx-4" ref={emblaRef}>
+                            <div className="flex gap-3 pb-2 px-4">
+                                <Button onClick={() => setActiveFilter('All Tools')} variant={activeFilter === 'All Tools' ? 'default' : 'secondary'} className="rounded-full h-10 flex-shrink-0 whitespace-nowrap"><Grid size={16} className="mr-2"/> All Tools</Button>
+                                <Button onClick={() => setActiveFilter('Plumbing')} variant={activeFilter === 'Plumbing' ? 'default' : 'secondary'} className="rounded-full h-10 bg-card text-white flex-shrink-0 whitespace-nowrap"><Droplet size={16} className="mr-2"/> Plumbing</Button>
+                                <Button onClick={() => setActiveFilter('Electric')} variant={activeFilter === 'Electric' ? 'default' : 'secondary'} className="rounded-full h-10 bg-card text-white flex-shrink-0 whitespace-nowrap"><Zap size={16} className="mr-2"/> Electric</Button>
+                                <Button onClick={() => setActiveFilter('Painting')} variant={activeFilter === 'Painting' ? 'default' : 'secondary'} className="rounded-full h-10 bg-card text-white flex-shrink-0 whitespace-nowrap"><Paintbrush size={16} className="mr-2"/> Painting</Button>
+                                <Button onClick={() => setActiveFilter('Carpentry')} variant={activeFilter === 'Carpentry' ? 'default' : 'secondary'} className="rounded-full h-10 bg-card text-white flex-shrink-0 whitespace-nowrap"><Hammer size={16} className="mr-2"/> Carpentry</Button>
+                            </div>
+                        </div>
+                        <Button
+                            onClick={scrollPrev}
+                            disabled={prevBtnDisabled}
+                            variant="outline"
+                            size="icon"
+                            className="absolute -left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background z-10"
+                        >
+                            <ArrowLeft size={16} />
+                        </Button>
+                        <Button
+                            onClick={scrollNext}
+                            disabled={nextBtnDisabled}
+                            variant="outline"
+                            size="icon"
+                            className="absolute -right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background z-10"
+                        >
+                            <ArrowRight size={16} />
+                        </Button>
                     </div>
 
                     <RegisterOwnerCard />
@@ -179,3 +231,5 @@ export default function RentToolsPage() {
         </div>
     );
 }
+
+    
