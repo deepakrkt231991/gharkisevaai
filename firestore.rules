@@ -54,10 +54,8 @@ service cloud.firestore {
 
     // --- TRANSACTION & SENSITIVE DATA ---
     match /transactions/{transactionId} {
-      // Admins can list all transactions for the dashboard.
-      allow list: if isAdmin();
-      // Users can only get their own specific transaction, Admins can get any.
-      allow get: if (request.auth != null && request.auth.uid == resource.data.userId) || isAdmin();
+      // Admins can read all transactions, users can only read their own.
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == resource.data.userId);
       allow create, update, delete: if false; // Created via trusted server actions
     }
      match /sos_alerts/{alertId} {
