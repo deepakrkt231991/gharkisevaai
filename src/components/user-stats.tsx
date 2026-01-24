@@ -1,11 +1,11 @@
+
 'use client';
 
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { doc, collection, query, where } from 'firebase/firestore';
 import type { User as UserEntity, Transaction } from '@/lib/entities';
-import { useDoc } from '@/firebase/firestore/use-doc';
 
 import { Card, CardContent } from './ui/card';
 import { Skeleton } from './ui/skeleton';
