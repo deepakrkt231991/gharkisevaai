@@ -3,7 +3,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function isAdmin() {
-      return request.auth.token.email == 'admin@gharkiseva.com';
+      // Use the user's specified admin email
+      return request.auth.token.email == 'deepakkadamrkt@gmail.com';
     }
 
     // =====================================================================
@@ -51,10 +52,16 @@ service cloud.firestore {
 
     // --- TRANSACTION & SENSITIVE DATA ---
     match /transactions/{transactionId} {
-      // Admins can read all transactions, users can only read their own if the userId field exists.
-      allow read: if isAdmin() || (request.auth != null && 'userId' in resource.data && request.auth.uid == resource.data.userId);
-      allow create, update, delete: if false; // Created via trusted server actions
+        // Admin can list and read all transactions.
+        allow list, read: if isAdmin();
+        
+        // A user can read their own transaction document directly.
+        allow get: if request.auth != null && 'userId' in resource.data && request.auth.uid == resource.data.userId;
+        
+        // Writes are disabled from the client for security.
+        allow create, update, delete: if false;
     }
+    
      match /sos_alerts/{alertId} {
        allow read, write: if request.auth != null && 'userId' in resource.data && request.auth.uid == resource.data.userId;
     }
