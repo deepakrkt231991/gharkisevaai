@@ -3,8 +3,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function isAdmin() {
-      // Use the user's specified admin email
-      return request.auth.token.email == 'deepakkadamrkt@gmail.com';
+      // Use the admin's specific UID for a more reliable check.
+      return request.auth.uid == '1eatIhLGf0ZIlAgG9rQXlOHa5DC3';
     }
 
     // =====================================================================
