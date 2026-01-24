@@ -1,6 +1,6 @@
 'use server';
 import { doc, updateDoc, deleteDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/init';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createPromotionalContent, type CreateContentOutput } from '@/ai/flows/content-creator-agent';

@@ -1,10 +1,8 @@
-
-
 "use server";
 
 import { z } from 'zod';
 import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/init';
 import { revalidatePath } from 'next/cache';
 import { analyzeHomeForVastu } from '@/ai/flows/home-vastu-agent';
 
@@ -141,5 +139,3 @@ export async function getPropertyMediaTips(): Promise<{success: boolean; tips: s
         return { success: false, tips: ["Could not load AI tips at this time. Please try again later."] };
     }
 }
-
-    

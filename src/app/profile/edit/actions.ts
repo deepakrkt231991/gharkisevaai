@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { doc, setDoc } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/init';
 import { getAuth } from 'firebase/auth';
 import { revalidatePath } from 'next/cache';
 import { updateProfile } from 'firebase/auth';

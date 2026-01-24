@@ -1,7 +1,6 @@
-
 'use server';
 import { doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/init';
 import { revalidatePath } from 'next/cache';
 import type { Product } from '@/lib/entities';
 

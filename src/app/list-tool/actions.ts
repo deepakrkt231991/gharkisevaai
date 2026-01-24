@@ -3,7 +3,7 @@
 
 import { z } from 'zod';
 import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/init';
 import { revalidatePath } from 'next/cache';
 
 const ListToolSchema = z.object({

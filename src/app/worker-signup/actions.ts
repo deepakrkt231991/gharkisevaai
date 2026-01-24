@@ -1,9 +1,8 @@
-
 "use server";
 
 import { z } from 'zod';
 import { addDoc, collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/init';
 import { getAuth } from 'firebase/auth';
 import { headers } from 'next/headers';
 

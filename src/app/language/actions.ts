@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { doc, updateDoc } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/init';
 import { revalidatePath } from 'next/cache';
 
 const UpdateLanguageSchema = z.object({

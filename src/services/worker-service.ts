@@ -6,7 +6,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {collection, getDocs, query, where} from 'firebase/firestore';
-import {initializeFirebase} from '@/firebase';
+import {initializeFirebase} from '@/firebase/init';
 
 // This is the tool the AI agent will use.
 export const findVerifiedWorkers = ai.defineTool(
