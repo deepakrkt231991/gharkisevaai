@@ -52,14 +52,12 @@ service cloud.firestore {
 
     // --- TRANSACTION & SENSITIVE DATA ---
     match /transactions/{transactionId} {
-        // Admin can list and read all transactions.
-        allow list, read: if isAdmin();
-        
-        // A user can read their own transaction document directly.
-        allow get: if request.auth != null && 'userId' in resource.data && request.auth.uid == resource.data.userId;
+        // Admin can read all transactions. A user can only read their own,
+        // provided the query filters by userId.
+        allow read: if request.auth != null && (isAdmin() || ('userId' in resource.data && request.auth.uid == resource.data.userId));
         
         // Writes are disabled from the client for security.
-        allow create, update, delete: if false;
+        allow write: if false;
     }
     
      match /sos_alerts/{alertId} {
