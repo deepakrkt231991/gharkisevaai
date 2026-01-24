@@ -10,6 +10,7 @@ export interface User {
     referredBy?: string; // The ID of the user or worker who referred this user.
     walletBalance?: number; // The balance of referral earnings for the user.
     photoURL?: string; // User's photo URL
+    language?: string; // The user's preferred language code (e.g., 'en', 'hi').
 }
 
 export interface Job {

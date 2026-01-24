@@ -1,5 +1,4 @@
 import { LanguageSelector } from '@/components/language-selector';
-import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -25,7 +24,7 @@ export default function LanguagePage() {
             <main className="flex-1 p-4 pb-32 overflow-y-auto">
                 <LanguageSelector />
             </main>
-            <BottomNavBar />
+            {/* The save button is now part of the LanguageSelector and fixed to the bottom */}
         </div>
     </div>
   );

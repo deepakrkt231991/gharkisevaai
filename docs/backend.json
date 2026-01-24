@@ -35,6 +35,10 @@
         "walletBalance": {
             "type": "number",
             "description": "The balance of referral earnings for the user."
+        },
+        "language": {
+            "type": "string",
+            "description": "The user's preferred language code (e.g., 'en', 'hi')."
         }
       },
       "required": ["uid", "userType"]
