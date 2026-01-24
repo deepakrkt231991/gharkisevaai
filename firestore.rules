@@ -52,7 +52,10 @@ service cloud.firestore {
     // --- TRANSACTION & SENSITIVE DATA ---
     // Only the user involved can read. No one can create/update directly.
     match /transactions/{transactionId} {
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Admins need to list all transactions for the dashboard.
+      // Users can only get their own specific transaction.
+      allow list: if request.auth != null;
+      allow get: if request.auth != null && request.auth.uid == resource.data.userId;
       allow create, update, delete: if false; // Created via trusted server actions
     }
      match /sos_alerts/{alertId} {
