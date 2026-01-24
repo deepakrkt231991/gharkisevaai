@@ -2,10 +2,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isAdmin() {
+      return request.auth.token.email == 'admin@gharkiseva.com';
+    }
+
     // =====================================================================
     // PUBLIC-READ COLLECTIONS
     // Anyone can read or list these collections. Writes require authentication.
-    // This section explicitly fixes the "auth: null" error for public data.
     // =====================================================================
     match /properties/{propertyId} {
       allow get, list: if true;
@@ -26,11 +29,11 @@ service cloud.firestore {
     }
     match /banners/{bannerId} {
       allow get, list: if true;
-      allow write: if false; // Managed via Firebase Console
+      allow write: if isAdmin(); // Only admin can write
     }
      match /app_settings/{docId} {
         allow get, list: if true;
-        allow write: if false; // Managed via Firebase Console
+        allow write: if isAdmin(); // Only admin can write
     }
 
 
@@ -50,12 +53,11 @@ service cloud.firestore {
     }
 
     // --- TRANSACTION & SENSITIVE DATA ---
-    // Only the user involved can read. No one can create/update directly.
     match /transactions/{transactionId} {
-      // Admins need to list all transactions for the dashboard.
-      // Users can only get their own specific transaction.
-      allow list: if request.auth != null;
-      allow get: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Admins can list all transactions for the dashboard.
+      allow list: if isAdmin();
+      // Users can only get their own specific transaction, Admins can get any.
+      allow get: if (request.auth != null && request.auth.uid == resource.data.userId) || isAdmin();
       allow create, update, delete: if false; // Created via trusted server actions
     }
      match /sos_alerts/{alertId} {
@@ -64,7 +66,6 @@ service cloud.firestore {
 
 
     // --- TWO-PARTY DATA (DEALS, JOBS, RENTALS) ---
-    // A shared function to check if the requesting user is part of the transaction.
     function isParty(resource) {
       let data = resource.data;
       return request.auth != null && (
@@ -78,25 +79,25 @@ service cloud.firestore {
     }
 
     match /deals/{dealId} {
-      allow read, update: if isParty(resource);
+      allow read, update: if isParty(resource) || isAdmin();
       // Only the buyer can initiate a deal
       allow create: if request.auth != null && request.auth.uid == request.resource.data.buyerId;
     }
 
     match /jobs/{jobId} {
-      allow read, update: if isParty(resource);
+      allow read, update: if isParty(resource) || isAdmin();
       // Only the customer can create a job
       allow create: if request.auth != null && request.auth.uid == request.resource.data.customerId;
     }
 
     match /rentals/{rentalId} {
-      allow read, update: if isParty(resource);
+      allow read, update: if isParty(resource) || isAdmin();
       // Only the renter can create a rental request
       allow create: if request.auth != null && request.auth.uid == request.resource.data.renterId;
     }
     
     match /legal_agreements/{agreementId} {
-      allow read: if isParty(resource);
+      allow read: if isParty(resource) || isAdmin();
       // Allow any authenticated user to create an agreement (triggered by an action)
       allow create: if request.auth != null;
     }
