@@ -67,13 +67,10 @@ const ServiceItem = ({ name, icon: Icon, href }: { name: string; icon: LucideIco
 const PropertyServiceItem = ({ name, icon: Icon, href, description }: { name: string; icon: LucideIcon; href: string, description: string }) => (
     <Link href={href} className="block">
         <Card className="glass-card h-full hover:border-primary transition-colors">
-            <CardContent className="p-4 flex items-center gap-4">
-                <div className="bg-primary/10 p-3 rounded-lg"><Icon className="text-primary"/></div>
-                <div className="flex-1">
-                    <h4 className="font-bold text-white">{name}</h4>
-                    <p className="text-xs text-muted-foreground">{description}</p>
-                </div>
-                <ChevronRight className="text-muted-foreground"/>
+            <CardContent className="p-4">
+                <div className="bg-primary/10 p-3 rounded-lg w-fit mb-3"><Icon className="text-primary"/></div>
+                <h4 className="font-bold text-white">{name}</h4>
+                <p className="text-xs text-muted-foreground">{description}</p>
             </CardContent>
         </Card>
     </Link>
@@ -92,7 +89,7 @@ export function AiServiceGrid() {
                 ))}
              </div>
           ) : (
-             <div className="space-y-4">
+             <div className="grid grid-cols-2 gap-4">
                 {category.services.map((service) => (
                      <PropertyServiceItem key={service.name} {...service} description={service.description || ''} />
                  ))}
