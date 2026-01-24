@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useUser } from '@/firebase';
 
 
 declare global {
@@ -31,6 +32,7 @@ export function WorkerSignupForm() {
   const initialState = { message: '', success: false, errors: [] };
   const [state, dispatch] = useActionState(createWorkerProfile, initialState);
   const { toast } = useToast();
+  const { user } = useUser();
   
   const [showIntro, setShowIntro] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
@@ -325,6 +327,7 @@ export function WorkerSignupForm() {
       
       <div className="px-4 space-y-6 flex-grow pb-32">
         <form action={dispatch}>
+            <input type="hidden" name="userId" value={user?.uid || ''} />
             {/* STEP 1: Personal Details */}
             {currentStep === 1 && (
                 <div className="glass-card rounded-xl p-5 space-y-4">

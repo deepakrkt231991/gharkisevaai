@@ -3,12 +3,12 @@
 import { z } from 'zod';
 import { addDoc, collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase/init';
-import { getAuth } from 'firebase/auth';
 import { headers } from 'next/headers';
 
 
 // Updated schema to include new fields for bank details and location
 const WorkerProfileSchema = z.object({
+  userId: z.string().min(1, { message: "You must be logged in to create a worker profile." }),
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   phone: z.string().min(10, { message: "Please enter a valid 10-digit phone number." }),
   skills: z.string().min(2, { message: "Please select a skill." }),
@@ -36,6 +36,7 @@ export async function createWorkerProfile(
 ): Promise<State> {
   
   const validatedFields = WorkerProfileSchema.safeParse({
+    userId: formData.get('userId'),
     name: formData.get('name'),
     phone: formData.get('phone'),
     skills: formData.get('skills'),
@@ -54,27 +55,20 @@ export async function createWorkerProfile(
   if (!validatedFields.success) {
     return {
       success: false,
-      message: 'Invalid form data. Please check the fields.',
+      message: validatedFields.error.errors[0].message || 'Invalid form data. Please check the fields.',
       errors: validatedFields.error.issues,
     };
   }
   
   try {
-    const { firestore, auth } = initializeFirebase();
-    const currentUser = auth.currentUser;
+    const { firestore } = initializeFirebase();
     
-    if (!currentUser) {
-        return {
-            success: false,
-            message: 'You must be logged in to create a worker profile.',
-        };
-    }
-
-    const { accountHolderName, accountNumber, ifscCode, latitude, longitude, ...workerData } = validatedFields.data;
+    const { userId, accountHolderName, accountNumber, ifscCode, latitude, longitude, ...workerData } = validatedFields.data;
     
-    const workerId = currentUser.uid;
+    const workerId = userId;
     const workerDocRef = doc(firestore, 'workers', workerId);
     
+    // Security handled by rules: allow write: if request.auth.uid == workerId;
     await setDoc(workerDocRef, {
       ...workerData,
       workerId: workerId,

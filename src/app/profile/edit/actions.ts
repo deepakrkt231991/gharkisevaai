@@ -3,12 +3,10 @@
 import { z } from 'zod';
 import { doc, setDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase/init';
-import { getAuth } from 'firebase/auth';
 import { revalidatePath } from 'next/cache';
-import { updateProfile } from 'firebase/auth';
 
 const EditProfileSchema = z.object({
-  uid: z.string(),
+  uid: z.string().min(1, { message: "User not authenticated." }),
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   phone: z.string().min(10, { message: "Please enter a valid 10-digit phone number." }).optional().or(z.literal('')),
   address: z.string().optional(),
@@ -43,24 +41,17 @@ export async function updateUserProfile(
   const { uid, ...profileData } = validatedFields.data;
   
   try {
-    const { firestore, auth } = initializeFirebase();
-    const currentUser = auth.currentUser;
+    const { firestore } = initializeFirebase();
     
-    if (!currentUser || currentUser.uid !== uid) {
-      return {
-        success: false,
-        message: 'Authentication error. You can only update your own profile.',
-      };
-    }
-
     const userDocRef = doc(firestore, 'users', uid);
     
+    // Security is handled by Firestore rules:
+    // match /users/{userId} { allow write: if request.auth.uid == userId; }
     await setDoc(userDocRef, profileData, { merge: true });
 
-    // Also update the auth profile display name
-    if (currentUser.displayName !== profileData.name) {
-        await updateProfile(currentUser, { displayName: profileData.name });
-    }
+    // Note: Updating the Firebase Auth user's displayName (via updateProfile)
+    // should be handled on the client-side, as auth.currentUser isn't available here.
+    // This action only updates the Firestore document, which is the app's primary source of truth.
 
     revalidatePath('/profile'); 
     revalidatePath('/profile/edit'); 

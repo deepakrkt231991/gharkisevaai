@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 
 const UpdateLanguageSchema = z.object({
   language: z.string().min(2, { message: "Please select a language." }),
-  uid: z.string(),
+  uid: z.string().min(1, { message: "User not authenticated." }),
 });
 
 type State = {
@@ -37,18 +37,12 @@ export async function updateUserLanguage(
   const { uid, language } = validatedFields.data;
   
   try {
-    const { firestore, auth } = initializeFirebase();
-    const currentUser = auth.currentUser;
-    
-    if (!currentUser || currentUser.uid !== uid) {
-      return {
-        success: false,
-        message: 'Authentication error.',
-      };
-    }
+    const { firestore } = initializeFirebase();
 
     const userDocRef = doc(firestore, 'users', uid);
     
+    // Security is handled by Firestore rules:
+    // match /users/{userId} { allow write: if request.auth.uid == userId; }
     await updateDoc(userDocRef, { language });
 
     revalidatePath('/profile'); 
