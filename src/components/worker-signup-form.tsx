@@ -1,13 +1,12 @@
 
-
-"use client";
+'use client';
 
 import { useFormStatus } from 'react-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin, Mail } from 'lucide-react';
+import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin, Mail, Banknote, Gift, IndianRupee, TrendingUp, Users as UsersIcon, Wrench } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
 import { verifyWorker } from '@/ai/flows/verification-agent';
@@ -33,6 +32,7 @@ export function WorkerSignupForm() {
   const [state, dispatch] = useActionState(createWorkerProfile, initialState);
   const { toast } = useToast();
   
+  const [showIntro, setShowIntro] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
   const { latitude, longitude, error: geoError, isLoading: isGeoLoading } = useGeolocation();
 
@@ -197,6 +197,68 @@ export function WorkerSignupForm() {
         default: return "Worker Registration";
     }
   };
+
+  if (showIntro) {
+    const benefits = [
+      {
+        icon: <Gift className="h-8 w-8 text-primary" />,
+        title: "0% Registration Fee",
+        description: "Joining our platform is completely free. No hidden charges to get started."
+      },
+      {
+        icon: <Banknote className="h-8 w-8 text-primary" />,
+        title: "Get Paid Faster",
+        description: "Receive your earnings directly in your bank account just 1 hour after job completion."
+      },
+      {
+        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        title: "Smart Ranking System",
+        description: "Our AI promotes you based on your performance. High ratings and quality work move you to the top."
+      },
+      {
+        icon: <UsersIcon className="h-8 w-8 text-primary" />,
+        title: "Lifetime Referral Bonus",
+        description: "Refer customers or other workers and earn a 0.05% commission on their transactions, for life."
+      },
+      {
+        icon: <IndianRupee className="h-8 w-8 text-primary" />,
+        title: "7% Success-Based Fee",
+        description: "We only charge a small 7% platform fee when you successfully complete a job. No work, no charge."
+      }
+    ];
+
+    return (
+      <div className="w-full max-w-lg p-4 md:p-8 space-y-8">
+        <div className="text-center">
+          <Wrench className="mx-auto h-12 w-12 text-primary mb-4" />
+          <h1 className="font-headline text-3xl font-extrabold text-white">Join as a Partner</h1>
+          <p className="text-muted-foreground mt-2">Grow your business with AI. Work on your own terms.</p>
+        </div>
+
+        <div className="space-y-4">
+          {benefits.map((benefit, index) => (
+            <div key={index} className="flex items-start gap-4">
+              <div className="flex-shrink-0 mt-1 bg-primary/10 p-3 rounded-lg">
+                {benefit.icon}
+              </div>
+              <div>
+                <h3 className="font-semibold text-white">{benefit.title}</h3>
+                <p className="text-sm text-muted-foreground">{benefit.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <Button onClick={() => setShowIntro(false)} size="lg" className="w-full h-14 text-lg">
+          Get Started
+        </Button>
+
+        <p className="text-center text-xs text-muted-foreground">
+          Already have an account? <Link href="/login" className="font-semibold text-primary hover:underline">Log In</Link>
+        </p>
+      </div>
+    );
+  }
 
 
   return (
