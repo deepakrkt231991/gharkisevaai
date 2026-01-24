@@ -1,14 +1,17 @@
 
 'use client';
 
-import { useUser, useAuth } from '@/firebase/provider';
+import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase/provider';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle, FileLock, Handshake, Languages } from 'lucide-react';
+import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle, FileLock, Handshake, Languages, LayoutDashboard } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import { doc } from 'firebase/firestore';
+import type { User as UserEntity } from '@/lib/entities';
+
 
 function ProfileHeader() {
     return (
@@ -33,6 +36,14 @@ export function ProfileHub() {
     const { user, isUserLoading } = useUser();
     const auth = useAuth();
     const router = useRouter();
+    const firestore = useFirestore();
+
+    const userDocRef = useMemoFirebase(() => {
+        if (!firestore || !user?.uid) return null;
+        return doc(firestore, 'users', user.uid);
+    }, [firestore, user?.uid]);
+
+    const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserEntity>(userDocRef);
 
     const handleLogout = async () => {
         if (!auth) return;
@@ -41,7 +52,7 @@ export function ProfileHub() {
         router.push('/');
     };
     
-    if (isUserLoading) {
+    if (isUserLoading || isProfileLoading) {
         return (
             <>
                 <ProfileHeader />
@@ -82,6 +93,8 @@ export function ProfileHub() {
             </>
         )
     }
+    
+    const isWorker = userProfile?.userType === 'worker';
 
     return (
         <>
@@ -98,12 +111,13 @@ export function ProfileHub() {
                 
                 <Card className="glass-card">
                     <CardContent className="p-0 divide-y divide-border">
+                        {isWorker && <ProfileMenuItem icon={LayoutDashboard} label="Worker Dashboard" href="/dashboard/worker" />}
                         <ProfileMenuItem icon={UserIcon} label="Edit Profile" href="/profile/edit" />
                         <ProfileMenuItem icon={Settings} label="App Settings" href="/settings" />
                         <ProfileMenuItem icon={Shield} label="Privacy & Security" href="/privacy" />
                         <ProfileMenuItem icon={FileLock} label="Legal Vault" href="/legal-vault" />
                         <ProfileMenuItem icon={HelpCircle} label="Help & Support" href="/support" />
-                        <ProfileMenuItem icon={Handshake} label="Become a Worker" href="/worker-signup" />
+                        {!isWorker && <ProfileMenuItem icon={Handshake} label="Become a Worker" href="/worker-signup" />}
                         <ProfileMenuItem icon={Languages} label="Change Language" href="/language" />
                     </CardContent>
                 </Card>

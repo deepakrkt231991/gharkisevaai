@@ -22,6 +22,7 @@ const WorkerProfileSchema = z.object({
   certificationsUploaded: z.string().optional(),
   shopLicenseUploaded: z.string().optional(),
   referredBy: z.string().optional(),
+  portfolioImageUrls: z.array(z.string().url()).optional(),
 });
 
 type State = {
@@ -48,6 +49,7 @@ export async function createWorkerProfile(
     certificationsUploaded: formData.get('certificationsUploaded'),
     shopLicenseUploaded: formData.get('shopLicenseUploaded'),
     referredBy: formData.get('referredBy'),
+    portfolioImageUrls: formData.getAll('portfolioImageUrls[]'),
   });
 
   if (!validatedFields.success) {

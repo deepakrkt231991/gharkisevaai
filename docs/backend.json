@@ -178,6 +178,11 @@
         "successfulOrders": {
             "type": "number",
             "description": "The total number of successfully completed orders."
+        },
+        "portfolioImageUrls": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "URLs of images for the worker's portfolio."
         }
       },
       "required": ["uid", "workerId", "isVerified"]

@@ -53,6 +53,7 @@ export interface Worker {
     certificationsUploaded?: boolean;
     shopLicenseUploaded?: boolean;
     successfulOrders?: number;
+    portfolioImageUrls?: string[];
     createdAt?: any; // Firestore Timestamp
 }
 

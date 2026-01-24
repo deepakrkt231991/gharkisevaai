@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin, Mail, Banknote, Gift, IndianRupee, TrendingUp, Users as UsersIcon, Wrench } from 'lucide-react';
+import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin, Mail, Banknote, Gift, IndianRupee, TrendingUp, Users as UsersIcon, Wrench, Upload, X } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
 import { verifyWorker } from '@/ai/flows/verification-agent';
@@ -46,8 +46,11 @@ export function WorkerSignupForm() {
   const [selfieUri, setSelfieUri] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState<{ verified: boolean; reasoning: string; name: string } | null>(null);
-  
+
   // Step 3 State
+  const [portfolioImageUrls, setPortfolioImageUrls] = useState<string[]>([]);
+  
+  // Step 4 State
   const [skills, setSkills] = useState('');
   const [emergencyContact, setEmergencyContact] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -60,40 +63,74 @@ export function WorkerSignupForm() {
 
   useEffect(() => {
     let newProgress = 0;
-    if (currentStep === 1) {
-        if(name) newProgress += 11;
-        if(phone) newProgress += 11;
-        if(referredBy) newProgress += 11;
-    } else if (currentStep === 2) {
-        newProgress = 33;
-        if(idCardUri) newProgress += 16.5;
-        if(selfieUri) newProgress += 16.5;
-        if(verificationResult?.verified) newProgress = 66;
-    } else if (currentStep === 3) {
-        newProgress = 66;
-        if(skills) newProgress += 8;
-        if(emergencyContact) newProgress += 8;
-        if (latitude && longitude) newProgress += 8;
-        if(agreedToTerms) newProgress += 10;
+    if (currentStep === 1) { // 25%
+        if(name) newProgress += 8;
+        if(phone) newProgress += 8;
+        if(referredBy) newProgress += 9;
+    } else if (currentStep === 2) { // 50%
+        newProgress = 25;
+        if(idCardUri) newProgress += 12.5;
+        if(selfieUri) newProgress += 12.5;
+        if(verificationResult?.verified) newProgress = 50;
+    } else if (currentStep === 3) { // 75%
+        newProgress = 50;
+        if(portfolioImageUrls.length > 0) newProgress += 25;
+    } else if (currentStep === 4) { // 100%
+        newProgress = 75;
+        if(skills) newProgress += 6;
+        if(emergencyContact) newProgress += 6;
+        if (latitude && longitude) newProgress += 6;
+        if(agreedToTerms) newProgress += 7;
     }
     setProgress(Math.min(100, newProgress));
-  }, [name, phone, referredBy, idCardUri, selfieUri, verificationResult, skills, emergencyContact, latitude, longitude, currentStep, agreedToTerms]);
+  }, [name, phone, referredBy, idCardUri, selfieUri, verificationResult, portfolioImageUrls, skills, emergencyContact, latitude, longitude, currentStep, agreedToTerms]);
 
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'id' | 'selfie') => {
-      const file = e.target.files?.[0];
-      if (file) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-              if (fileType === 'id') {
-                  setIdCardUri(reader.result as string);
-              } else {
-                  setSelfieUri(reader.result as string);
-              }
-          };
-          reader.readAsDataURL(file);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'id' | 'selfie' | 'portfolio') => {
+      const files = e.target.files;
+      if (!files) return;
+
+      if (fileType === 'portfolio') {
+            const currentCount = portfolioImageUrls.length;
+            const filesArray = Array.from(files);
+            const remainingSlots = 4 - currentCount;
+
+             if (filesArray.length > remainingSlots) {
+                toast({
+                    title: "Maximum photos reached",
+                    description: `You can only add ${remainingSlots} more photos.`,
+                    variant: "destructive"
+                });
+            }
+            
+            const filesToAdd = filesArray.slice(0, remainingSlots);
+            const newPreviews: string[] = [];
+
+            filesToAdd.forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    newPreviews.push(event.target?.result as string);
+                    if (newPreviews.length === filesToAdd.length) {
+                        setPortfolioImageUrls(prev => [...prev, ...newPreviews]);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+      } else {
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const result = reader.result as string;
+            if (fileType === 'id') setIdCardUri(result);
+            else setSelfieUri(result);
+        };
+        reader.readAsDataURL(file);
       }
   };
+
+  const removePortfolioImage = (index: number) => {
+    setPortfolioImageUrls(prev => prev.filter((_, i) => i !== index));
+  }
 
   const handleVerification = async () => {
       if (!idCardUri || !selfieUri) {
@@ -178,8 +215,10 @@ export function WorkerSignupForm() {
   const nextStep = () => {
     if (currentStep === 1 && name && phone) {
       setCurrentStep(2);
-    } else if (currentStep === 2 && (idCardUri && selfieUri)) {
+    } else if (currentStep === 2 && (idCardUri && selfieUri && verificationResult?.verified)) {
       setCurrentStep(3);
+    } else if (currentStep === 3 && portfolioImageUrls.length > 0) {
+      setCurrentStep(4);
     }
   };
 
@@ -193,7 +232,8 @@ export function WorkerSignupForm() {
     switch (currentStep) {
         case 1: return "Basic Information";
         case 2: return "AI Identity Verification";
-        case 3: return "Final Details";
+        case 3: return "Showcase Your Work";
+        case 4: return "Final Details";
         default: return "Worker Registration";
     }
   };
@@ -363,9 +403,40 @@ export function WorkerSignupForm() {
                     )}
                 </div>
             )}
-            
-            {/* STEP 3: Final Details */}
+
+            {/* STEP 3: Portfolio */}
             {currentStep === 3 && (
+                 <div className="glass-card rounded-xl p-5 space-y-4">
+                    <div className="space-y-1">
+                        <Label className="text-muted-foreground">Showcase Your Work</Label>
+                        <p className="text-xs text-muted-foreground">Upload up to 4 photos of your past work or your shop.</p>
+                    </div>
+                     <div className="p-4 border-2 border-dashed rounded-lg bg-input/50 border-border">
+                        <div className="grid grid-cols-2 gap-2 mb-4">
+                            {portfolioImageUrls.map((src, index) => (
+                                <div key={index} className="relative aspect-video">
+                                    <Image src={src} alt="Portfolio preview" layout="fill" objectFit="cover" className="rounded-md" />
+                                     <Button size="icon" variant="destructive" type="button" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removePortfolioImage(index)}>
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                        {portfolioImageUrls.length < 4 && (
+                            <label className="w-full">
+                                <div className="flex items-center justify-center w-full bg-primary text-primary-foreground h-12 rounded-lg cursor-pointer">
+                                    <Upload className="mr-2 h-4 w-4"/>
+                                    <span>{portfolioImageUrls.length > 0 ? `Add More (${4 - portfolioImageUrls.length} left)` : 'Upload Photos'}</span>
+                                </div>
+                                <input type="file" className="sr-only" multiple accept="image/*" onChange={(e) => handleFileChange(e, 'portfolio')} />
+                            </label>
+                        )}
+                    </div>
+                </div>
+            )}
+            
+            {/* STEP 4: Final Details */}
+            {currentStep === 4 && (
                 <>
                 <div className="glass-card rounded-xl p-5 space-y-4">
                     <div className="flex items-center gap-2 mb-2">
@@ -449,6 +520,9 @@ export function WorkerSignupForm() {
             <input type="hidden" name="referredBy" value={referredBy} />
             <input type="hidden" name="latitude" value={latitude || ''} />
             <input type="hidden" name="longitude" value={longitude || ''} />
+             {portfolioImageUrls.map((url, i) => (
+                <input key={i} type="hidden" name="portfolioImageUrls[]" value={url} />
+            ))}
         </form>
       </div>
 
@@ -467,8 +541,13 @@ export function WorkerSignupForm() {
 
        {/* Sticky Bottom Actions */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] p-6 bg-gradient-to-t from-background via-background to-transparent pt-10">
-        {currentStep < 3 ? (
-            <Button onClick={nextStep} className="w-full bg-primary text-white font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all" disabled={(currentStep === 1 && (!name || !phone)) || (currentStep === 2 && !verificationResult?.verified)}>
+        {currentStep < 4 ? (
+            <Button onClick={nextStep} className="w-full bg-primary text-white font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all" 
+              disabled={
+                (currentStep === 1 && (!name || !phone)) || 
+                (currentStep === 2 && !verificationResult?.verified) ||
+                (currentStep === 3 && portfolioImageUrls.length === 0)
+              }>
                 Next Step
             </Button>
         ) : (
