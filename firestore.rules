@@ -3,8 +3,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function isAdmin() {
-      // Use the admin's specific UID for a more reliable check.
-      return request.auth.uid == '1eatIhLGf0ZIlAgG9rQXlOHa5DC3';
+      // Check for the admin's specific email.
+      return request.auth != null && request.auth.token.email == 'admin@gharkiseva.com';
     }
 
     // =====================================================================
@@ -47,21 +47,22 @@ service cloud.firestore {
     }
      match /health/{healthId} {
        // Assuming health data has a 'userId' field
-       allow read, write: if request.auth != null && 'userId' in resource.data && request.auth.uid == resource.data.userId;
+       allow read, write: if 'userId' in resource.data && request.auth != null && request.auth.uid == resource.data.userId;
     }
 
     // --- TRANSACTION & SENSITIVE DATA ---
     match /transactions/{transactionId} {
         // Admin can read all transactions. A user can only read their own,
         // provided the query filters by userId.
-        allow read: if request.auth != null && (isAdmin() || ('userId' in resource.data && request.auth.uid == resource.data.userId));
+        allow get: if request.auth != null && ('userId' in resource.data && request.auth.uid == resource.data.userId);
+        allow list: if isAdmin();
         
         // Writes are disabled from the client for security.
         allow write: if false;
     }
     
      match /sos_alerts/{alertId} {
-       allow read, write: if request.auth != null && 'userId' in resource.data && request.auth.uid == resource.data.userId;
+       allow read, write: if 'userId' in resource.data && request.auth != null && request.auth.uid == resource.data.userId;
     }
 
 
