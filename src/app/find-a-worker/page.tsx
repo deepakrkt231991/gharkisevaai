@@ -25,7 +25,7 @@ export default function FindWorkerPage() {
             <div>
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold font-headline text-white">Top Professionals</h2>
-                    <Link href="#" className="text-sm font-bold text-primary">See All</Link>
+                    <Link href="/find-a-worker" className="text-sm font-bold text-primary">See All</Link>
                 </div>
                 <div className="space-y-4">
                     {workers.map((worker) => (

@@ -8,7 +8,7 @@ export function Footer() {
         <p className="text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} GrihSeva AI. All rights reserved.
         </p>
-        <nav className="flex gap-4">
+        <nav className="flex gap-4 flex-wrap justify-center">
             <Link href="/summary" className="text-sm text-muted-foreground hover:text-primary">
                 App Summary
             </Link>
@@ -23,6 +23,9 @@ export function Footer() {
             </Link>
              <Link href="/features" className="text-sm text-muted-foreground hover:text-primary">
                 Features
+            </Link>
+            <Link href="/support" className="text-sm text-muted-foreground hover:text-primary">
+                Contact Us
             </Link>
         </nav>
       </div>
