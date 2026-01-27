@@ -1,4 +1,5 @@
 
+
 "use server";
 
 import { z } from 'zod';
@@ -23,6 +24,7 @@ const WorkerProfileSchema = z.object({
   shopLicenseUploaded: z.string().optional(),
   referredBy: z.string().optional(),
   portfolioImageUrls: z.array(z.string().url()).optional(),
+  shopPhotoUrl: z.string().url().optional(),
 });
 
 type State = {
@@ -51,6 +53,7 @@ export async function createWorkerProfile(
     shopLicenseUploaded: formData.get('shopLicenseUploaded'),
     referredBy: formData.get('referredBy'),
     portfolioImageUrls: formData.getAll('portfolioImageUrls[]'),
+    shopPhotoUrl: formData.get('shopPhotoUrl') || undefined,
   });
 
   if (!validatedFields.success) {

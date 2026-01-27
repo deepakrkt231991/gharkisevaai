@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useActionState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin, Mail, Banknote, Gift, IndianRupee, TrendingUp, Users as UsersIcon, Wrench, Upload, X } from 'lucide-react';
+import { AlertCircle, Loader2, User, ShieldCheck, Landmark, Lock, Mic, IdCard, Camera, CheckCircle, Bot, ArrowLeft, MapPin, Mail, Banknote, Gift, IndianRupee, TrendingUp, Users as UsersIcon, Wrench, Upload, X, Building } from 'lucide-react';
 
 import { createWorkerProfile } from '@/app/worker-signup/actions';
 import { verifyWorker } from '@/ai/flows/verification-agent';
@@ -51,6 +51,8 @@ export function WorkerSignupForm() {
 
   // Step 3 State
   const [portfolioImageUrls, setPortfolioImageUrls] = useState<string[]>([]);
+  const [shopPhotoUrl, setShopPhotoUrl] = useState<string | null>(null);
+
   
   // Step 4 State
   const [skills, setSkills] = useState('');
@@ -76,7 +78,8 @@ export function WorkerSignupForm() {
         if(verificationResult?.verified) newProgress = 50;
     } else if (currentStep === 3) { // 75%
         newProgress = 50;
-        if(portfolioImageUrls.length > 0) newProgress += 25;
+        if(shopPhotoUrl) newProgress += 10;
+        if(portfolioImageUrls.length > 0) newProgress += 15;
     } else if (currentStep === 4) { // 100%
         newProgress = 75;
         if(skills) newProgress += 6;
@@ -85,10 +88,10 @@ export function WorkerSignupForm() {
         if(agreedToTerms) newProgress += 7;
     }
     setProgress(Math.min(100, newProgress));
-  }, [name, phone, referredBy, idCardUri, selfieUri, verificationResult, portfolioImageUrls, skills, emergencyContact, latitude, longitude, currentStep, agreedToTerms]);
+  }, [name, phone, referredBy, idCardUri, selfieUri, verificationResult, shopPhotoUrl, portfolioImageUrls, skills, emergencyContact, latitude, longitude, currentStep, agreedToTerms]);
 
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'id' | 'selfie' | 'portfolio') => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'id' | 'selfie' | 'portfolio' | 'shop') => {
       const files = e.target.files;
       if (!files) return;
 
@@ -124,7 +127,8 @@ export function WorkerSignupForm() {
         reader.onloadend = () => {
             const result = reader.result as string;
             if (fileType === 'id') setIdCardUri(result);
-            else setSelfieUri(result);
+            else if (fileType === 'selfie') setSelfieUri(result);
+            else if (fileType === 'shop') setShopPhotoUrl(result);
         };
         reader.readAsDataURL(file);
       }
@@ -219,7 +223,7 @@ export function WorkerSignupForm() {
       setCurrentStep(2);
     } else if (currentStep === 2 && (idCardUri && selfieUri && verificationResult?.verified)) {
       setCurrentStep(3);
-    } else if (currentStep === 3 && portfolioImageUrls.length > 0) {
+    } else if (currentStep === 3) {
       setCurrentStep(4);
     }
   };
@@ -412,28 +416,43 @@ export function WorkerSignupForm() {
                  <div className="glass-card rounded-xl p-5 space-y-4">
                     <div className="space-y-1">
                         <Label className="text-muted-foreground">Showcase Your Work</Label>
-                        <p className="text-xs text-muted-foreground">Upload up to 4 photos of your past work or your shop.</p>
+                        <p className="text-xs text-muted-foreground">Upload your shop photo, visiting card, or past work samples.</p>
                     </div>
-                     <div className="p-4 border-2 border-dashed rounded-lg bg-input/50 border-border">
-                        <div className="grid grid-cols-2 gap-2 mb-4">
-                            {portfolioImageUrls.map((src, index) => (
-                                <div key={index} className="relative aspect-video">
-                                    <Image src={src} alt="Portfolio preview" layout="fill" objectFit="cover" className="rounded-md" />
-                                     <Button size="icon" variant="destructive" type="button" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removePortfolioImage(index)}>
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            ))}
-                        </div>
-                        {portfolioImageUrls.length < 4 && (
-                            <label className="w-full">
-                                <div className="flex items-center justify-center w-full bg-primary text-primary-foreground h-12 rounded-lg cursor-pointer">
-                                    <Upload className="mr-2 h-4 w-4"/>
-                                    <span>{portfolioImageUrls.length > 0 ? `Add More (${4 - portfolioImageUrls.length} left)` : 'Upload Photos'}</span>
-                                </div>
-                                <input type="file" className="sr-only" multiple accept="image/*" onChange={(e) => handleFileChange(e, 'portfolio')} />
-                            </label>
+                     <label className="relative flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-input/50 border-border hover:border-primary">
+                        <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileChange(e, 'shop')} />
+                        {shopPhotoUrl ? (
+                            <Image src={shopPhotoUrl} alt="Shop photo preview" layout="fill" objectFit="cover" className="rounded-lg" />
+                        ) : (
+                            <div className="text-center text-muted-foreground">
+                                <Building className="mx-auto h-8 w-8" />
+                                <p className="text-xs mt-1 font-bold">Upload Shop / Certificate Photo</p>
+                            </div>
                         )}
+                    </label>
+                    
+                    <div className="space-y-1">
+                        <Label className="text-muted-foreground">Work Portfolio (Optional)</Label>
+                        <div className="p-4 border-2 border-dashed rounded-lg bg-input/50 border-border">
+                            <div className="grid grid-cols-2 gap-2 mb-4">
+                                {portfolioImageUrls.map((src, index) => (
+                                    <div key={index} className="relative aspect-video">
+                                        <Image src={src} alt="Portfolio preview" layout="fill" objectFit="cover" className="rounded-md" />
+                                        <Button size="icon" variant="destructive" type="button" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removePortfolioImage(index)}>
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                            {portfolioImageUrls.length < 4 && (
+                                <label className="w-full">
+                                    <div className="flex items-center justify-center w-full bg-primary text-primary-foreground h-12 rounded-lg cursor-pointer">
+                                        <Upload className="mr-2 h-4 w-4"/>
+                                        <span>{portfolioImageUrls.length > 0 ? `Add More (${4 - portfolioImageUrls.length} left)` : 'Upload Work Photos'}</span>
+                                    </div>
+                                    <input type="file" className="sr-only" multiple accept="image/*" onChange={(e) => handleFileChange(e, 'portfolio')} />
+                                </label>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
@@ -509,7 +528,7 @@ export function WorkerSignupForm() {
                     <div className="flex items-center space-x-2 pt-4">
                         <Checkbox id="terms" onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} />
                         <Label htmlFor="terms" className="text-sm text-muted-foreground">
-                            I agree to the <Link href="/terms" className="underline text-primary">Terms & Conditions</Link>.
+                            I agree to the 7% platform fee and <Link href="/terms" className="underline text-primary">Terms & Conditions</Link>.
                         </Label>
                     </div>
                 </div>
@@ -523,6 +542,7 @@ export function WorkerSignupForm() {
             <input type="hidden" name="referredBy" value={referredBy} />
             <input type="hidden" name="latitude" value={latitude || ''} />
             <input type="hidden" name="longitude" value={longitude || ''} />
+            {shopPhotoUrl && <input type="hidden" name="shopPhotoUrl" value={shopPhotoUrl} />}
              {portfolioImageUrls.map((url, i) => (
                 <input key={i} type="hidden" name="portfolioImageUrls[]" value={url} />
             ))}
@@ -548,8 +568,7 @@ export function WorkerSignupForm() {
             <Button onClick={nextStep} className="w-full bg-primary text-white font-extrabold py-4 h-14 rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all" 
               disabled={
                 (currentStep === 1 && (!name || !phone)) || 
-                (currentStep === 2 && !verificationResult?.verified) ||
-                (currentStep === 3 && portfolioImageUrls.length === 0)
+                (currentStep === 2 && !verificationResult?.verified)
               }>
                 Next Step
             </Button>
