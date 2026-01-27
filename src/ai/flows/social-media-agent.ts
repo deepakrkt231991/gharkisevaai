@@ -10,13 +10,13 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const SocialMediaAdInputSchema = z.object({
+const SocialMediaAdInputSchema = z.object({
   topic: z.string().describe("The topic for the ad, e.g., 'hiring plumbers in Delhi', 'promoting our new AI verification feature'."),
   platform: z.enum(["Facebook", "LinkedIn", "Instagram"]).describe("The target social media platform."),
 });
 export type SocialMediaAdInput = z.infer<typeof SocialMediaAdInputSchema>;
 
-export const SocialMediaAdOutputSchema = z.object({
+const SocialMediaAdOutputSchema = z.object({
   adCopy: z.string().describe("The generated ad copy, formatted with headlines, body text, and relevant hashtags, tailored for the specified platform."),
 });
 export type SocialMediaAdOutput = z.infer<typeof SocialMediaAdOutputSchema>;

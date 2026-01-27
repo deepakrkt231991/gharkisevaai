@@ -4,7 +4,7 @@ import { initializeFirebase } from '@/firebase/init';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createPromotionalContent, type CreateContentOutput } from '@/ai/flows/content-creator-agent';
-import { createSocialMediaAd, SocialMediaAdInputSchema, type SocialMediaAdOutput } from '@/ai/flows/social-media-agent';
+import { createSocialMediaAd, type SocialMediaAdOutput } from '@/ai/flows/social-media-agent';
 import { verifyPropertyDocs } from '@/ai/flows/property-verification-agent';
 import { generateTrustCertificate } from '@/ai/flows/certificate-generator-agent';
 
@@ -91,6 +91,11 @@ export type AdState = {
     data: SocialMediaAdOutput | null;
 };
 
+const SocialMediaAdInputSchema = z.object({
+  topic: z.string().min(3, { message: 'Please provide a topic for the ad.'}),
+  platform: z.enum(["Facebook", "LinkedIn", "Instagram"]),
+});
+
 export async function generateSocialAd(
     prevState: AdState,
     formData: FormData
@@ -101,7 +106,7 @@ export async function generateSocialAd(
     });
 
     if (!validatedFields.success) {
-        return { success: false, message: 'Invalid input for ad generation.', data: null };
+        return { success: false, message: validatedFields.error.errors[0].message, data: null };
     }
 
     try {
