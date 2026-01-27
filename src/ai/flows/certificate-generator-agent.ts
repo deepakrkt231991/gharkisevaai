@@ -10,14 +10,14 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const CertificateInputSchema = z.object({
+const CertificateInputSchema = z.object({
   ownerName: z.string().describe("The name of the property owner."),
   propertyId: z.string().describe("The unique ID of the property."),
   verificationDate: z.string().describe("The date the verification was completed (e.g., 'October 28, 2023')."),
 });
 export type CertificateInput = z.infer<typeof CertificateInputSchema>;
 
-export const CertificateOutputSchema = z.object({
+const CertificateOutputSchema = z.object({
   certificateUrl: z
     .string()
     .describe("The generated 'Verified Seller Certificate' as a data URI."),
