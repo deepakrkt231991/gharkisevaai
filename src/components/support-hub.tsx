@@ -37,7 +37,7 @@ export function SupportHub() {
           </a>
            <a href="tel:+910000000000" className="flex items-center gap-4 p-3 bg-black/20 rounded-lg border border-border">
             <Phone className="text-primary" />
-            <span className="text-white font-medium">+91 000-000-0000</span>
+            <span className="text-white font-medium">+91 000-000-0000 (Mon-Fri, 9am-6pm)</span>
           </a>
         </CardContent>
       </Card>

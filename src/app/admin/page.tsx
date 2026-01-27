@@ -7,8 +7,8 @@ import { useUser } from '@/firebase';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-// IMPORTANT: In a real app, this should be a list of admin UIDs stored in a secure config.
-const ADMIN_EMAIL = "admin@gharkiseva.com"; 
+// IMPORTANT: This email is the master admin for the entire app.
+const ADMIN_EMAIL = "gharkisevaai@gmail.com"; 
 
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
@@ -33,7 +33,7 @@ export default function AdminPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">You do not have permission to view this page. Please contact the administrator if you believe this is an error.</p>
+              <p className="text-muted-foreground">You do not have permission to view this page. Please log in with the admin account or contact support if you believe this is an error.</p>
             </CardContent>
           </Card>
       </div>

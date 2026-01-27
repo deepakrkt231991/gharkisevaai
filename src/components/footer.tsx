@@ -5,9 +5,10 @@ export function Footer() {
   return (
     <footer className="border-t bg-secondary mt-auto">
       <div className="container py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-        <p className="text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} GrihSeva AI. All rights reserved.
-        </p>
+        <div className="text-center text-sm text-muted-foreground">
+          <p>© {new Date().getFullYear()} GrihSeva AI. All rights reserved.</p>
+          <p>Contact: <a href="mailto:gharkisevaai@gmail.com" className="font-medium text-primary hover:underline">gharkisevaai@gmail.com</a></p>
+        </div>
         <nav className="flex gap-4 flex-wrap justify-center">
             <Link href="/summary" className="text-sm text-muted-foreground hover:text-primary">
                 App Summary
