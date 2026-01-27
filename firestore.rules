@@ -4,15 +4,28 @@ service cloud.firestore {
 
     function isAdmin() {
       // Check for the admin's specific email.
-      return request.auth != null && request.auth.token.email == 'admin@gharkiseva.com';
+      return request.auth != null && request.auth.token.email == 'deepakkadamrkt@gmail.com';
     }
 
     // =====================================================================
     // PUBLIC-READ COLLECTIONS
     // =====================================================================
     match /properties/{propertyId} {
-      allow get, list: if true;
-      allow write: if request.auth != null;
+      // Public can list verified properties. Owners and admins can get any.
+      allow list: if resource.data.verificationStatus == 'verified';
+      allow get: if resource.data.verificationStatus == 'verified'
+                  || (request.auth != null && request.auth.uid == resource.data.ownerId)
+                  || isAdmin();
+
+      // Authenticated users can create listings.
+      allow create: if request.auth != null;
+
+      // Owners can update their listings, but not the verification status. Admins can update anything.
+      allow update: if (request.auth != null && request.auth.uid == resource.data.ownerId && request.resource.data.verificationStatus == resource.data.verificationStatus)
+                    || isAdmin();
+
+      // Only admins can delete properties.
+      allow delete: if isAdmin();
     }
     match /products/{productId} {
       allow get, list: if true;
@@ -52,10 +65,8 @@ service cloud.firestore {
 
     // --- TRANSACTION & SENSITIVE DATA ---
     match /transactions/{transactionId} {
-        // Admin can read all transactions. A user can only read their own,
-        // provided the query filters by userId.
-        allow get: if request.auth != null && ('userId' in resource.data && request.auth.uid == resource.data.userId);
-        allow list: if isAdmin();
+        allow get: if request.auth != null && (isAdmin() || ('userId' in resource.data && request.auth.uid == resource.data.userId));
+        allow list: if request.auth != null && (isAdmin() || (request.query.where.size() > 0 && request.query.where[0][1] == 'userId'));
         
         // Writes are disabled from the client for security.
         allow write: if false;

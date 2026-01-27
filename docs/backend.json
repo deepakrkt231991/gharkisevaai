@@ -187,6 +187,10 @@
             "type": "array",
             "items": { "type": "string" },
             "description": "URLs of images for the worker's portfolio."
+        },
+        "shopPhotoUrl": {
+          "type": "string",
+          "description": "URL of the worker's shop, visiting card, or certificate photo."
         }
       },
       "required": ["uid", "workerId", "isVerified"]
@@ -392,11 +396,23 @@
         "parking": { "type": "number" },
         "imageUrl": { "type": "string" },
         "videoUrl": { "type": "string", "description": "URL of the property video walkthrough." },
-        "isAiVerified": { "type": "boolean", "description": "Whether the property has been verified by AI." },
         "listingType": { "type": "string", "enum": ["sale", "rent"], "description": "Whether the property is for sale or for rent." },
-        "vastuScore": { "type": "number", "description": "Vastu compliance score from 0 to 10." }
+        "vastuScore": { "type": "number", "description": "Vastu compliance score from 0 to 10." },
+        "verificationStatus": {
+            "type": "string",
+            "enum": ["pending", "verified", "rejected", "review_needed"],
+            "description": "The verification status of the property, managed by admin."
+        },
+        "verificationNotes": {
+            "type": "string",
+            "description": "Notes from the user or admin regarding verification."
+        },
+        "utilityBillUrl": { "type": "string", "description": "URL of the uploaded utility bill." },
+        "taxPaperUrl": { "type": "string", "description": "URL of the uploaded property tax paper." },
+        "aadharUrl": { "type": "string", "description": "URL of the uploaded Aadhar card." },
+        "panUrl": { "type": "string", "description": "URL of the uploaded PAN card." }
       },
-      "required": ["propertyId", "ownerId", "title", "location", "sqft", "parking", "listingType"]
+      "required": ["propertyId", "ownerId", "title", "location", "sqft", "parking", "listingType", "verificationStatus"]
     },
     "Deal": {
         "$schema": "http://json-schema.org/draft-07/schema#",
