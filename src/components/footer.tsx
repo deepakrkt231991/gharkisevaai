@@ -9,6 +9,9 @@ export function Footer() {
           © {new Date().getFullYear()} GrihSeva AI. All rights reserved.
         </p>
         <nav className="flex gap-4">
+            <Link href="/summary" className="text-sm text-muted-foreground hover:text-primary">
+                App Summary
+            </Link>
             <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary">
                 Terms of Service
             </Link>
