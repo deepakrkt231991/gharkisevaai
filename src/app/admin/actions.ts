@@ -1,10 +1,12 @@
 'use server';
-import { doc, updateDoc, deleteDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc, addDoc, collection, serverTimestamp, getDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase/init';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createPromotionalContent, type CreateContentOutput } from '@/ai/flows/content-creator-agent';
 import { createSocialMediaAd, SocialMediaAdInputSchema, type SocialMediaAdOutput } from '@/ai/flows/social-media-agent';
+import { verifyPropertyDocs } from '@/ai/flows/property-verification-agent';
+import { generateTrustCertificate } from '@/ai/flows/certificate-generator-agent';
 
 const PLATFORM_ADMIN_UID = 'GRIHSEVA_ADMIN_UID';
 
@@ -83,7 +85,6 @@ export async function generateAdminPromoPoster(
   }
 }
 
-// NEW ACTION FOR SOCIAL MEDIA
 export type AdState = {
     success: boolean;
     message: string;
@@ -134,5 +135,74 @@ export async function withdrawAdminFunds(amount: number): Promise<{ success: boo
 
     } catch (e: any) {
         return { success: false, message: e.message || 'An error occurred while logging the withdrawal.' };
+    }
+}
+
+
+// --- PROPERTY VERIFICATION ACTIONS ---
+
+export async function approvePropertyAndGenerateCertificate(propertyId: string): Promise<{ success: boolean; message: string }> {
+    if (!propertyId) {
+        return { success: false, message: 'Property ID is required.' };
+    }
+    const { firestore } = initializeFirebase();
+    const propertyRef = doc(firestore, 'properties', propertyId);
+
+    try {
+        // 1. Get property and owner data
+        const propertySnap = await getDoc(propertyRef);
+        if (!propertySnap.exists()) throw new Error('Property not found.');
+        const propertyData = propertySnap.data();
+
+        const ownerRef = doc(firestore, 'users', propertyData.ownerId);
+        const ownerSnap = await getDoc(ownerRef);
+        if (!ownerSnap.exists()) throw new Error('Property owner not found.');
+        const ownerData = ownerSnap.data();
+
+        // 2. Generate Certificate
+        const verificationDate = new Date().toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+
+        const certificateResult = await generateTrustCertificate({
+            ownerName: ownerData.name || 'Valued User',
+            propertyId: propertyId,
+            verificationDate: verificationDate,
+        });
+
+        if (!certificateResult.certificateUrl) {
+            throw new Error('AI failed to generate the certificate image.');
+        }
+
+        // 3. Update property with verified status and certificate URL
+        await updateDoc(propertyRef, {
+            verificationStatus: 'verified',
+            certificateUrl: certificateResult.certificateUrl,
+            certificateGeneratedAt: serverTimestamp(),
+        });
+        
+        revalidatePath('/admin');
+        revalidatePath('/dashboard/seller');
+
+        return { success: true, message: 'Property approved and certificate issued!' };
+
+    } catch (e: any) {
+        console.error("Error approving property and generating certificate:", e);
+        return { success: false, message: e.message || 'An unknown error occurred.' };
+    }
+}
+
+export async function rejectProperty(propertyId: string): Promise<{ success: boolean; message: string }> {
+    if (!propertyId) {
+        return { success: false, message: 'Property ID is required.' };
+    }
+    const { firestore } = initializeFirebase();
+    const propertyRef = doc(firestore, 'properties', propertyId);
+    try {
+        await updateDoc(propertyRef, { verificationStatus: 'rejected' });
+        revalidatePath('/admin');
+        return { success: true, message: 'Property has been rejected.' };
+    } catch (e: any) {
+        return { success: false, message: e.message };
     }
 }

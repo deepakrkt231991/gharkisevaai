@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -6,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle, FileLock, Handshake, Languages, LayoutDashboard } from 'lucide-react';
+import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle, FileLock, Handshake, Languages, LayoutDashboard, Building } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { doc } from 'firebase/firestore';
@@ -112,6 +111,7 @@ export function ProfileHub() {
                 <Card className="glass-card">
                     <CardContent className="p-0 divide-y divide-border">
                         {isWorker && <ProfileMenuItem icon={LayoutDashboard} label="Worker Dashboard" href="/dashboard/worker" />}
+                        <ProfileMenuItem icon={Building} label="Seller Dashboard" href="/dashboard/seller" />
                         <ProfileMenuItem icon={UserIcon} label="Edit Profile" href="/profile/edit" />
                         <ProfileMenuItem icon={Settings} label="App Settings" href="/settings" />
                         <ProfileMenuItem icon={Shield} label="Privacy & Security" href="/privacy" />
@@ -130,5 +130,3 @@ export function ProfileHub() {
         </>
     );
 }
-
-    

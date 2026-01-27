@@ -56,6 +56,7 @@ export interface Worker {
     successfulOrders?: number;
     portfolioImageUrls?: string[];
     createdAt?: any; // Firestore Timestamp
+    shopPhotoUrl?: string;
 }
 
 export interface Health {
@@ -155,9 +156,16 @@ export interface Property {
     parking: number;
     imageUrl?: string;
     videoUrl?: string; // URL of the property video walkthrough.
-    isAiVerified: boolean; // Whether the property has been verified by AI.
     listingType: "sale" | "rent"; // Whether the property is for sale or for rent.
     vastuScore?: number; // Vastu compliance score from 0 to 10.
+    verificationStatus: "pending" | "verified" | "rejected" | "review_needed";
+    verificationNotes?: string;
+    utilityBillUrl?: string;
+    taxPaperUrl?: string;
+    aadharUrl?: string;
+    panUrl?: string;
+    certificateUrl?: string;
+    certificateGeneratedAt?: any; // Firestore Timestamp
     createdAt?: any; // Firestore Timestamp
 }
 

@@ -410,7 +410,9 @@
         "utilityBillUrl": { "type": "string", "description": "URL of the uploaded utility bill." },
         "taxPaperUrl": { "type": "string", "description": "URL of the uploaded property tax paper." },
         "aadharUrl": { "type": "string", "description": "URL of the uploaded Aadhar card." },
-        "panUrl": { "type": "string", "description": "URL of the uploaded PAN card." }
+        "panUrl": { "type": "string", "description": "URL of the uploaded PAN card." },
+        "certificateUrl": { "type": "string", "description": "URL of the generated verification certificate." },
+        "certificateGeneratedAt": { "type": "string", "format": "date-time", "description": "Timestamp for when the certificate was generated." }
       },
       "required": ["propertyId", "ownerId", "title", "location", "sqft", "parking", "listingType", "verificationStatus"]
     },
