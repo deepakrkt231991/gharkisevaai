@@ -1,4 +1,3 @@
-
 // src/app/rent-tools/page.tsx
 'use client';
 
