@@ -268,7 +268,8 @@
         "userId": { "type": "string", "description": "The ID of the user/worker who this transaction belongs to." },
         "amount": { "type": "number" },
         "type": { "type": "string", "enum": ["referral_commission", "payout", "refund", "platform_fee", "tax", "admin_withdrawal"] },
-        "sourceJobId": { "type": "string", "description": "The job ID that triggered this transaction." },
+        "sourceJobId": { "type": "string", "description": "The job, deal, or rental ID that triggered this transaction." },
+        "sourceType": { "type": "string", "enum": ["job", "deal", "rental"], "description": "The type of source that generated the transaction." },
         "timestamp": { "type": "string", "format": "date-time" },
         "jobCompletedAt": { "type": "string", "format": "date-time", "description": "Timestamp for when the source job was completed, used for payout rules."}
       },

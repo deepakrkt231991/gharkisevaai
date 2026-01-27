@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote } from "lucide-react";
+import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag } from "lucide-react";
 import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, where, orderBy } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
@@ -204,7 +204,7 @@ function RevenueWithdrawalCard({ netProfit }: { netProfit: number }) {
   return (
     <Card className="bg-gray-900/50 border-accent text-white rounded-xl border">
       <CardContent className="p-6 text-center space-y-3">
-        <p className="text-sm font-medium text-white/70">TOTAL APP EARNINGS (WITHDRAWABLE)</p>
+        <p className="text-sm font-medium text-white/70">TOTAL NET PROFIT (WITHDRAWABLE)</p>
         <p className="text-4xl font-extrabold text-accent">₹{netProfit.toFixed(2)}</p>
         <Button onClick={handleWithdraw} disabled={isPending || netProfit < 500} className="w-full max-w-xs mx-auto bg-accent text-accent-foreground hover:bg-accent/90 h-12 text-base font-bold">
           {isPending ? <Loader2 className="mr-2 animate-spin" /> : null}
@@ -255,48 +255,6 @@ function WeeklyGrowthReport() {
     )
 }
 
-function EarningsChart({ totalEarnings, referralPayouts }: { totalEarnings: number, referralPayouts: number }) {
-    const chartData = [
-        { name: "Total", earnings: totalEarnings, payouts: referralPayouts },
-    ];
-
-    const chartConfig: ChartConfig = {
-        earnings: {
-            label: "Platform Fees",
-            color: "hsl(var(--accent))",
-        },
-        payouts: {
-            label: "Referral Payouts",
-            color: "hsl(var(--destructive))",
-        },
-    };
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Earnings vs. Payouts</CardTitle>
-                <CardDescription>
-                    A summary of your gross earnings (platform fees) against referral commissions paid out.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="min-h-[150px] w-full">
-                    <BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ left: 10 }}>
-                        <CartesianGrid horizontal={false} />
-                        <XAxis type="number" hide />
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent hideLabel indicator="line" />}
-                        />
-                        <Bar dataKey="earnings" fill="var(--color-earnings)" radius={4} name="Platform Fees (7%)" />
-                        <Bar dataKey="payouts" fill="var(--color-payouts)" radius={4} name="Referral Payouts (0.05%)" />
-                    </BarChart>
-                </ChartContainer>
-            </CardContent>
-        </Card>
-    );
-}
-
 export function AdminDashboard() {
   const firestore = useFirestore();
 
@@ -325,17 +283,28 @@ export function AdminDashboard() {
   const { data: transactions, isLoading: transactionsLoading } = useCollection<Transaction>(transactionsQuery);
   const { data: disputedDeals, isLoading: disputesLoading } = useCollection<Deal>(disputedDealsQuery);
 
-  const { totalVolume, platformFees, referralPayouts, adminWithdrawals, netProfit } = useMemo(() => {
-    if (!transactions) return { totalVolume: 0, platformFees: 0, referralPayouts: 0, adminWithdrawals: 0, netProfit: 0 };
+  const {
+    totalVolume,
+    workerFee,
+    marketplaceIncome,
+    toolIncome,
+    referralPayouts,
+    adminWithdrawals,
+    netProfit
+  } = useMemo(() => {
+    if (!transactions) return { totalVolume: 0, workerFee: 0, marketplaceIncome: 0, toolIncome: 0, referralPayouts: 0, adminWithdrawals: 0, netProfit: 0 };
     
     let volume = 0;
-    let fees = 0;
+    let workerFee = 0;
+    let marketplaceIncome = 0;
+    let toolIncome = 0;
     let referrals = 0;
     let withdrawals = 0;
     
     const processedJobs = new Set();
 
     transactions.forEach(tx => {
+        // Calculate Total Volume
         if ((tx.type === 'payout' || tx.type === 'platform_fee' || tx.type === 'tax') && tx.sourceJobId && !processedJobs.has(tx.sourceJobId)) {
             const jobTransactions = transactions.filter(t => t.sourceJobId === tx.sourceJobId && (t.type === 'payout' || t.type === 'platform_fee' || t.type === 'tax'));
             const jobTotal = jobTransactions.reduce((sum, current) => sum + current.amount, 0);
@@ -343,9 +312,17 @@ export function AdminDashboard() {
             processedJobs.add(tx.sourceJobId);
         }
 
+        // Segregate Platform Fees by source
         if (tx.type === 'platform_fee') {
-            fees += tx.amount;
+            if (tx.sourceType === 'job') {
+                workerFee += tx.amount;
+            } else if (tx.sourceType === 'deal') {
+                marketplaceIncome += tx.amount;
+            } else if (tx.sourceType === 'rental') {
+                toolIncome += tx.amount;
+            }
         }
+        
         if (tx.type === 'referral_commission') {
             referrals += tx.amount;
         }
@@ -354,14 +331,17 @@ export function AdminDashboard() {
         }
     });
 
+    const totalPlatformFees = workerFee + marketplaceIncome + toolIncome;
     const totalDeductions = referrals + withdrawals;
 
     return { 
         totalVolume: volume, 
-        platformFees: fees, 
+        workerFee,
+        marketplaceIncome,
+        toolIncome,
         referralPayouts: referrals,
         adminWithdrawals: withdrawals,
-        netProfit: fees - totalDeductions
+        netProfit: totalPlatformFees - totalDeductions
     };
   }, [transactions]);
 
@@ -418,34 +398,57 @@ export function AdminDashboard() {
         <TabsContent value="finance" className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <StatCard
-                  title="Total Transaction Volume"
-                  value={`₹${totalVolume.toFixed(2)}`}
-                  description="Total value of all completed jobs"
-                  icon={<IndianRupee className="h-4 w-4 text-muted-foreground" />}
+                  title="Worker Fee Income"
+                  value={`₹${workerFee.toFixed(2)}`}
+                  description="From 7% service fee"
+                  icon={<Users className="h-4 w-4 text-muted-foreground" />}
               />
               <StatCard
-                  title="Platform Fee Earned (7%)"
-                  value={`₹${platformFees.toFixed(2)}`}
-                  description="Your gross revenue from commissions"
-                  icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
+                  title="Marketplace Income"
+                  value={`₹${marketplaceIncome.toFixed(2)}`}
+                  description="From used item sales"
+                  icon={<ShoppingBag className="h-4 w-4 text-muted-foreground" />}
               />
               <StatCard
-                  title="Referral Payouts"
-                  value={`- ₹${referralPayouts.toFixed(2)}`}
-                  description="Commissions paid to referrers"
-                  icon={<Share2 className="h-4 w-4 text-muted-foreground" />}
+                  title="Tool Rental Income"
+                  value={`₹${toolIncome.toFixed(2)}`}
+                  description="From tool rentals"
+                  icon={<Hammer className="h-4 w-4 text-muted-foreground" />}
               />
-              <StatCard
-                  title="Total Withdrawn"
-                  value={`₹${adminWithdrawals.toFixed(2)}`}
-                  description="Total amount paid out to admin"
-                  icon={<Banknote className="h-4 w-4 text-muted-foreground" />}
+               <StatCard
+                  title="Home Rent Income"
+                  value="₹0.00"
+                  description="Feature coming soon"
+                  icon={<Home className="h-4 w-4 text-muted-foreground" />}
               />
             </div>
-
+            
              <RevenueWithdrawalCard netProfit={netProfit} />
-
-             <EarningsChart totalEarnings={platformFees} referralPayouts={referralPayouts} />
+             
+             <Card>
+                <CardHeader>
+                    <CardTitle>Financial Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    <div className="flex justify-between items-center text-sm">
+                        <p className="text-muted-foreground">Total Platform Fees Earned</p>
+                        <p className="font-medium text-green-500">+ ₹{(workerFee + marketplaceIncome + toolIncome).toFixed(2)}</p>
+                    </div>
+                     <div className="flex justify-between items-center text-sm">
+                        <p className="text-muted-foreground">Referral Commissions Paid</p>
+                        <p className="font-medium text-destructive">- ₹{referralPayouts.toFixed(2)}</p>
+                    </div>
+                     <div className="flex justify-between items-center text-sm">
+                        <p className="text-muted-foreground">Admin Withdrawals</p>
+                        <p className="font-medium text-destructive">- ₹{adminWithdrawals.toFixed(2)}</p>
+                    </div>
+                    <div className="border-t border-border my-2"></div>
+                    <div className="flex justify-between items-center font-bold">
+                        <p>Net Profit</p>
+                        <p className="text-lg">₹{netProfit.toFixed(2)}</p>
+                    </div>
+                </CardContent>
+             </Card>
       
              <WeeklyGrowthReport />
 
@@ -461,7 +464,7 @@ export function AdminDashboard() {
                                 <TableHead>User ID</TableHead>
                                 <TableHead>Type</TableHead>
                                 <TableHead>Amount</TableHead>
-                                <TableHead>Job ID</TableHead>
+                                <TableHead>Source</TableHead>
                                 <TableHead>Time</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -475,7 +478,7 @@ export function AdminDashboard() {
                                         <TableCell className={cn("font-semibold", tx.amount < 0 ? "text-destructive" : "text-green-500")}>
                                             {tx.amount < 0 ? `- ₹${Math.abs(tx.amount).toFixed(2)}` : `+ ₹${tx.amount.toFixed(2)}`}
                                         </TableCell>
-                                        <TableCell className="font-mono text-xs">{tx.sourceJobId || 'N/A'}</TableCell>
+                                        <TableCell className="font-mono text-xs capitalize">{tx.sourceType || 'Job'} / {tx.sourceJobId?.substring(0,6)}...</TableCell>
                                         <TableCell>{getTimeAgo(tx.timestamp)}</TableCell>
                                     </TableRow>
                                 ))

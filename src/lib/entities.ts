@@ -94,7 +94,8 @@ export interface Transaction {
     userId: string; // The ID of the user/worker who this transaction belongs to.
     amount: number;
     type: "referral_commission" | "payout" | "refund" | "platform_fee" | "tax" | "admin_withdrawal";
-    sourceJobId?: string; // The job ID that triggered this transaction.
+    sourceJobId?: string; // The job, deal, or rental ID that triggered this transaction.
+    sourceType?: "job" | "deal" | "rental"; // The type of source that generated the transaction.
     timestamp?: any; // Firestore Timestamp
     jobCompletedAt?: any; // Firestore Timestamp
 }

@@ -69,6 +69,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
             amount: platformFeeNet,
             type: 'platform_fee',
             sourceJobId: jobId,
+            sourceType: 'job',
             timestamp: completionTimestamp,
         });
 
@@ -78,6 +79,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
             amount: gstAmount,
             type: 'tax',
             sourceJobId: jobId,
+            sourceType: 'job',
             timestamp: completionTimestamp,
         });
 
@@ -88,6 +90,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
                 amount: workerPayout,
                 type: 'payout',
                 sourceJobId: jobId,
+                sourceType: 'job',
                 timestamp: completionTimestamp,
                 jobCompletedAt: completionTimestamp, // For the 1-hour rule
             });
@@ -105,6 +108,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
                     amount: commission,
                     type: 'referral_commission',
                     sourceJobId: jobId,
+                    sourceType: 'job',
                     timestamp: completionTimestamp,
                 });
             }
@@ -238,6 +242,7 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
             amount: sellerPayout,
             type: 'payout',
             sourceJobId: dealId,
+            sourceType: 'deal',
             timestamp: completionTimestamp,
             jobCompletedAt: completionTimestamp,
         });
@@ -248,6 +253,7 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
             amount: platformFeeNet,
             type: 'platform_fee',
             sourceJobId: dealId,
+            sourceType: 'deal',
             timestamp: completionTimestamp,
         });
 
@@ -257,6 +263,7 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
             amount: gstAmount,
             type: 'tax',
             sourceJobId: dealId,
+            sourceType: 'deal',
             timestamp: completionTimestamp,
         });
 
@@ -272,6 +279,7 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
                     amount: commission,
                     type: 'referral_commission',
                     sourceJobId: dealId,
+                    sourceType: 'deal',
                     timestamp: completionTimestamp,
                 });
             }
@@ -345,6 +353,7 @@ export async function completeToolRental(rentalId: string): Promise<{success: bo
             amount: ownerPayout,
             type: 'payout',
             sourceJobId: rentalId,
+            sourceType: 'rental',
             timestamp: completionTimestamp,
             jobCompletedAt: completionTimestamp,
         });
@@ -355,6 +364,7 @@ export async function completeToolRental(rentalId: string): Promise<{success: bo
             amount: platformFeeNet,
             type: 'platform_fee',
             sourceJobId: rentalId,
+            sourceType: 'rental',
             timestamp: completionTimestamp,
         });
 
@@ -364,6 +374,7 @@ export async function completeToolRental(rentalId: string): Promise<{success: bo
             amount: gstAmount,
             type: 'tax',
             sourceJobId: rentalId,
+            sourceType: 'rental',
             timestamp: completionTimestamp,
         });
 
@@ -379,6 +390,7 @@ export async function completeToolRental(rentalId: string): Promise<{success: bo
                     amount: commission,
                     type: 'referral_commission',
                     sourceJobId: rentalId,
+                    sourceType: 'rental',
                     timestamp: completionTimestamp,
                 });
             }

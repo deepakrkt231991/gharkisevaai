@@ -7,11 +7,13 @@ import { collection, query, where, orderBy } from 'firebase/firestore';
 import type { Transaction } from '@/lib/entities';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Bell, TrendingUp, Banknote, FileText, Users, Wrench, QrCode, IndianRupee, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Bell, TrendingUp, Banknote, FileText, Users, Wrench, QrCode, IndianRupee, Loader2, BarChart2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from './ui/skeleton';
+import { BarChart, CartesianGrid, XAxis, Bar, Tooltip, ResponsiveContainer } from 'recharts';
+import { format, subDays } from 'date-fns';
 
 function HubHeader() {
     const { user } = useUser();
@@ -126,6 +128,78 @@ const TransactionRow = ({ tx }: { tx: Transaction & {id: string} }) => {
     );
 }
 
+const EarningsChart = ({ transactions }: { transactions: Transaction[] }) => {
+  const chartData = useMemo(() => {
+    const last7Days = Array.from({ length: 7 }).map((_, i) => subDays(new Date(), i));
+    
+    const dailyTotals = last7Days.reduce((acc, date) => {
+        const dateString = format(date, 'yyyy-MM-dd');
+        acc[dateString] = { payouts: 0, referrals: 0 };
+        return acc;
+    }, {} as Record<string, { payouts: number, referrals: number }>);
+
+    transactions.forEach(tx => {
+        if (!tx.timestamp) return;
+        const txDate = tx.timestamp.toDate();
+        const dateString = format(txDate, 'yyyy-MM-dd');
+        
+        if (dailyTotals.hasOwnProperty(dateString)) {
+            if (tx.type === 'payout') {
+                dailyTotals[dateString].payouts += tx.amount;
+            } else if (tx.type === 'referral_commission') {
+                dailyTotals[dateString].referrals += tx.amount;
+            }
+        }
+    });
+
+    return Object.keys(dailyTotals).map(dateString => ({
+        date: format(new Date(dateString), 'dd MMM'),
+        Payouts: dailyTotals[dateString].payouts,
+        'Referral Bonus': dailyTotals[dateString].referrals,
+    })).reverse(); // Reverse to show oldest date first
+
+  }, [transactions]);
+  
+  if (!transactions || transactions.length === 0) return null;
+
+  return (
+    <Card className="glass-card">
+        <CardHeader>
+            <CardTitle className="font-headline text-white flex items-center gap-2">
+                <BarChart2 />
+                Earning Lifestyle
+            </CardTitle>
+        </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
+            <XAxis
+              dataKey="date"
+              stroke="hsl(var(--muted-foreground))"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <Tooltip
+              cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
+              contentStyle={{
+                backgroundColor: 'hsl(var(--card))',
+                borderColor: 'hsl(var(--border))',
+                borderRadius: 'var(--radius)',
+              }}
+              labelStyle={{ color: 'hsl(var(--foreground))' }}
+            />
+            <Bar dataKey="Payouts" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="Referral Bonus" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+};
+
+
 export function EarningsHub() {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
@@ -161,6 +235,8 @@ export function EarningsHub() {
       <HubHeader />
       <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-24">
         <TotalIncomeCard totalEarnings={totalEarnings} />
+        
+        <EarningsChart transactions={transactions || []} />
         
          <div className="space-y-4">
              <div className="flex justify-between items-center">
