@@ -102,7 +102,7 @@ export function ProfileHub() {
             <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-32">
                 <div className="flex flex-col items-center text-center gap-2">
                     <Avatar className="h-24 w-24 border-4 border-primary">
-                        <AvatarImage src={user.photoURL || `https://picsum.photos/seed/${'\'\''}${user.uid}/150/150`} />
+                        <AvatarImage src={user.photoURL || `https://picsum.photos/seed/${user.uid}/150/150`} />
                         <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                     <h2 className="text-2xl font-bold font-headline mt-2">{user.displayName || 'GrihSeva User'}</h2>
@@ -130,3 +130,5 @@ export function ProfileHub() {
         </>
     );
 }
+
+    
