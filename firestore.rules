@@ -75,7 +75,12 @@ service cloud.firestore {
     }
     
      match /sos_alerts/{alertId} {
-       allow read, write: if 'userId' in resource.data && request.auth != null && request.auth.uid == resource.data.userId;
+        // Admin can read any alert (get, list) and update its status.
+        allow read, update: if isAdmin();
+
+        // Users can create/read/write their own alerts.
+        allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+        allow get, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
 
