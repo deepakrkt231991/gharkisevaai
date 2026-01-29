@@ -8,6 +8,7 @@ const schema = z.object({
     message: 'Invalid data URI for worker photo.',
   }),
   workerName: z.string().min(1, { message: 'Worker name is required.' }),
+  userId: z.string().min(1, { message: 'User must be logged in.' }),
 });
 
 type State = {
@@ -24,6 +25,7 @@ export async function createPromoPoster(
   const validatedFields = schema.safeParse({
     workerPhotoUri: formData.get('workerPhotoUri'),
     workerName: formData.get('workerName'),
+    userId: formData.get('userId'),
   });
 
   if (!validatedFields.success) {
@@ -38,6 +40,7 @@ export async function createPromoPoster(
     const result = await createPromotionalContentFlow({
       workerPhotoUri: validatedFields.data.workerPhotoUri,
       workerName: validatedFields.data.workerName,
+      referralCode: validatedFields.data.userId,
     });
     return {
       success: true,

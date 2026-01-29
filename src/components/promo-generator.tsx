@@ -31,6 +31,7 @@ export function PromoGenerator() {
       const formData = new FormData();
       formData.append('workerName', workerName);
       formData.append('workerPhotoUri', base64data);
+      formData.append('userId', user?.uid || '');
       dispatch(formData);
     };
   };
