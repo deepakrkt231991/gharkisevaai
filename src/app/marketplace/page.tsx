@@ -16,6 +16,7 @@ import { ProductCard } from '@/components/product-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import useEmblaCarousel from 'embla-carousel-react';
+import { AdPlaceholder } from '@/components/ad-placeholder';
 
 const MarketplaceHeader = () => (
      <header className="sticky top-0 z-40 flex flex-col gap-4 bg-background/80 p-4 backdrop-blur-md border-b border-border">
@@ -208,6 +209,7 @@ export default function MarketplacePage() {
                         </TabsList>
 
                         <TabsContent value="buy" className="pt-6 space-y-6">
+                            <AdPlaceholder type="banner" />
                             <div className="relative">
                                 <div className="overflow-hidden" ref={emblaRef}>
                                     <div className="flex gap-2 pb-2 -mx-4 px-4">
