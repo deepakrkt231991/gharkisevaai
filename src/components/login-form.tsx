@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useAuth, useFirestore } from '@/firebase';
 import {
   createUserWithEmailAndPassword,
@@ -23,6 +22,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, Wrench } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
+import { Logo } from './logo';
 
 const GoogleIcon = (props: React.ComponentProps<'svg'>) => (
     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -132,7 +132,7 @@ export function LoginForm() {
   return (
     <Card className="glass-card w-full">
       <CardHeader className="text-center">
-        <Image src="/logo.png" alt="Ghar Ki Seva Logo" width={64} height={64} className="mx-auto mb-2" />
+        <Logo className="h-16 w-16 mx-auto mb-2" />
         <CardTitle className="font-headline text-2xl">Welcome to Ghar Ki Seva</CardTitle>
         <CardDescription>Log in or create an account to get started.</CardDescription>
       </CardHeader>

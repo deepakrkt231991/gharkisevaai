@@ -2,7 +2,6 @@
 'use client'
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Wrench, Bell, LayoutDashboard, Share2, Users, Handshake, Bot, Languages, UserPlus, Hammer } from 'lucide-react';
@@ -15,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useEffect, useState } from 'react';
+import { Logo } from './logo';
 
 export function Header() {
   const [isClient, setIsClient] = useState(false)
@@ -27,7 +27,7 @@ export function Header() {
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-40 w-full border-b">
       <div className="container flex h-16 items-center">
         <Link href="/" className="flex items-center gap-3 font-bold text-lg font-headline">
-          <Image src="/logo.png" alt="Ghar Ki Seva Logo" width={36} height={36} />
+          <Logo className="h-9 w-9" />
           <span>GrihSeva AI</span>
         </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
@@ -80,7 +80,7 @@ export function Header() {
                   <SheetDescription className="sr-only">Main navigation menu.</SheetDescription>
                   <nav className="grid gap-6 text-lg font-medium mt-8">
                     <Link href="/" className="flex items-center gap-2 text-lg font-bold font-headline">
-                      <Image src="/logo.png" alt="Ghar Ki Seva Logo" width={36} height={36} />
+                      <Logo className="h-9 w-9" />
                       <span>GrihSeva AI</span>
                     </Link>
                     <Link href="/dashboard/earnings" className="flex items-center gap-4 text-muted-foreground hover:text-primary"><LayoutDashboard />Dashboard</Link>

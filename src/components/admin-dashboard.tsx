@@ -2,8 +2,6 @@
 "use client";
 
 import { useMemo, useTransition, useActionState } from "react";
-import Image from "next/image";
-import { useFormStatus } from "react-dom";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,6 +27,10 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { Logo } from "./logo";
+import Image from "next/image";
+import { useFormStatus } from "react-dom";
+
 
 function StatCard({ title, value, icon, description }: { title: string; value: string | number; icon: React.ReactNode, description?: string }) {
   return (
@@ -368,7 +370,7 @@ export function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <div className="flex items-center gap-3">
-            <Image src="/logo.png" alt="Ghar Ki Seva Logo" width={40} height={40} />
+            <Logo className="h-10 w-10" />
             <h1 className="text-3xl font-bold font-headline">Admin Panel</h1>
         </div>
         <p className="text-muted-foreground">Welcome back! Here's your real-time business overview.</p>
