@@ -1,6 +1,6 @@
 
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type AdsenseBannerProps = {
     adSlot: string;
@@ -9,17 +9,24 @@ type AdsenseBannerProps = {
 };
 
 const AdsenseBanner = ({ adSlot, adFormat = 'auto', className }: AdsenseBannerProps) => {
+    const insRef = useRef<HTMLModElement>(null);
+
     useEffect(() => {
+        if (insRef.current && insRef.current.getAttribute('data-ad-status') === 'filled') {
+            return;
+        }
+
         try {
             ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
         } catch (err) {
             console.error('Adsense Error:', err);
         }
-    }, [adSlot]); // Re-run when adSlot changes
+    }, [adSlot]);
 
     return (
         <div className={className}>
             <ins
+                ref={insRef}
                 className="adsbygoogle"
                 style={{ display: 'block' }}
                 data-ad-client="ca-pub-4493898466896244"
