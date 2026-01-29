@@ -66,21 +66,25 @@ service cloud.firestore {
     // --- TRANSACTION & SENSITIVE DATA ---
     match /transactions/{transactionId} {
         // Admins can get any transaction. Users can only get their own.
-        allow get: if request.auth != null && (isAdmin() || ('userId' in resource.data && request.auth.uid == resource.data.userId));
+        allow get: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
         // Admins can list all. Users can only list their own by querying on their userId.
-        allow list: if request.auth != null && (isAdmin() || (request.query.where[0][1] == 'userId' && request.query.where[0][2] == request.auth.uid));
+        allow list: if isAdmin() || (request.auth != null && request.query.where[0][0] == 'userId' && request.query.where[0][2] == request.auth.uid);
         
         // Writes are disabled from the client for security.
         allow write: if false;
     }
     
      match /sos_alerts/{alertId} {
-        // Admin can read any alert (get, list) and update its status.
-        allow read, update: if isAdmin();
+        // Admin can read any alert. Users can read their own.
+        allow get: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
+        // Admins can list all alerts. Users can list their own via a query.
+        allow list: if isAdmin() || (request.auth != null && request.query.where[0][0] == 'userId' && request.query.where[0][2] == request.auth.uid);
 
-        // Users can create/read/write their own alerts.
+        // Users can create their own alerts. Admins can update any.
         allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-        allow get, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+        allow update: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
+        // Users and Admins can delete alerts they have access to read.
+        allow delete: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
     }
 
 
