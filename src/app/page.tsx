@@ -1,3 +1,4 @@
+
 'use client';
 
 import { HomeHeader } from '@/components/home-header';
@@ -25,13 +26,18 @@ export default function Home() {
           <HomeCarouselBanner />
           <AiServiceGrid />
           <SmartHub />
-          <Card className="glass-card p-2">
-            <AdsenseBanner adSlot="2001427785" />
-          </Card>
           <WhyChooseUsHome />
           <TrendingNow />
           <LiveFeed />
         </main>
+        
+        {/* Sticky Ad Banner */}
+        <div className="fixed bottom-20 left-1/2 z-40 w-full max-w-md -translate-x-1/2 px-2">
+            <Card className="glass-card p-1">
+                <AdsenseBanner adSlot="2001427785" />
+            </Card>
+        </div>
+
         <BottomNavBar />
       </div>
     </div>
