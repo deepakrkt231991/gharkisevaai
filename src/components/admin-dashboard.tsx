@@ -16,7 +16,7 @@ import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, where, orderBy } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
 import type { SOSAlert, Worker, Transaction, Deal } from "@/lib/entities";
-import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds } from "@/app/admin/actions";
+import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds, approvePropertyAndGenerateCertificate, rejectProperty } from "@/app/admin/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Label } from "./ui/label";
@@ -367,7 +367,10 @@ export function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold font-headline">Ghar Ki Seva - Admin Panel</h1>
+        <div className="flex items-center gap-3">
+            <Image src="/logo.png" alt="Ghar Ki Seva Logo" width={40} height={40} />
+            <h1 className="text-3xl font-bold font-headline">Admin Panel</h1>
+        </div>
         <p className="text-muted-foreground">Welcome back! Here's your real-time business overview.</p>
       </div>
 

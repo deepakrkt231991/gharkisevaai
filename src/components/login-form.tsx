@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth, useFirestore } from '@/firebase';
 import {
   createUserWithEmailAndPassword,
@@ -131,7 +132,7 @@ export function LoginForm() {
   return (
     <Card className="glass-card w-full">
       <CardHeader className="text-center">
-        <Wrench className="mx-auto h-10 w-10 text-primary mb-2" />
+        <Image src="/logo.png" alt="Ghar Ki Seva Logo" width={64} height={64} className="mx-auto mb-2" />
         <CardTitle className="font-headline text-2xl">Welcome to Ghar Ki Seva</CardTitle>
         <CardDescription>Log in or create an account to get started.</CardDescription>
       </CardHeader>
