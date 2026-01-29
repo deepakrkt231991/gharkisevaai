@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: 'Ghar Ki Seva (AI Verified)',
   description: '7% Fee, 100% Trust. The smartest way to Repair, Rent & Sell with AI.',
   manifest: '/manifest.json',
+  authors: [{ name: 'Ghar Ki Seva AI', url: 'mailto:gharkisevaai@gmail.com' }],
 };
 
 export default function RootLayout({
