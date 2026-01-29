@@ -7,6 +7,19 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.email == 'gharkisevaai@gmail.com';
     }
 
+    function isParty(resource) {
+      // Ensure data exists before accessing fields
+      let data = resource.data;
+      return request.auth != null && (
+        ('buyerId' in data && request.auth.uid == data.buyerId) ||
+        ('sellerId' in data && request.auth.uid == data.sellerId) ||
+        ('customerId' in data && request.auth.uid == data.customerId) ||
+        ('workerId' in data && request.auth.uid == data.workerId) ||
+        ('renterId' in data && request.auth.uid == data.renterId) ||
+        ('ownerId' in data && request.auth.uid == data.ownerId)
+      );
+    }
+
     // =====================================================================
     // PUBLIC-READ COLLECTIONS
     // =====================================================================
@@ -65,20 +78,24 @@ service cloud.firestore {
 
     // --- TRANSACTION & SENSITIVE DATA ---
     match /transactions/{transactionId} {
-        // Admins can get any transaction. Users can only get their own.
-        allow get: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
-        // Admins can list all. Users can only list their own by querying on their userId.
-        allow list: if isAdmin() || (request.auth != null && request.query.where[0][0] == 'userId' && request.query.where[0][2] == request.auth.uid);
+        // Admins can read any transaction.
+        allow read: if isAdmin();
+        // Users can only get their own.
+        allow get: if request.auth != null && resource.data.userId == request.auth.uid;
+        // Users can only list their own by querying on their userId.
+        allow list: if request.auth != null && request.query.where[0][0] == 'userId' && request.query.where[0][2] == request.auth.uid;
         
         // Writes are disabled from the client for security.
         allow write: if false;
     }
     
      match /sos_alerts/{alertId} {
-        // Admin can read any alert. Users can read their own.
-        allow get: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
-        // Admins can list all alerts. Users can list their own via a query.
-        allow list: if isAdmin() || (request.auth != null && request.query.where[0][0] == 'userId' && request.query.where[0][2] == request.auth.uid);
+        // Admins can read all alerts.
+        allow read: if isAdmin();
+        // Users can read their own.
+        allow get: if request.auth != null && resource.data.userId == request.auth.uid;
+        // Users can list their own via a query.
+        allow list: if request.auth != null && request.query.where[0][0] == 'userId' && request.query.where[0][2] == request.auth.uid;
 
         // Users can create their own alerts. Admins can update any.
         allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
@@ -89,19 +106,6 @@ service cloud.firestore {
 
 
     // --- TWO-PARTY DATA (DEALS, JOBS, RENTALS) ---
-    function isParty(resource) {
-      // Ensure data exists before accessing fields
-      let data = resource.data;
-      return request.auth != null && (
-        ('buyerId' in data && request.auth.uid == data.buyerId) ||
-        ('sellerId' in data && request.auth.uid == data.sellerId) ||
-        ('customerId' in data && request.auth.uid == data.customerId) ||
-        ('workerId' in data && request.auth.uid == data.workerId) ||
-        ('renterId' in data && request.auth.uid == data.renterId) ||
-        ('ownerId' in data && request.auth.uid == data.ownerId)
-      );
-    }
-
     match /deals/{dealId} {
       allow read, update: if isParty(resource) || isAdmin();
       // Only the buyer can initiate a deal
