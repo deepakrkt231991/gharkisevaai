@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview The Certificate Authority - An AI agent for generating trust certificates.
@@ -48,7 +49,7 @@ const certificateGeneratorFlow = ai.defineFlow(
       - **Background:** A very light beige (#F5F5DC) with a subtle, low-opacity "Ghar Ki Seva" logo as a watermark in the center.
       - **Color Scheme:** Use a deep, trustworthy blue for headings, black for body text, and a vibrant green for checkmarks.
       - **Fonts:** Use a classic serif font for headings (like 'Alegreya') and a clean sans-serif for body text (like 'PT Sans').
-      - **Logo:** Place the official "Ghar Ki Seva" logo at the top center.
+      - **Logo:** Place the official "Ghar Ki Seva" logo (a stylized 'G' with a house inside) at the top center.
 
       **Certificate Content (Exact Text and Layout):**
 
