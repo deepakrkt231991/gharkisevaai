@@ -10,6 +10,8 @@ import { SmartHub } from '@/components/smart-hub';
 import { TrendingNow } from '@/components/trending-now';
 import { UserStats } from '@/components/user-stats';
 import { WhyChooseUsHome } from '@/components/why-choose-us-home';
+import AdsenseBanner from '@/components/adsense-banner';
+import { Card } from '@/components/ui/card';
 
 
 export default function Home() {
@@ -23,6 +25,9 @@ export default function Home() {
           <HomeCarouselBanner />
           <AiServiceGrid />
           <SmartHub />
+          <Card className="glass-card p-2">
+            <AdsenseBanner adSlot="2001427785" />
+          </Card>
           <WhyChooseUsHome />
           <TrendingNow />
           <LiveFeed />
