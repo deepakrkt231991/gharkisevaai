@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   description: '7% Fee, 100% Trust. The smartest way to Repair, Rent & Sell with AI.',
   manifest: '/manifest.json',
   authors: [{ name: 'Ghar Ki Seva AI', url: 'mailto:gharkisevaai@gmail.com' }],
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  }
 };
 
 export default function RootLayout({
@@ -30,7 +34,6 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="GrihSeva AI" />
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4493898466896244"
