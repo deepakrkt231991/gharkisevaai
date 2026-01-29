@@ -1,3 +1,4 @@
+
 'use client';
 import { useCollection, useMemoFirebase } from '@/firebase';
 import { useFirestore } from '@/firebase/provider';
@@ -76,7 +77,7 @@ export function ExploreMarketplace() {
             .map(p => ({
                 id: p.id,
                 propertyId: p.id,
-                ownerId: `demo-user-${'\'\''}${p.id}`,
+                ownerId: `demo-user-${p.id}`,
                 title: p.title || 'Demo Sale Property',
                 location: p.location || 'Unknown Location',
                 price: p.price || 0,
@@ -101,7 +102,7 @@ export function ExploreMarketplace() {
             .map(p => ({
                 id: p.id,
                 propertyId: p.id,
-                ownerId: `demo-user-${'\'\''}${p.id}`,
+                ownerId: `demo-user-${p.id}`,
                 title: p.title || 'Demo Rent Property',
                 location: p.location || 'Unknown Location',
                 price: p.price || 0,
