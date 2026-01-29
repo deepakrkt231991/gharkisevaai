@@ -14,6 +14,7 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import AdsenseBanner from './adsense-banner';
 
 // Helper function to calculate distance (Haversine formula)
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -158,9 +159,17 @@ export function ExploreMarketplace() {
                     </>
                 )}
                 
-                {!isLoading && properties.map(prop => (
-                    <PropertyCard key={prop.id} property={prop} />
-                ))}
+                {!isLoading && properties.flatMap((prop, index) => {
+                    const content = [<PropertyCard key={prop.id} property={prop} />];
+                    if ((index + 1) % 4 === 0) {
+                        content.push(
+                            <div key={`ad-${index}`} className="my-4 rounded-xl overflow-hidden glass-card p-2">
+                                <AdsenseBanner adSlot="2001427785" />
+                            </div>
+                        );
+                    }
+                    return content;
+                })}
 
                  {!isLoading && properties.length === 0 && (
                     <div className="text-center py-8">

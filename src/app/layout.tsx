@@ -30,8 +30,13 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="GrihSeva AI" />
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path fill=%22%23006970%22 d=%22M15 40 L50 10 L85 40 V90 H15 Z%22 /><path stroke=%22%23fff%22 stroke-width=%2210%22 d=%22M35 30 L65 50 M65 30 L35 50%22 /></svg>" />
-        <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path fill=%22%23006970%22 d=%22M15 40 L50 10 L85 40 V90 H15 Z%22 /><path stroke=%22%23fff%22 stroke-width=%2210%22 d=%22M35 30 L65 50 M65 30 L35 50%22 /></svg>" />
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4493898466896244"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
         <FirebaseClientProvider>
