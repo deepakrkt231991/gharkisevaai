@@ -58,8 +58,7 @@ export default function TermsPage() {
             </Card>
 
           </div>
-        </div>
-      </main>
+        </main>
       <Footer />
     </div>
   );
