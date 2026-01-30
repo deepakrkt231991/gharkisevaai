@@ -56,9 +56,8 @@ export default function TermsPage() {
                 ))}
               </CardContent>
             </Card>
-
-          </div>
-        </main>
+        </div>
+      </main>
       <Footer />
     </div>
   );
