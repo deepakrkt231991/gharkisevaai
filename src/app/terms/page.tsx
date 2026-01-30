@@ -1,6 +1,5 @@
 
 import { Header } from '@/components/header';
-import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserCheck, Gavel, Banknote, Percent } from 'lucide-react';
 
@@ -58,7 +57,6 @@ export default function TermsPage() {
             </Card>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
