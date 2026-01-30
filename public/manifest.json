@@ -1,6 +1,11 @@
+
 {
-  "name": "GrihSeva AI",
-  "short_name": "GrihSeva",
+  "name": "Ghar Ki Seva (AI Verified)",
+  "short_name": "GrihSeva AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f2223",
+  "theme_color": "#006970",
   "description": "7% Fee, 100% Trust. The smartest way to Repair, Rent & Sell with AI.",
   "icons": [
     {
@@ -13,10 +18,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "theme_color": "#006970",
-  "background_color": "#0f2223",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait"
+  ]
 }
