@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
+import { Footer } from '@/components/Footer';
 
 export default function SocialMediaPage() {
     return (

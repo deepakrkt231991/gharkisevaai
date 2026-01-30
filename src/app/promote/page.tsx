@@ -1,5 +1,5 @@
 import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
+import { Footer } from '@/components/Footer';
 import { PromoGenerator } from '@/components/promo-generator';
 
 export default function PromotePage() {

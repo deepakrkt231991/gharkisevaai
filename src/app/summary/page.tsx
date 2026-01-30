@@ -1,6 +1,6 @@
 
 import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
+import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Bot, IndianRupee, ShieldCheck, Users, Percent, Receipt } from 'lucide-react';
 
