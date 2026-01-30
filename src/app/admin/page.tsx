@@ -1,7 +1,6 @@
 'use client'; // Need this to use hooks
 
 import { Header } from '@/components/header';
-import { Footer } from '@/components/Footer';
 import { AdminDashboard } from '@/components/admin-dashboard';
 import { useUser } from '@/firebase';
 import { Loader2, ShieldAlert } from 'lucide-react';
@@ -48,7 +47,6 @@ export default function AdminPage() {
           <AdminDashboard />
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

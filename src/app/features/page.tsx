@@ -1,6 +1,5 @@
 
 import { Header } from '@/components/header';
-import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bot, Shield, Handshake, Users, IndianRupee, Banknote, FileText } from 'lucide-react';
 
@@ -70,7 +69,6 @@ export default function FeaturesPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

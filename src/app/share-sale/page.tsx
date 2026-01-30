@@ -1,5 +1,4 @@
 import { Header } from '@/components/header';
-import { Footer } from '@/components/Footer';
 import { SalePosterGenerator } from '@/components/sale-poster-generator';
 
 export default function ShareSalePage() {
@@ -17,7 +16,6 @@ export default function ShareSalePage() {
           <SalePosterGenerator />
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

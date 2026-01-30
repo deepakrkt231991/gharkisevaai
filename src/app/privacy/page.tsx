@@ -1,6 +1,5 @@
 
 import { Header } from '@/components/header';
-import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Database, Shield, Bot, UserCheck } from 'lucide-react';
 
@@ -58,7 +57,6 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
