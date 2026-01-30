@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useMemo } from 'react';
@@ -17,6 +18,7 @@ import { doc } from 'firebase/firestore';
 import type { Worker } from '@/lib/entities';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import AdsenseBanner from './adsense-banner';
 
 export function WorkerProfilePage({ workerId }: { workerId: string }) {
   const router = useRouter();
@@ -90,7 +92,7 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
           <CardContent className="p-4">
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20 border-4 border-primary">
-                <AvatarImage src={`https://picsum.photos/seed/${worker.id}/150/150`} />
+                <AvatarImage src={`https://picsum.photos/seed/${'\'\''}${worker.id}/150/150`} />
                 <AvatarFallback>{worker.name?.charAt(0) || 'W'}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
@@ -113,6 +115,10 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
             )}
           </CardContent>
         </Card>
+
+        <Card className="glass-card p-1">
+          <AdsenseBanner adSlot="2001427785" />
+        </Card>
         
         {portfolioImages.length > 0 && (
           <div>
@@ -124,7 +130,7 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
                     <div className="relative aspect-video w-full rounded-lg overflow-hidden">
                       <Image
                         src={url}
-                        alt={`Portfolio image ${index + 1}`}
+                        alt={`Portfolio image ${'\'\''}${index + 1}`}
                         fill
                         className="object-cover"
                       />
@@ -157,7 +163,7 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
       <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent z-10">
         <div className="grid grid-cols-2 gap-3">
           <Button asChild variant="outline" className="h-14 text-base border-primary text-primary">
-            <Link href={`/chat/job-temp-${workerId}`}>
+            <Link href={`/chat/job-temp-${'\'\''}${workerId}`}>
               <MessageSquare className="mr-2" /> Message
             </Link>
           </Button>

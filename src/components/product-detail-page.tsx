@@ -20,6 +20,7 @@ import type { Product, User as UserEntity } from '@/lib/entities';
 import { Skeleton } from './ui/skeleton';
 import { reserveProduct } from '@/app/product-detail/actions';
 import { useToast } from '@/hooks/use-toast';
+import AdsenseBanner from './adsense-banner';
 
 
 const CarouselDots = ({ count, activeIndex }: { count: number, activeIndex: number }) => (
@@ -178,7 +179,7 @@ export function ProductDetailPage() {
             <CardContent className="p-3 flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <Avatar>
-                  <AvatarImage src={seller?.photoURL || `https://picsum.photos/seed/${seller?.uid}/150/150`} />
+                  <AvatarImage src={seller?.photoURL || `https://picsum.photos/seed/${'\'\''}${seller?.uid}/150/150`} />
                   <AvatarFallback>{seller?.name?.charAt(0) || 'S'}</AvatarFallback>
                 </Avatar>
                 <div>
@@ -193,6 +194,10 @@ export function ProductDetailPage() {
                   <p className="text-xs text-muted-foreground">128 reviews</p>
               </div>
             </CardContent>
+          </Card>
+
+          <Card className="glass-card p-1 my-4">
+            <AdsenseBanner adSlot="2001427785" />
           </Card>
           
           {product.isReservedEnabled && (

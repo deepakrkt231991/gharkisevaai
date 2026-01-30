@@ -7,6 +7,8 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { Wrench, Zap, Paintbrush } from 'lucide-react';
 import Link from 'next/link';
+import AdsenseBanner from '@/components/adsense-banner';
+import { Card } from '@/components/ui/card';
 
 export default function FindWorkerPage() {
     const workers = PlaceHolderImages.filter(img => img.specialty);
@@ -28,9 +30,17 @@ export default function FindWorkerPage() {
                     <Link href="/find-a-worker" className="text-sm font-bold text-primary">See All</Link>
                 </div>
                 <div className="space-y-4">
-                    {workers.map((worker) => (
-                        <ProfessionalCard key={worker.id} worker={worker} />
-                    ))}
+                    {workers.flatMap((worker, index) => {
+                        const content = [<ProfessionalCard key={worker.id} worker={worker} />];
+                        if ((index + 1) % 4 === 0) {
+                            content.push(
+                                <Card key={`ad-${'\'\''}${index}`} className="glass-card p-1 my-2">
+                                    <AdsenseBanner adSlot="2001427785" />
+                                </Card>
+                            );
+                        }
+                        return content;
+                    })}
                 </div>
             </div>
         </main>
