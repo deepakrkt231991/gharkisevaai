@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ExploreHeader } from '@/components/explore-header';
@@ -34,7 +35,7 @@ export default function FindWorkerPage() {
                         const content = [<ProfessionalCard key={worker.id} worker={worker} />];
                         if ((index + 1) % 4 === 0) {
                             content.push(
-                                <Card key={`ad-${'\'\''}${index}`} className="glass-card p-1 my-2">
+                                <Card key={`ad-${index}`} className="glass-card p-1 my-2">
                                     <AdsenseBanner adSlot="2001427785" />
                                 </Card>
                             );
