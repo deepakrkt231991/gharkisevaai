@@ -1,6 +1,4 @@
-import { ChatInterface } from '@/components/chat-interface';
 
-// ✅ Sahi (Next.js 15+ Tarika)
 export default async function Page({
   params,
 }: {
