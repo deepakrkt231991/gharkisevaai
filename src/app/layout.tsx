@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   authors: [{ name: 'Ghar Ki Seva AI', url: 'mailto:gharkisevaai@gmail.com' }],
   icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
+    icon: '/logo.png?v=2',
+    apple: '/logo.png?v=2',
   }
 };
 
