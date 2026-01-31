@@ -19,7 +19,6 @@ export function Logo({ className }: { className?: string }) {
             <path d="M64.2857 96.4286H83.5714V115.714H64.2857V96.4286Z" fill="white"/>
             <path d="M102.857 128.571H77.1428C74.002 128.571 71.4285 125.998 71.4285 122.857V113.571C71.4285 110.43 74.002 107.857 77.1428 107.857H102.857C105.998 107.857 108.571 110.43 108.571 113.571V122.857C108.571 125.998 105.998 128.571 102.857 128.571Z" fill="url(#paint6_linear_1_2)"/>
             <path d="M83.5714 107.857C83.5714 104.282 86.4528 101.429 90 101.429C93.5472 101.429 96.4286 104.282 96.4286 107.857" stroke="url(#paint7_linear_1_2)" strokeWidth="4"/>
-            <text fill="url(#paint8_linear_1_2)" xmlSpace="preserve" style={{whiteSpace: "pre"}} fontFamily="Manrope" fontSize="24" fontWeight="800" letterSpacing="0em"><tspan x="28.1875" y="152.895">Ghar Ki Seva</tspan></text>
             <defs>
                 <linearGradient id="paint0_linear_1_2" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
                     <stop stopColor="#00D4D4"/>
