@@ -1,11 +1,17 @@
 import { ChatInterface } from '@/components/chat-interface';
 
-export default function ChatPage({ params }: { params: { chatId: string } }) {
+// ✅ Sahi (Next.js 15+ Tarika)
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ chatId: string }>; // Params ko Promise define karein
+}) {
+  const { chatId } = await params; // Yahan await karna zaroori hai
+
   return (
-    <div className="dark bg-background text-foreground">
-      <div className="relative mx-auto flex h-screen w-full max-w-md flex-col">
-        <ChatInterface chatId={params.chatId} />
-      </div>
+    <div>
+      <h1>Chat ID: {chatId}</h1>
+      {/* Aapka baaki ka code */}
     </div>
   );
 }
