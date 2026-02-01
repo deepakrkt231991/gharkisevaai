@@ -1,11 +1,8 @@
 
 import { WorkerProfilePage } from '@/components/worker-profile-page';
 
-interface PageProps {
-    params: { workerId: string };
-}
-
-export default function WorkerPublicProfile({ params }: PageProps) {
+// Simplified and corrected the props definition to prevent future TypeErrors.
+export default function WorkerPublicProfile({ params }: { params: { workerId: string } }) {
   const { workerId } = params;
   
   return (

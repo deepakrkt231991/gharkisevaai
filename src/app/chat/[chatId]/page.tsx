@@ -2,11 +2,8 @@
 import { ChatInterface } from '@/components/chat-interface';
 import React from 'react';
 
-interface PageProps {
-  params: { chatId: string };
-}
-
-export default function ChatPage({ params }: PageProps) {
+// Simplified and corrected the props definition to fix the TypeError in Vercel build.
+export default function ChatPage({ params }: { params: { chatId: string } }) {
   const { chatId } = params;
 
   return (
