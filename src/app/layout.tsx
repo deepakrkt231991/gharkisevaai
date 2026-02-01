@@ -6,6 +6,8 @@ import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { PwaLoader } from '@/components/pwa-loader';
 import { PwaUpdateNotifier } from '@/components/pwa-update-notifier';
 import { FloatingAiAssistant } from '@/components/floating-ai-assistant';
+import Script from 'next/script';
+import { InstallPwaBanner } from '@/components/install-pwa-banner';
 
 
 export const metadata: Metadata = {
@@ -34,11 +36,6 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Ghar Ki Sevaai" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4493898466896244"
-          crossOrigin="anonymous"
-        ></script>
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
         <FirebaseClientProvider>
@@ -48,6 +45,11 @@ export default function RootLayout({
           <FloatingAiAssistant />
           <Toaster />
         </FirebaseClientProvider>
+        <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4493898466896244"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
