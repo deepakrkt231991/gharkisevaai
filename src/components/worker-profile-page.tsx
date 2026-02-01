@@ -98,7 +98,7 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
           <CardContent className="p-4">
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20 border-4 border-primary">
-                <AvatarImage src={`https://picsum.photos/seed/${'\'\''}${worker.id}/150/150`} />
+                <AvatarImage src={`https://picsum.photos/seed/${worker.id}/150/150`} />
                 <AvatarFallback>{worker.name?.charAt(0) || 'W'}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
@@ -136,7 +136,7 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
                     <div className="relative aspect-video w-full rounded-lg overflow-hidden">
                       <Image
                         src={url}
-                        alt={`Portfolio image ${'\'\''}${index + 1}`}
+                        alt={`Portfolio image ${index + 1}`}
                         fill
                         className="object-cover"
                       />

@@ -184,7 +184,7 @@ export function ProductDetailPage() {
             <CardContent className="p-3 flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <Avatar>
-                  <AvatarImage src={seller?.photoURL || `https://picsum.photos/seed/${'\'\''}${seller?.uid}/150/150`} />
+                  <AvatarImage src={seller?.photoURL || `https://picsum.photos/seed/${seller?.uid}/150/150`} />
                   <AvatarFallback>{seller?.name?.charAt(0) || 'S'}</AvatarFallback>
                 </Avatar>
                 <div>

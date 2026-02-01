@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useFormStatus } from 'react-dom';
@@ -113,7 +114,7 @@ export function WorkerSignupForm() {
              if (filesArray.length > remainingSlots) {
                 toast({
                     title: "Maximum photos reached",
-                    description: `You can only add ${'\'\'\''}remainingSlots} more photos.`,
+                    description: `You can only add ${remainingSlots} more photos.`,
                     variant: "destructive"
                 });
             }
@@ -335,7 +336,7 @@ export function WorkerSignupForm() {
           <p className="text-white text-sm font-bold bg-primary/10 px-3 py-1 rounded-full">{Math.ceil(progress)}% Complete</p>
         </div>
         <div className="rounded-full bg-[#395456] overflow-hidden">
-          <div className="h-2 rounded-full bg-primary transition-all duration-500" style={{ width: `${'\'\''}${progress}%` }}></div>
+          <div className="h-2 rounded-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }}></div>
         </div>
       </div>
       
@@ -409,7 +410,7 @@ export function WorkerSignupForm() {
                                 <p>{verificationResult.reasoning}</p>
                                 {!verificationResult.verified && (
                                     <Button asChild className="mt-3 w-full" variant="secondary">
-                                        <a href={`mailto:gharkisevaai@gmail.com?subject=Manual%20Worker%20Verification%20Request&body=Hello%20Admin,%0D%0A%0D%0AMy%20AI%20verification%20failed.%20Please%20manually%20verify%20my%20profile.%0D%0A%0D%0AName:%20${'\'\''}${name}%0D%0APhone:%20${'\'\''}${phone}%0D%0A%0D%0AThank%20you.`}>
+                                        <a href={`mailto:gharkisevaai@gmail.com?subject=Manual%20Worker%20Verification%20Request&body=Hello%20Admin,%0D%0A%0D%0AMy%20AI%20verification%20failed.%20Please%20manually%20verify%20my%20profile.%0D%0A%0D%0AName:%20${name}%0D%0APhone:%20${phone}%0D%0A%0D%0AThank%20you.`}>
                                             <Mail className="mr-2 h-4 w-4" />
                                             Send to Admin for Approval
                                         </a>
@@ -457,7 +458,7 @@ export function WorkerSignupForm() {
                                 <label className="w-full">
                                     <div className="flex items-center justify-center w-full bg-primary text-primary-foreground h-12 rounded-lg cursor-pointer">
                                         <Upload className="mr-2 h-4 w-4"/>
-                                        <span>{portfolioImageUrls.length > 0 ? `Add More (${'\'\''}${4 - portfolioImageUrls.length} left)` : 'Upload Work Photos'}</span>
+                                        <span>{portfolioImageUrls.length > 0 ? `Add More (${4 - portfolioImageUrls.length} left)` : 'Upload Work Photos'}</span>
                                     </div>
                                     <input type="file" className="sr-only" multiple accept="image/*" onChange={(e) => handleFileChange(e, 'portfolio')} />
                                 </label>
