@@ -2,12 +2,11 @@
 import { WorkerProfilePage } from '@/components/worker-profile-page';
 
 interface PageProps {
-    params: Promise<{ workerId: string }>;
+    params: { workerId: string };
 }
 
-export default async function WorkerPublicProfile({ params }: PageProps) {
-  const resolvedParams = await params;
-  const workerId = resolvedParams.workerId;
+export default function WorkerPublicProfile({ params }: PageProps) {
+  const { workerId } = params;
   
   return (
     <div className="dark bg-background text-foreground">
