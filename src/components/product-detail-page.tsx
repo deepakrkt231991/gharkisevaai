@@ -22,6 +22,10 @@ import { reserveProduct } from '@/app/product-detail/actions';
 import { useToast } from '@/hooks/use-toast';
 import AdsenseBanner from './adsense-banner';
 
+const WhatsAppIcon = () => (
+    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"><title>WhatsApp</title><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52s-.67-.816-.923-1.123c-.253-.307-.508-.262-.67.025-.164.288-.67 1.164-.67 1.164s-.67.149-1.645.923c-.976.775-1.045 1.502-1.045 1.502s.508 1.645 1.645 2.52c1.138.875 2.596 1.943 3.846 1.943.347 0 .82-.025 1.123-.307.303-.282.67-1.164.67-1.164s-.05-.099-.124-.198c-.074-.099-.297-.149-.297-.149zM12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18.5c-4.687 0-8.5-3.813-8.5-8.5s3.813-8.5 8.5-8.5 8.5 3.813 8.5 8.5-3.813 8.5-8.5 8.5z" fill="currentColor"/></svg>
+);
+
 
 const CarouselDots = ({ count, activeIndex }: { count: number, activeIndex: number }) => (
     <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2">
@@ -115,6 +119,7 @@ export function ProductDetailPage() {
   
   const productImages = product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls : ['https://placehold.co/800x800?text=No+Image'];
   const chatLink = product.activeDealId ? `/chat/deal-${product.activeDealId}` : `/chat/product-${productId}`;
+  const whatsAppMessage = `Hi, I'm interested in your '${product.name}' listed on Ghar Ki Seva.`;
 
   return (
     <div className="flex flex-col h-screen bg-background text-white">
@@ -222,13 +227,18 @@ export function ProductDetailPage() {
       </main>
 
       <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent z-10">
-        <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-14 text-base border-primary text-primary"><Phone className="mr-2"/> Call Seller</Button>
-            <Button asChild className="h-14 text-base bg-primary text-primary-foreground">
+        <div className="grid grid-cols-3 gap-2">
+            <Button asChild variant="outline" className="h-14 text-base bg-green-500/10 border-green-500/30 text-green-400 flex items-center gap-2">
+                <a href={`https://wa.me/918291569096?text=${encodeURIComponent(whatsAppMessage)}`} target="_blank" rel="noopener noreferrer">
+                    <WhatsAppIcon /> WhatsApp
+                </a>
+            </Button>
+            <Button asChild variant="outline" className="h-14 text-base border-primary text-primary">
               <Link href={chatLink}>
-                  <MessageSquare className="mr-2"/> Message
+                  <MessageSquare/> Chat
               </Link>
             </Button>
+             <Button variant="outline" className="h-14 text-base border-primary text-primary"><Phone/></Button>
           </div>
       </footer>
     </div>

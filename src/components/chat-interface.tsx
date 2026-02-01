@@ -499,7 +499,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
         }
     }
     
-    const whatsAppNumber = otherUser?.phone || '910000000000';
+    const whatsAppNumber = otherUser?.phone || '918291569096';
     const whatsAppMessage = `Hi, I'm contacting you from Ghar Ki Seva regarding: ${getContextTitle()}`;
 
     return (
