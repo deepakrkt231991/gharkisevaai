@@ -169,7 +169,7 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
       <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent z-10">
         <div className="grid grid-cols-3 gap-2">
             <Button asChild variant="outline" className="h-14 text-base bg-green-500/10 border-green-500/30 text-green-400 flex items-center gap-2">
-                <a href={`https://wa.me/918291569096?text=${encodeURIComponent(whatsAppMessage)}`} target="_blank" rel="noopener noreferrer">
+                <a href={`https://wa.me/${worker.phone || '918291569096'}?text=${encodeURIComponent(whatsAppMessage)}`} target="_blank" rel="noopener noreferrer">
                     <WhatsAppIcon /> WhatsApp
                 </a>
             </Button>

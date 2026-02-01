@@ -1,7 +1,14 @@
+
 import { WorkerProfilePage } from '@/components/worker-profile-page';
 
-export default async function WorkerPublicProfile({ params }: { params: { workerId: string } }) {
-  const { workerId } = params;
+interface PageProps {
+    params: Promise<{ workerId: string }>;
+}
+
+export default async function WorkerPublicProfile({ params }: PageProps) {
+  const resolvedParams = await params;
+  const workerId = resolvedParams.workerId;
+  
   return (
     <div className="dark bg-background text-foreground">
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">

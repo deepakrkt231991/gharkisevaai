@@ -1,7 +1,12 @@
+
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { LifeBuoy, Mail, Phone } from 'lucide-react';
+
+const WhatsAppIcon = () => (
+    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400 fill-current"><title>WhatsApp</title><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52s-.67-.816-.923-1.123c-.253-.307-.508-.262-.67.025-.164.288-.67 1.164-.67 1.164s-.67.149-1.645.923c-.976.775-1.045 1.502-1.045 1.502s.508 1.645 1.645 2.52c1.138.875 2.596 1.943 3.846 1.943.347 0 .82-.025 1.123-.307.303-.282.67-1.164.67-1.164s-.05-.099-.124-.198c-.074-.099-.297-.149-.297-.149zM12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18.5c-4.687 0-8.5-3.813-8.5-8.5s3.813-8.5 8.5-8.5 8.5 3.813 8.5 8.5-3.813 8.5-8.5 8.5z"/></svg>
+);
 
 const faqs = [
   {
@@ -31,6 +36,10 @@ export function SupportHub() {
           <CardDescription>We're here to help you.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <a href="https://wa.me/918291569096?text=Hello%20Ghar%20Ki%20Seva%20Support" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-3 bg-black/20 rounded-lg border border-border">
+            <WhatsAppIcon />
+            <span className="text-white font-medium">Chat on WhatsApp</span>
+          </a>
           <a href="mailto:gharkisevaai@gmail.com" className="flex items-center gap-4 p-3 bg-black/20 rounded-lg border border-border">
             <Mail className="text-primary" />
             <span className="text-white font-medium">gharkisevaai@gmail.com</span>
