@@ -9,12 +9,14 @@ const withPWA = require('next-pwa')({
 
 
 const nextConfig: NextConfig = {
+  output: 'export',
   productionBrowserSourceMaps: true,
   /* config options here */
   typescript: {
     ignoreBuildErrors: false,
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
