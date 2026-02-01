@@ -1,11 +1,11 @@
 {
-  "name": "GrihSeva AI",
-  "short_name": "GrihSeva",
+  "name": "Ghar Ki Sevaai",
+  "short_name": "Sevaai",
   "description": "7% Fee, 100% Trust. The smartest way to Repair, Rent & Sell with AI.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f2223",
-  "theme_color": "#006970",
+  "theme_color": "#f97316",
   "icons": [
     {
       "src": "/logo.png",

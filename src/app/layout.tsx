@@ -9,10 +9,10 @@ import { FloatingAiAssistant } from '@/components/floating-ai-assistant';
 
 
 export const metadata: Metadata = {
-  title: 'Ghar Ki Seva (AI Verified)',
+  title: 'Ghar Ki Sevaai',
   description: '7% Fee, 100% Trust. The smartest way to Repair, Rent & Sell with AI.',
   manifest: '/manifest.json',
-  authors: [{ name: 'Ghar Ki Seva AI', url: 'mailto:gharkisevaai@gmail.com' }],
+  authors: [{ name: 'Ghar Ki Sevaai', url: 'mailto:gharkisevaai@gmail.com' }],
   icons: {
     icon: '/logo.png?v=2',
     apple: '/logo.png?v=2',
@@ -30,10 +30,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-        <meta name="theme-color" content="#006970" />
+        <meta name="theme-color" content="#f97316" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="GrihSeva AI" />
+        <meta name="apple-mobile-web-app-title" content="Ghar Ki Sevaai" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4493898466896244"
