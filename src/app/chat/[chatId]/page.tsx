@@ -1,11 +1,11 @@
 import React from 'react';
 
 type Props = {
-  params: { chatId: string };
+  params: Promise<{ chatId: string }>;
 };
 
-export default function ChatPage({ params }: Props) {
-  const { chatId } = params;
+export default async function ChatPage({ params }: Props) {
+  const { chatId } = await params;
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
