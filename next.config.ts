@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const withPWA = require('next-pwa')({
@@ -9,9 +10,6 @@ const withPWA = require('next-pwa')({
 
 
 const nextConfig: NextConfig = {
-  output: 'export',
-  productionBrowserSourceMaps: true,
-  /* config options here */
   typescript: {
     ignoreBuildErrors: false,
   },
