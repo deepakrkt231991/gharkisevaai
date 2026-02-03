@@ -1,7 +1,6 @@
-export const dynamic = 'force-dynamic'; // यह लाइन सबसे ऊपर डालें
+export const dynamic = 'force-dynamic';
 
-export default function LegalDocumentPage() {
-  // आपका बाकी सारा कोड यहाँ रहेगा...import { LegalDocumentViewer } from '@/components/legal-document-viewer';
+import { LegalDocumentViewer } from '@/components/legal-document-viewer';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
