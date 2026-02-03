@@ -1,10 +1,13 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
-  // यह लाइन जोड़ें
-  output: 'standalone', 
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // यह हिस्सा जोड़ें
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  // यहाँ तक
 };
 
 export default nextConfig;
