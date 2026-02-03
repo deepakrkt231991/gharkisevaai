@@ -1,5 +1,4 @@
-export const dynamic = 'force-dynamic';
-
+import { Suspense } from 'react';
 import { LegalDocumentViewer } from '@/components/legal-document-viewer';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,10 @@ export default function LegalDocumentPage() {
         <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
             <LegalDocHeader/>
             <main className="flex-1 p-4 pb-32 overflow-y-auto">
-                <LegalDocumentViewer />
+                {/* यहाँ Suspense डालना ज़रूरी है */}
+                <Suspense fallback={<div className="p-10 text-center">Loading Agreement...</div>}>
+                    <LegalDocumentViewer />
+                </Suspense>
             </main>
             <BottomNavBar />
         </div>
