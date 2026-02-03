@@ -23,7 +23,8 @@
     "framer-motion": "latest",
     "react-hook-form": "latest",
     "@hookform/resolvers": "latest",
-    "tailwindcss-animate": "latest"
+    "tailwindcss-animate": "latest",
+    "recharts": "latest"
   },
   "devDependencies": {
     "typescript": "^5",
