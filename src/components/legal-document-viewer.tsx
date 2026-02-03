@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react'; // Suspense इम्पोर्ट किया
 import { Card, CardContent, CardHeader, CardDescription, CardFooter } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,7 +14,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { doc } from 'firebase/firestore';
 import type { LegalAgreement } from '@/lib/entities';
 
-export function LegalDocumentViewer() {
+// 1. असली लॉजिक को एक अलग फंक्शन में डाल दिया
+function LegalDocumentContent() {
     const { toast } = useToast();
     const { user, isUserLoading } = useUser();
     const router = useRouter();
@@ -93,7 +95,6 @@ export function LegalDocumentViewer() {
         );
     }
 
-
     return (
         <div className="space-y-4">
             <Card className="glass-card overflow-hidden">
@@ -102,20 +103,19 @@ export function LegalDocumentViewer() {
                     <div className="flex justify-between items-center">
                          <p className="text-xs text-muted-foreground font-mono">Deal ID: {deal.dealId}</p>
                           {deal.status === 'completed' ? (
-                             <Badge variant="outline" className="text-white border-primary/50 bg-primary/30">
-                                <Shield className="mr-2 h-3 w-3"/>Completed & Closed
-                             </Badge>
-                         ) : (
-                             <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-900/30">
-                                <Shield className="mr-2 h-3 w-3"/>Legally Verified (Active)
-                             </Badge>
-                         )}
+                              <Badge variant="outline" className="text-white border-primary/50 bg-primary/30">
+                                 <Shield className="mr-2 h-3 w-3"/>Completed & Closed
+                              </Badge>
+                          ) : (
+                              <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-900/30">
+                                 <Shield className="mr-2 h-3 w-3"/>Legally Verified (Active)
+                              </Badge>
+                          )}
                     </div>
                      <p className="text-xs text-muted-foreground">{date}</p>
                 </CardHeader>
 
                 <CardContent className="p-4 space-y-4">
-                    {/* 1. Parties */}
                     <div>
                         <h4 className="font-bold text-lg mb-2 text-white flex items-center gap-2"><User size={20}/>Parties (पक्ष)</h4>
                         <div className="flex flex-col gap-3">
@@ -141,10 +141,7 @@ export function LegalDocumentViewer() {
                             </div>
                         </div>
                     </div>
-
                     <Separator />
-
-                    {/* 2. Item/Service Details */}
                     <div>
                         <h4 className="font-bold text-lg mb-2 text-white flex items-center gap-2"><Package size={20}/>Item/Service Details (विवरण)</h4>
                         <div className="bg-black/10 p-3 rounded-lg space-y-1">
@@ -154,10 +151,7 @@ export function LegalDocumentViewer() {
                              <p className="font-semibold text-white">{deal.itemCondition || "90% Working (AI Verified)"}</p>
                         </div>
                     </div>
-
                     <Separator />
-
-                     {/* 3. Payment Terms */}
                     <div>
                         <h4 className="font-bold text-lg mb-2 text-white flex items-center gap-2"><IndianRupee size={20}/>Payment Terms (भुगतान शर्तें)</h4>
                         <div className="bg-black/10 p-3 rounded-lg space-y-3">
@@ -175,17 +169,13 @@ export function LegalDocumentViewer() {
                             </div>
                         </div>
                     </div>
-
-                     <Separator />
-
-                     {/* 4. Commission Clause */}
+                    <Separator />
                     <div>
                          <h4 className="font-bold text-lg mb-2 text-white flex items-center gap-2"><Info size={20}/>Commission Clause</h4>
                          <p className="text-sm text-muted-foreground bg-black/10 p-3 rounded-lg">
                             इस डील का 0.05% हिस्सा रेफरल पार्टनर को क्रेडिट किया गया है।
                          </p>
                     </div>
-
                 </CardContent>
                 <CardFooter className="bg-black/20 p-4">
                      <p className="text-xs text-center text-muted-foreground w-full">Digitally Signed via GrihSeva AI Security Vault</p>
@@ -197,5 +187,14 @@ export function LegalDocumentViewer() {
                 Download Agreement
             </Button>
         </div>
+    );
+}
+
+// 2. मेन कंपोनेंट को Suspense में लपेट दिया
+export function LegalDocumentViewer() {
+    return (
+        <Suspense fallback={<div className="flex justify-center p-10"><Loader2 className="animate-spin" /> Loading...</div>}>
+            <LegalDocumentContent />
+        </Suspense>
     );
 }
