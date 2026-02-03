@@ -7,5 +7,6 @@ export default function TermsPage() {
       <p className="mt-4">Ghar Ki Sevaai में आपका स्वागत है।</p>
     </div>
   );
-}
+  
+
 
