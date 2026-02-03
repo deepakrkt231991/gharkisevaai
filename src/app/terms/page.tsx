@@ -1,19 +1,17 @@
-'use client'
 import React, { Suspense } from 'react';
+import ExploreClient from './ExploreClient'; // अगर आपके पास क्लाइंट कंपोनेंट अलग है
 
-function ExploreContent() {
-  return (
-    <div className="p-10 text-center">
-      <h1 className="text-2xl font-bold">Explore Services</h1>
-      <p>Ghar Ki Sevaai - Services coming soon!</p>
-    </div>
-  );
-}
-
+// यह मुख्य पेज है
 export default function ExplorePage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ExploreContent />
-    </Suspense>
+    <div className="min-h-screen bg-gray-50">
+      <Suspense fallback={<div className="p-10 text-center">Loading Explore...</div>}>
+        {/* यहाँ आपका एक्सप्लोर का कंटेंट आएगा */}
+        <section className="p-4">
+          <h1 className="text-xl font-bold">Services Explore</h1>
+          <p>अपनी पसंद की सेवा चुनें</p>
+        </section>
+      </Suspense>
+    </div>
   );
 }
