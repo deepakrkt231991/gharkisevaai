@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "latest",
+    "@radix-ui/react-slot": "latest",
     "class-variance-authority": "latest",
     "clsx": "latest",
     "date-fns": "latest",
