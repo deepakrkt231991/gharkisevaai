@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function TermsPage() {
   return (
     <div className="p-10 text-center">
@@ -6,3 +8,4 @@ export default function TermsPage() {
     </div>
   );
 }
+
