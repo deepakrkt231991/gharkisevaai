@@ -24,7 +24,9 @@
     "react-hook-form": "latest",
     "@hookform/resolvers": "latest",
     "tailwindcss-animate": "latest",
-    "recharts": "latest"
+    "recharts": "latest",
+    "class-variance-authority": "latest",
+    "lucide-react": "latest"
   },
   "devDependencies": {
     "typescript": "^5",
