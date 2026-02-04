@@ -25,7 +25,12 @@
     "@hookform/resolvers": "latest",
     "tailwindcss-animate": "latest",
     "recharts": "latest",
-    "class-variance-authority": "latest"
+    "class-variance-authority": "latest",
+    "@radix-ui/react-checkbox": "latest",
+    "@radix-ui/react-label": "latest",
+    "@radix-ui/react-slot": "latest",
+    "@radix-ui/react-dialog": "latest",
+    "@radix-ui/react-tabs": "latest"
   },
   "devDependencies": {
     "typescript": "^5",
