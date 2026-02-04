@@ -1,3 +1,4 @@
+cat <<EOF > package.json
 {
   "name": "nextn",
   "version": "0.1.0",
@@ -9,44 +10,22 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@hookform/resolvers": "latest",
-    "@radix-ui/react-accordion": "latest",
-    "@radix-ui/react-alert-dialog": "latest",
-    "@radix-ui/react-avatar": "latest",
-    "@radix-ui/react-checkbox": "latest",
-    "@radix-ui/react-collapsible": "latest",
-    "@radix-ui/react-dialog": "latest",
-    "@radix-ui/react-dropdown-menu": "latest",
-    "@radix-ui/react-label": "latest",
-    "@radix-ui/react-menubar": "latest",
-    "@radix-ui/react-popover": "latest",
-    "@radix-ui/react-progress": "latest",
-    "@radix-ui/react-radio-group": "latest",
-    "@radix-ui/react-scroll-area": "latest",
-    "@radix-ui/react-select": "latest",
-    "@radix-ui/react-separator": "latest",
-    "@radix-ui/react-slider": "latest",
-    "@radix-ui/react-slot": "latest",
-    "@radix-ui/react-switch": "latest",
-    "@radix-ui/react-tabs": "latest",
-    "@radix-ui/react-toast": "latest",
-    "@radix-ui/react-tooltip": "latest",
-    "class-variance-authority": "latest",
-    "clsx": "latest",
-    "date-fns": "latest",
-    "embla-carousel-autoplay": "latest",
-    "embla-carousel-react": "latest",
-    "firebase": "latest",
-    "framer-motion": "latest",
-    "lucide-react": "latest",
-    "next": "15.1.11",
+    "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "latest",
-    "recharts": "latest",
+    "firebase": "latest",
+    "embla-carousel-react": "latest",
+    "embla-carousel-autoplay": "latest",
+    "lucide-react": "latest",
+    "clsx": "latest",
     "tailwind-merge": "latest",
+    "zod": "latest",
+    "date-fns": "latest",
+    "framer-motion": "latest",
+    "react-hook-form": "latest",
+    "@hookform/resolvers": "latest",
     "tailwindcss-animate": "latest",
-    "zod": "latest"
+    "recharts": "latest"
   },
   "devDependencies": {
     "typescript": "^5",
@@ -57,3 +36,4 @@
     "tailwindcss": "^3.4.1"
   }
 }
+EOF
