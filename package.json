@@ -25,8 +25,7 @@
     "@hookform/resolvers": "latest",
     "tailwindcss-animate": "latest",
     "recharts": "latest",
-    "class-variance-authority": "latest",
-    "lucide-react": "latest"
+    "class-variance-authority": "latest"
   },
   "devDependencies": {
     "typescript": "^5",
