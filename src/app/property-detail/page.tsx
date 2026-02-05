@@ -1,14 +1,15 @@
-import { PropertyDetailPage } from '@/components/product-detail-page';
+'use client';
+import React, { Suspense } from 'react';
 
-// यह लाइन Next.js को बताएगी कि इस पेज को लाइव लोड करना है
 export const dynamic = "force-dynamic";
 
 export default function PropertyDetail() {
   return (
-    <div className="dark bg-background text-foreground">
-        <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col bg-background overflow-x-hidden">
-             <PropertyDetailPage />
-        </div>
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="p-4 text-center">
+        <h1 className="text-xl font-bold">Property Details</h1>
+        <p>Coming Soon...</p>
+      </div>
+    </Suspense>
   );
 }
