@@ -1,14 +1,18 @@
-import { WorkerSignupPage } from '@/components/worker-signup-page';
+'use client';
+import React, { Suspense } from 'react';
 
-// यह जादुई लाइन इस एरर को खत्म कर देगी
 export const dynamic = "force-dynamic";
 
 export default function WorkerSignup() {
   return (
-    <div className="dark bg-background text-foreground">
-        <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col bg-background overflow-x-hidden">
-             <WorkerSignupPage />
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="dark bg-background text-foreground min-h-screen flex items-center justify-center p-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Worker Signup</h1>
+          <p className="text-muted-foreground">Registration coming soon...</p>
+          <a href="/" className="mt-4 inline-block text-blue-500 underline">Back to Home</a>
         </div>
-    </div>
+      </div>
+    </Suspense>
   );
 }
