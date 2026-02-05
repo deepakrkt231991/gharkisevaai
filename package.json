@@ -1,6 +1,6 @@
 {
   "name": "nextn",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -14,8 +14,11 @@
     "react-dom": "^19.0.0",
     "firebase": "latest",
     "genkit": "latest",
-    "@genkit-ai/googleai": "latest",
     "@genkit-ai/ai": "latest",
+    "@genkit-ai/core": "latest",
+    "@genkit-ai/dotprompt": "latest",
+    "@genkit-ai/googleai": "latest",
+    "@genkit-ai/flow": "latest",
     "embla-carousel-react": "latest",
     "embla-carousel-autoplay": "latest",
     "lucide-react": "latest",
