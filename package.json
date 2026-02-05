@@ -1,6 +1,6 @@
 {
   "name": "nextn",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,6 +12,7 @@
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-is": "^19.0.0",
     "firebase": "latest",
     "genkit": "latest",
     "@genkit-ai/ai": "latest",
@@ -31,7 +32,7 @@
     "react-hook-form": "latest",
     "@hookform/resolvers": "latest",
     "tailwindcss-animate": "latest",
-    "recharts": "latest",
+    "recharts": "2.12.7",
     "class-variance-authority": "latest",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-checkbox": "latest",
