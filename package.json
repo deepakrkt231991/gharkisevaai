@@ -1,6 +1,6 @@
 {
   "name": "nextn",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -38,6 +38,7 @@
     "@radix-ui/react-label": "latest",
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-dialog": "latest",
+    "@radix-ui/react-alert-dialog": "latest",
     "@radix-ui/react-tabs": "latest",
     "@radix-ui/react-progress": "latest",
     "@radix-ui/react-scroll-area": "latest",
@@ -51,7 +52,8 @@
     "@radix-ui/react-separator": "latest",
     "@radix-ui/react-slider": "latest",
     "@radix-ui/react-tooltip": "latest",
-    "@radix-ui/react-navigation-menu": "latest"
+    "@radix-ui/react-navigation-menu": "latest",
+    "@radix-ui/react-collapsible": "latest"
   },
   "devDependencies": {
     "typescript": "^5",
