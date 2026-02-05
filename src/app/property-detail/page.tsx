@@ -1,4 +1,7 @@
-import { PropertyDetailPage } from '@/components/property-detail-page';
+import { PropertyDetailPage } from '@/components/product-detail-page';
+
+// यह लाइन Next.js को बताएगी कि इस पेज को लाइव लोड करना है
+export const dynamic = "force-dynamic";
 
 export default function PropertyDetail() {
   return (
