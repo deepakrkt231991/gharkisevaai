@@ -1,6 +1,6 @@
 {
   "name": "nextn",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -43,7 +43,8 @@
     "@radix-ui/react-switch": "latest",
     "@radix-ui/react-separator": "latest",
     "@radix-ui/react-slider": "latest",
-    "@radix-ui/react-tooltip": "latest"
+    "@radix-ui/react-tooltip": "latest",
+    "@radix-ui/react-navigation-menu": "latest"
   },
   "devDependencies": {
     "typescript": "^5",
