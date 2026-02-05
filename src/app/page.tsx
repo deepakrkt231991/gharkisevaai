@@ -1,15 +1,34 @@
 'use client';
-import React, { Suspense } from 'react';
 
-export const dynamic = "force-dynamic";
+import { HomeHeader } from '@/components/home-header';
+import { BottomNavBar } from '@/components/bottom-nav-bar';
+import { WelcomeVideoModal } from '@/components/welcome-video-modal';
+import { HomeCarouselBanner } from '@/components/home-carousel-banner';
+import { LiveFeed } from '@/components/live-feed';
+import { AiServiceGrid } from '@/components/ai-service-grid';
+import { SmartHub } from '@/components/smart-hub';
+import { TrendingNow } from '@/components/trending-now';
+import { UserStats } from '@/components/user-stats';
+import { WhyChooseUsHome } from '@/components/why-choose-us-home';
 
-export default function WorkerSignup() {
+
+export default function Home() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div className="p-4 text-center">
-        <h1 className="text-xl font-bold">Worker Signup</h1>
-        <p>Registration Page</p>
+    <div className="dark bg-background text-foreground">
+      <WelcomeVideoModal />
+      <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
+        <HomeHeader />
+        <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-48">
+          <UserStats />
+          <HomeCarouselBanner />
+          <AiServiceGrid />
+          <SmartHub />
+          <WhyChooseUsHome />
+          <TrendingNow />
+          <LiveFeed />
+        </main>
+        <BottomNavBar />
       </div>
-    </Suspense>
+    </div>
   );
 }
