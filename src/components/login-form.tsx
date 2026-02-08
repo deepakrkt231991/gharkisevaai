@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -11,6 +10,7 @@ import {
   updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -38,6 +38,7 @@ export function LoginForm() {
   const [signupPassword, setSignupPassword] = useState('');
   const [signupAgreed, setSignupAgreed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordResetting, setIsPasswordResetting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const auth = useAuth();
@@ -128,6 +129,38 @@ export function LoginForm() {
       setIsLoading(false);
     }
   };
+  
+  const handlePasswordReset = async () => {
+    if (!loginEmail) {
+      setError('Please enter your email address to reset the password.');
+      toast({
+        variant: 'destructive',
+        title: 'Email Required',
+        description: 'Please enter your email address in the email field first.',
+      });
+      return;
+    }
+    setIsPasswordResetting(true);
+    setError(null);
+    try {
+      await sendPasswordResetEmail(auth, loginEmail);
+      toast({
+        title: 'Password Reset Email Sent',
+        description: `If an account exists for ${loginEmail}, you will receive an email with instructions to reset your password.`,
+        className: 'bg-green-600 border-green-600 text-white',
+      });
+    } catch (err: any) {
+      // Don't show Firebase specific errors to user for security, just show a generic success message
+       toast({
+        title: 'Password Reset Email Sent',
+        description: `If an account exists for ${loginEmail}, you will receive an email with instructions to reset your password.`,
+        className: 'bg-green-600 border-green-600 text-white',
+      });
+    } finally {
+      setIsPasswordResetting(false);
+    }
+  };
+
 
   return (
     <Card className="glass-card w-full">
@@ -144,8 +177,8 @@ export function LoginForm() {
           </TabsList>
           
           <TabsContent value="login" className="space-y-4 pt-4">
-            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
+            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isPasswordResetting}>
+                {(isLoading && !isPasswordResetting) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
                 Continue with Google
             </Button>
             <div className="relative my-2">
@@ -165,8 +198,19 @@ export function LoginForm() {
                 <Label htmlFor="login-password">Password</Label>
                 <Input id="login-password" type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
               </div>
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <div className="text-right -mt-2">
+                <Button
+                    type="button"
+                    variant="link"
+                    className="p-0 h-auto text-xs"
+                    onClick={handlePasswordReset}
+                    disabled={isLoading || isPasswordResetting}
+                >
+                    {isPasswordResetting ? <><Loader2 className="mr-2 h-3 w-3 animate-spin"/>Sending...</> : 'Forgot Password?'}
+                </Button>
+              </div>
+              <Button type="submit" disabled={isLoading || isPasswordResetting} className="w-full">
+                {(isLoading && !isPasswordResetting) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Log In
               </Button>
             </form>
