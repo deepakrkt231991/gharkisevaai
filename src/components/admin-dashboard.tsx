@@ -13,7 +13,7 @@ import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapP
 import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, where, orderBy } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
-import type { SOSAlert, Worker, Transaction, Deal } from "@/lib/entities";
+import type { SOSAlert, Worker, Transaction, Deal, Property } from "@/lib/entities";
 import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds, approvePropertyAndGenerateCertificate, rejectProperty } from "@/app/admin/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
@@ -93,6 +93,60 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
                 <Button className="bg-green-600 hover:bg-green-700" onClick={handleApprove} disabled={isPending}>
                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4"/>}
                     Approve
+                </Button>
+                <Button variant="destructive" onClick={handleReject} disabled={isPending}>Reject</Button>
+            </div>
+        </Card>
+    )
+}
+
+function PropertyVerificationCard({ property }: { property: Property & {id: string} }) {
+    const { toast } = useToast();
+    const [isPending, startTransition] = useTransition();
+
+    const handleApprove = () => {
+        startTransition(async () => {
+            const result = await approvePropertyAndGenerateCertificate(property.id);
+            if(result.success) {
+                toast({ title: "Success", description: `Property ${property.title} approved and certificate generated.`, className: "bg-green-600 text-white" });
+            } else {
+                toast({ title: "Error", description: result.message, variant: "destructive" });
+            }
+        });
+    };
+
+    const handleReject = () => {
+         startTransition(async () => {
+            if (confirm(`Are you sure you want to reject this property listing?`)) {
+                const result = await rejectProperty(property.id);
+                 if(result.success) {
+                    toast({ title: "Success", description: `Property ${property.title} has been rejected.` });
+                } else {
+                    toast({ title: "Error", description: result.message, variant: "destructive" });
+                }
+            }
+        });
+    };
+
+    return (
+         <Card className="flex flex-col md:flex-row items-start justify-between p-4 gap-4">
+            <div className="flex items-start gap-4">
+                <Image src={property.imageUrl || 'https://placehold.co/150x100'} alt={property.title || 'Property Image'} width={150} height={100} className="rounded-md object-cover hidden md:block" />
+                <div>
+                    <p className="font-semibold text-white">{property.title}</p>
+                    <p className="text-sm text-muted-foreground">{property.location}</p>
+                    <p className="text-sm text-muted-foreground">Owner: {property.ownerId.substring(0, 8)}...</p>
+                    <Badge className="mt-2">{property.listingType}</Badge>
+                </div>
+            </div>
+            <div className="flex flex-col gap-2 w-full md:w-auto">
+                <Button variant="outline" disabled={isPending} asChild>
+                    {/* In a real app, this would open a modal with document links */}
+                    <Link href="#" onClick={() => toast({title: "Coming Soon", description: "Document viewer is not yet implemented."})}>View Documents</Link>
+                </Button>
+                <Button className="bg-green-600 hover:bg-green-700" onClick={handleApprove} disabled={isPending}>
+                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4"/>}
+                    Approve & Certify
                 </Button>
                 <Button variant="destructive" onClick={handleReject} disabled={isPending}>Reject</Button>
             </div>
@@ -270,6 +324,11 @@ export function AdminDashboard() {
     return query(collection(firestore, 'workers'), where('isVerified', '==', false));
   }, [firestore]);
 
+  const pendingPropertiesQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'properties'), where('verificationStatus', 'in', ['pending', 'review_needed']));
+  }, [firestore]);
+
   const transactionsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return query(collection(firestore, 'transactions'), orderBy('timestamp', 'desc'));
@@ -282,6 +341,7 @@ export function AdminDashboard() {
 
   const { data: sosAlerts, isLoading: sosLoading } = useCollection<SOSAlert>(sosAlertsQuery);
   const { data: pendingVerifications, isLoading: pendingLoading } = useCollection<Worker>(pendingVerificationsQuery);
+  const { data: pendingProperties, isLoading: propertiesLoading } = useCollection<Property>(pendingPropertiesQuery);
   const { data: transactions, isLoading: transactionsLoading } = useCollection<Transaction>(transactionsQuery);
   const { data: disputedDeals, isLoading: disputesLoading } = useCollection<Deal>(disputedDealsQuery);
 
@@ -381,8 +441,8 @@ export function AdminDashboard() {
            <TabsTrigger value="finance"><IndianRupee className="mr-2 h-4 w-4" /> Finance</TabsTrigger>
            <TabsTrigger value="verification">
             <CheckCircle className="mr-2 h-4 w-4" /> Verification
-             {pendingVerifications && pendingVerifications.length > 0 && (
-                <Badge className="ml-2">{pendingVerifications.length}</Badge>
+             {((pendingVerifications?.length || 0) + (pendingProperties?.length || 0)) > 0 && (
+                <Badge className="ml-2">{((pendingVerifications?.length || 0) + (pendingProperties?.length || 0))}</Badge>
             )}
           </TabsTrigger>
            <TabsTrigger value="marketing"><Share2 className="mr-2 h-4 w-4" /> Marketing</TabsTrigger>
@@ -496,7 +556,7 @@ export function AdminDashboard() {
             </Card>
         </TabsContent>
 
-        <TabsContent value="verification">
+        <TabsContent value="verification" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Pending Worker Verifications</CardTitle>
@@ -510,7 +570,26 @@ export function AdminDashboard() {
                       <WorkerVerificationRow key={p.id} worker={p} />
                     ))
                  ) : !pendingLoading && (
-                    <p className="text-center text-muted-foreground p-8">No pending verifications.</p>
+                    <p className="text-center text-muted-foreground p-8">No pending worker verifications.</p>
+                 )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Property Verifications</CardTitle>
+              <CardDescription>Approve or reject new property listings.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                 {propertiesLoading && <div className="text-center p-8 flex items-center justify-center gap-2"><Loader2 className="animate-spin"/> Loading pending properties...</div>}
+                 {pendingProperties && pendingProperties.length > 0 ? (
+                    pendingProperties.map((p) => (
+                      <PropertyVerificationCard key={p.id} property={p} />
+                    ))
+                 ) : !propertiesLoading && (
+                    <p className="text-center text-muted-foreground p-8">No pending property verifications.</p>
                  )}
               </div>
             </CardContent>
