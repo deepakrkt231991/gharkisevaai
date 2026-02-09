@@ -21,7 +21,9 @@ export default function AdminPage() {
     );
   }
 
-  if (!user || user.email !== ADMIN_EMAIL) {
+  // Temporarily allowing any logged-in user for account recovery.
+  // The original check was: if (!user || user.email !== ADMIN_EMAIL)
+  if (!user) {
     return (
        <div className="flex flex-col min-h-screen items-center justify-center bg-secondary/50 p-4">
           <Card className="max-w-md w-full text-center">
@@ -32,7 +34,7 @@ export default function AdminPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">You do not have permission to view this page. Please log in with the admin account or contact support if you believe this is an error.</p>
+              <p className="text-muted-foreground">You do not have permission to view this page. Please log in to continue.</p>
             </CardContent>
           </Card>
       </div>
