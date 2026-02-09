@@ -75,14 +75,10 @@ export default function FindWorkerPage() {
         let q = query(collection(firestore, 'workers'), where('isVerified', '==', true));
         
         const activeSkill = categories.find(c => c.name === activeCategory)?.skill;
-        // This is the main optimization: filter by category directly in the Firestore query.
-        // It drastically reduces the amount of data downloaded by the client.
         if (activeCategory !== 'All' && activeSkill) {
             q = query(q, where('skills', 'array-contains', activeSkill));
         }
 
-        // Note: More complex sorting and filtering combinations (e.g., filter by rating AND sort by experience)
-        // are handled on the client side due to Firestore's query limitations.
         return q;
     }, [firestore, activeCategory]);
     
@@ -99,15 +95,17 @@ export default function FindWorkerPage() {
             return { worker, distance };
         });
 
-        // Client-side filtering for search and advanced filters
         let filtered = processedData.filter(({ worker }) => {
-            const searchMatch = searchTerm === '' || worker.name?.toLowerCase().includes(searchTerm.toLowerCase()) || worker.skills?.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
+            const searchMatch = searchTerm === '' || 
+                                worker.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                worker.skills?.some(s => s.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                                (worker as any).location?.city?.toLowerCase().includes(searchTerm.toLowerCase());
+
             const ratingMatch = !filters.minRating || (worker.rating || 0) >= 4.0;
             const experienceMatch = !filters.isExperienced || (worker.successfulOrders || 0) >= 50;
             return searchMatch && ratingMatch && experienceMatch;
         });
         
-        // Client-side sorting
         if (sortBy === 'near_me') {
             filtered.sort((a, b) => {
                 if (a.distance === null) return 1;
@@ -115,8 +113,7 @@ export default function FindWorkerPage() {
                 return a.distance - b.distance;
             });
         } else if (sortBy === 'price_low_high') {
-             // Assuming a 'startingPrice' field exists on the worker document
-            filtered.sort((a, b) => ((a.worker as any).startingPrice || 999) - ((b.worker as any).startingPrice || 999));
+             filtered.sort((a, b) => ((a.worker as any).startingPrice || 999) - ((b.worker as any).startingPrice || 999));
         } else if (sortBy === 'rating') {
             filtered.sort((a, b) => (b.worker.rating || 0) - (a.worker.rating || 0));
         } else if (sortBy === 'experience') {
@@ -204,11 +201,11 @@ export default function FindWorkerPage() {
                          <div className="space-y-3">
                             <Label>Filter By</Label>
                              <div className="flex items-center space-x-2">
-                                <Switch id="f-rating" checked={filters.minRating} onCheckedChange={(checked) => setFilters(p => ({...p, minRating: checked}))} />
+                                <Switch id="f-rating" checked={filters.minRating} onCheckedChange={(checked) => setFilters(p => ({...p, minRating: checked as boolean}))} />
                                 <Label htmlFor="f-rating">Rating 4.0+</Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Switch id="f-exp" checked={filters.isExperienced} onCheckedChange={(checked) => setFilters(p => ({...p, isExperienced: checked}))} />
+                                <Switch id="f-exp" checked={filters.isExperienced} onCheckedChange={(checked) => setFilters(p => ({...p, isExperienced: checked as boolean}))} />
                                 <Label htmlFor="f-exp">Experienced (50+ Jobs)</Label>
                             </div>
                         </div>
