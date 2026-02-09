@@ -115,6 +115,14 @@
             "type": "string",
             "format": "date-time",
             "description": "Timestamp of when the job was marked as completed."
+        },
+        "rating": {
+          "type": "number",
+          "description": "The star rating (1-5) given by the customer upon job completion."
+        },
+        "reviewText": {
+          "type": "string",
+          "description": "The written review or comment from the customer."
         }
       },
       "required": ["jobId", "customerId", "status"]
@@ -191,6 +199,10 @@
         "shopPhotoUrl": {
           "type": "string",
           "description": "URL of the worker's shop, visiting card, or certificate photo."
+        },
+        "bio": {
+          "type": "string",
+          "description": "A short bio or description written by the worker."
         }
       },
       "required": ["uid", "workerId", "isVerified"]

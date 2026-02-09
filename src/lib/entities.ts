@@ -30,6 +30,8 @@ export interface Job {
     gst?: number;
     workerPayout?: number;
     completedAt?: any; // Firestore Timestamp
+    rating?: number; // The star rating (1-5) given by the customer upon job completion.
+    reviewText?: string; // The written review or comment from the customer.
 }
 
 export interface Worker {
@@ -57,6 +59,7 @@ export interface Worker {
     portfolioImageUrls?: string[];
     createdAt?: any; // Firestore Timestamp
     shopPhotoUrl?: string;
+    bio?: string; // A short bio or description written by the worker.
 }
 
 export interface Health {

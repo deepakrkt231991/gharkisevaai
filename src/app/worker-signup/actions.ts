@@ -25,6 +25,7 @@ const WorkerProfileSchema = z.object({
   referredBy: z.string().optional(),
   portfolioImageUrls: z.array(z.string().url()).optional(),
   shopPhotoUrl: z.string().url().optional(),
+  bio: z.string().optional(),
 });
 
 type State = {
@@ -54,6 +55,7 @@ export async function createWorkerProfile(
     referredBy: formData.get('referredBy'),
     portfolioImageUrls: formData.getAll('portfolioImageUrls[]'),
     shopPhotoUrl: formData.get('shopPhotoUrl') || undefined,
+    bio: formData.get('bio'),
   });
 
   if (!validatedFields.success) {
