@@ -7,7 +7,7 @@ import { Loader2, ShieldAlert } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 // IMPORTANT: This email is the master admin for the entire app.
-const ADMIN_EMAIL = "gharkisevaai@gmail.com"; 
+const ADMIN_EMAIL = "deepakkadamrkt@gmail.com"; 
 
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
