@@ -6,6 +6,12 @@ import { getFirestore } from 'firebase/firestore';
 
 // This function can be called from both client and server.
 export function initializeFirebase() {
+  if (!firebaseConfig.apiKey) {
+    throw new Error(
+      'Firebase API Key is missing. Please check your environment variables.'
+    );
+  }
+
   if (getApps().length) {
     return getSdks(getApp());
   }
