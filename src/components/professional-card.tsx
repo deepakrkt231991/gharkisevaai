@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, MessageSquare, Calendar, CheckCircle } from 'lucide-react';
+import { Star, MessageSquare, Calendar, CheckCircle, MapPin } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { ImagePlaceholder } from '@/lib/placeholder-images';
@@ -12,9 +12,10 @@ import type { Worker } from '@/lib/entities';
 
 interface ProfessionalCardProps {
   worker: ImagePlaceholder | (Worker & { id: string });
+  distance?: number | null;
 }
 
-export function ProfessionalCard({ worker }: ProfessionalCardProps) {
+export function ProfessionalCard({ worker, distance }: ProfessionalCardProps) {
   // Data normalization
   const id = worker.id;
   const name = worker.name || 'Verified Worker';
@@ -52,6 +53,11 @@ export function ProfessionalCard({ worker }: ProfessionalCardProps) {
                 <span className="text-sm font-bold text-white">{rating}</span>
                 <span className="text-xs text-muted-foreground">({reviews} reviews)</span>
               </div>
+              {distance !== null && distance !== undefined && (
+                <p className="text-xs text-primary font-bold flex items-center gap-1 mt-1">
+                    <MapPin size={12} /> {distance.toFixed(1)} km away
+                </p>
+              )}
             </div>
           </div>
           <div className="text-right">

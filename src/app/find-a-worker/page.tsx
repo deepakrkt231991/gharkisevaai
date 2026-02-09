@@ -3,7 +3,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Search, SlidersHorizontal, Wrench, Zap, Paintbrush, AirVent, Tv, Refrigerator, WashingMachine, Thermometer, Droplets, Star, TrendingUp, IndianRupee, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, SlidersHorizontal, Wrench, Zap, Paintbrush, AirVent, Tv, Refrigerator, WashingMachine, Thermometer, Droplets, Star, TrendingUp, IndianRupee, Loader2, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ProfessionalCard } from '@/components/professional-card';
@@ -18,6 +18,8 @@ import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
+import { useGeolocation } from '@/hooks/use-geolocation';
+import { calculateDistance } from '@/lib/geo-helpers';
 
 
 const categories = [
@@ -70,6 +72,7 @@ export default function FindWorkerPage() {
         minRating: false,
         isExperienced: false
     });
+    const { latitude: userLat, longitude: userLon } = useGeolocation();
 
     const workersQuery = useMemoFirebase(() => {
         if (!firestore) return null;
@@ -89,10 +92,19 @@ export default function FindWorkerPage() {
                 skills: [(p.specialty || 'professional').toLowerCase().replace(' ', '_')],
                 rating: p.rating,
                 successfulOrders: p.reviews,
-                startingPrice: p.startingPrice
+                startingPrice: p.startingPrice,
+                location: { latitude: 28.6139, longitude: 77.2090 } // Demo location
             } as any));
 
-        let filtered = dataToFilter.filter(worker => {
+        let processedData = dataToFilter.map(worker => {
+            let distance: number | null = null;
+            if (userLat && userLon && worker.location?.latitude && worker.location?.longitude) {
+                distance = calculateDistance(userLat, userLon, worker.location.latitude, worker.location.longitude);
+            }
+            return { worker, distance };
+        });
+
+        let filtered = processedData.filter(({ worker }) => {
             const categoryMatch = activeCategory === 'All' || worker.skills?.includes(categories.find(c => c.name === activeCategory)?.skill || '');
             const searchMatch = searchTerm === '' || worker.name?.toLowerCase().includes(searchTerm.toLowerCase()) || worker.skills?.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
             const ratingMatch = !filters.minRating || (worker.rating || 0) >= 4.0;
@@ -100,16 +112,22 @@ export default function FindWorkerPage() {
             return categoryMatch && searchMatch && ratingMatch && experienceMatch;
         });
 
-        if (sortBy === 'price_low_high') {
-            filtered.sort((a, b) => (a.startingPrice || 999) - (b.startingPrice || 999));
+        if (sortBy === 'near_me') {
+            filtered.sort((a, b) => {
+                if (a.distance === null) return 1;
+                if (b.distance === null) return -1;
+                return a.distance - b.distance;
+            });
+        } else if (sortBy === 'price_low_high') {
+            filtered.sort((a, b) => (a.worker.startingPrice || 999) - (b.worker.startingPrice || 999));
         } else if (sortBy === 'rating') {
-            filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            filtered.sort((a, b) => (b.worker.rating || 0) - (a.worker.rating || 0));
         } else if (sortBy === 'experience') {
-            filtered.sort((a, b) => (b.successfulOrders || 0) - (a.successfulOrders || 0));
+            filtered.sort((a, b) => (b.worker.successfulOrders || 0) - (a.worker.successfulOrders || 0));
         }
 
         return filtered;
-    }, [workers, isLoading, activeCategory, searchTerm, sortBy, filters]);
+    }, [workers, isLoading, activeCategory, searchTerm, sortBy, filters, userLat, userLon]);
 
     return (
         <Drawer>
@@ -141,8 +159,8 @@ export default function FindWorkerPage() {
                                 </div>
                             ) : filteredAndSortedWorkers.length > 0 ? (
                                 <div className="space-y-4">
-                                    {filteredAndSortedWorkers.map((worker) => (
-                                        <ProfessionalCard key={worker.id} worker={worker} />
+                                    {filteredAndSortedWorkers.map(({ worker, distance }) => (
+                                        <ProfessionalCard key={worker.id} worker={worker} distance={distance} />
                                     ))}
                                 </div>
                             ) : (
@@ -168,6 +186,10 @@ export default function FindWorkerPage() {
                         <div className="space-y-3">
                             <Label>Sort By</Label>
                             <RadioGroup value={sortBy} onValueChange={setSortBy}>
+                                 <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="near_me" id="r-near" disabled={!userLat} />
+                                    <Label htmlFor="r-near" className="flex items-center gap-2"><MapPin/> Near Me</Label>
+                                </div>
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="rating" id="r-rating" />
                                     <Label htmlFor="r-rating" className="flex items-center gap-2"><Star/> Top Rated</Label>
