@@ -1,11 +1,9 @@
-
-
 'use client';
 
 import { useMemo } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Share, Star, MessageSquare, Calendar, CheckCircle, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Share, Star, MessageSquare, Calendar, CheckCircle, ShieldCheck, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -19,10 +17,18 @@ import type { Worker } from '@/lib/entities';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import AdsenseBanner from './adsense-banner';
+import { Separator } from './ui/separator';
 
 const WhatsAppIcon = () => (
     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"><title>WhatsApp</title><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52s-.67-.816-.923-1.123c-.253-.307-.508-.262-.67.025-.164.288-.67 1.164-.67 1.164s-.67.149-1.645.923c-.976.775-1.045 1.502-1.045 1.502s.508 1.645 1.645 2.52c1.138.875 2.596 1.943 3.846 1.943.347 0 .82-.025 1.123-.307.303-.282.67-1.164.67-1.164s-.05-.099-.124-.198c-.074-.099-.297-.149-.297-.149zM12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18.5c-4.687 0-8.5-3.813-8.5-8.5s3.813-8.5 8.5-8.5 8.5 3.813 8.5 8.5-3.813 8.5-8.5 8.5z" fill="currentColor"/></svg>
 );
+
+// Placeholder reviews
+const fakeReviews = [
+    { id: 1, name: 'Anjali P.', rating: 5, comment: 'Very professional and quick work! Fixed my AC in no time. Highly recommended.', date: '2 days ago', helpful: 12 },
+    { id: 2, name: 'Vikram S.', rating: 4, comment: 'Good service, but was a bit late. The plumbing work itself was excellent though.', date: '1 week ago', helpful: 5 },
+    { id: 3, name: 'Sunita M.', rating: 5, comment: 'Extremely satisfied with the painting job. The team was clean, efficient, and very polite. My house looks brand new!', date: '3 weeks ago', helpful: 21 },
+];
 
 export function WorkerProfilePage({ workerId }: { workerId: string }) {
   const router = useRouter();
@@ -77,7 +83,7 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
 
   const portfolioImages = worker.portfolioImageUrls && worker.portfolioImageUrls.length > 0
     ? worker.portfolioImageUrls
-    : ['https://placehold.co/600x400?text=No+Portfolio'];
+    : [];
     
   const whatsAppMessage = `Hi ${worker.name}, I'm interested in your ${worker.skills?.join(', ')} services from Ghar Ki Seva.`;
 
@@ -122,10 +128,6 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
           </CardContent>
         </Card>
 
-        <Card className="glass-card p-1">
-          <AdsenseBanner adSlot="2001427785" />
-        </Card>
-        
         {portfolioImages.length > 0 && (
           <div>
             <h3 className="text-lg font-bold font-headline mb-3">Portfolio / Gallery</h3>
@@ -150,20 +152,44 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
         
         <Card className="glass-card">
             <CardContent className="p-4">
-                <h3 className="text-lg font-bold font-headline mb-3">Stats & Badges</h3>
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-card p-3 rounded-lg">
-                        <p className="text-xs text-muted-foreground">Response Time</p>
-                        <p className="font-bold text-white">Under 15 mins</p>
-                    </div>
-                     <div className="bg-card p-3 rounded-lg">
-                        <p className="text-xs text-muted-foreground">Job Success</p>
-                        <p className="font-bold text-white">98%</p>
-                    </div>
+                <h3 className="text-lg font-bold font-headline mb-4">Reviews & Ratings</h3>
+                 <div className="space-y-4">
+                    {fakeReviews.map((review) => (
+                        <div key={review.id} className="space-y-3">
+                           <div className="flex items-start gap-3">
+                                <Avatar className="h-9 w-9">
+                                    <AvatarImage src={`https://i.pravatar.cc/150?u=${review.name}`} />
+                                    <AvatarFallback>{review.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <div className="flex justify-between items-center">
+                                        <p className="font-semibold text-white">{review.name}</p>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <div className="flex text-yellow-400">
+                                            {[...Array(5)].map((_, i) => <Star key={i} className={`h-3 w-3 ${i < review.rating ? 'fill-current' : ''}`} />)}
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">{review.date}</p>
+                                    </div>
+                                </div>
+                           </div>
+                           <p className="text-sm text-white/90">{review.comment}</p>
+                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                               <span>Helpful?</span>
+                               <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1.5"><ThumbsUp className="h-4 w-4"/> {review.helpful}</Button>
+                               <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1.5"><ThumbsDown className="h-4 w-4"/></Button>
+                           </div>
+                           <Separator className="bg-border/50" />
+                        </div>
+                    ))}
                  </div>
             </CardContent>
         </Card>
 
+        <Card className="glass-card p-1">
+          <AdsenseBanner adSlot="2001427785" />
+        </Card>
+        
       </main>
 
       <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-4 bg-gradient-to-t from-background to-transparent z-10">
