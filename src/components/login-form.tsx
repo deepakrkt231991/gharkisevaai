@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -150,12 +151,22 @@ export function LoginForm() {
         className: 'bg-green-600 border-green-600 text-white',
       });
     } catch (err: any) {
-      // Don't show Firebase specific errors to user for security, just show a generic success message
-       toast({
-        title: 'Password Reset Email Sent',
-        description: `If an account exists for ${loginEmail}, you will receive an email with instructions to reset your password.`,
-        className: 'bg-green-600 border-green-600 text-white',
-      });
+      // For security, we generally don't want to reveal if an email exists or not.
+      // However, we can provide slightly more helpful feedback.
+      if ((err as any).code === 'auth/invalid-email') {
+         toast({
+          variant: 'destructive',
+          title: 'Invalid Email Address',
+          description: 'Please check if you have entered your email correctly.',
+        });
+      } else {
+        // Generic message for all other errors (user not found, network error, etc.)
+        toast({
+          title: 'Password Reset Email Sent',
+          description: `If an account exists for ${loginEmail}, you will receive an email with instructions. Please also check your spam folder.`,
+          className: 'bg-green-600 border-green-600 text-white',
+        });
+      }
     } finally {
       setIsPasswordResetting(false);
     }
