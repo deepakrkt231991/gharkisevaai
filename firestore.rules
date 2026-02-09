@@ -4,7 +4,7 @@ service cloud.firestore {
 
     function isAdmin() {
       // Check for the admin's specific email.
-      return request.auth != null && request.auth.token.email == 'deepakkadamrkt@gmail.com';
+      return request.auth != null && request.auth.token.email == 'deepakkadam231991@gmail.com';
     }
 
     function isParty(resource) {
