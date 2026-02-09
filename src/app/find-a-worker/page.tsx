@@ -5,18 +5,15 @@ import Link from 'next/link';
 import { ArrowLeft, Search, SlidersHorizontal, Wrench, Zap, Paintbrush, AirVent, Tv, Refrigerator, WashingMachine, Thermometer, Droplets, Star, TrendingUp, IndianRupee, Loader2, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ProfessionalCard } from '@/components/professional-card';
+import { ProfessionalCard, ProfessionalCardSkeleton } from '@/components/professional-card';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
+import { collection, query, where, orderBy } from 'firebase/firestore';
 import type { Worker } from '@/lib/entities';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter, DrawerClose } from '@/components/ui/drawer';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import { Skeleton } from '@/components/ui/skeleton';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { cn } from '@/lib/utils';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { calculateDistance } from '@/lib/geo-helpers';
 
@@ -76,26 +73,25 @@ export default function FindWorkerPage() {
     const workersQuery = useMemoFirebase(() => {
         if (!firestore) return null;
         let q = query(collection(firestore, 'workers'), where('isVerified', '==', true));
-        // We fetch all verified workers and filter on the client, as Firestore doesn't support complex 'OR' queries on different fields needed for our search/filter logic.
+        
+        const activeSkill = categories.find(c => c.name === activeCategory)?.skill;
+        // This is the main optimization: filter by category directly in the Firestore query.
+        // It drastically reduces the amount of data downloaded by the client.
+        if (activeCategory !== 'All' && activeSkill) {
+            q = query(q, where('skills', 'array-contains', activeSkill));
+        }
+
+        // Note: More complex sorting and filtering combinations (e.g., filter by rating AND sort by experience)
+        // are handled on the client side due to Firestore's query limitations.
         return q;
-    }, [firestore]);
+    }, [firestore, activeCategory]);
     
     const { data: workers, isLoading } = useCollection<Worker>(workersQuery);
 
     const filteredAndSortedWorkers = useMemo(() => {
-        const dataToFilter = (!isLoading && workers && workers.length > 0) 
-            ? workers 
-            : PlaceHolderImages.filter(p => p.type === 'worker').map(p => ({
-                id: p.id,
-                name: p.name,
-                skills: [(p.specialty || 'professional').toLowerCase().replace(' ', '_')],
-                rating: p.rating,
-                successfulOrders: p.reviews,
-                startingPrice: p.startingPrice,
-                location: { latitude: 28.6139, longitude: 77.2090 } // Demo location
-            } as any));
+        if (!workers) return [];
 
-        let processedData = dataToFilter.map(worker => {
+        let processedData = workers.map(worker => {
             let distance: number | null = null;
             if (userLat && userLon && worker.location?.latitude && worker.location?.longitude) {
                 distance = calculateDistance(userLat, userLon, worker.location.latitude, worker.location.longitude);
@@ -103,14 +99,15 @@ export default function FindWorkerPage() {
             return { worker, distance };
         });
 
+        // Client-side filtering for search and advanced filters
         let filtered = processedData.filter(({ worker }) => {
-            const categoryMatch = activeCategory === 'All' || worker.skills?.includes(categories.find(c => c.name === activeCategory)?.skill || '');
             const searchMatch = searchTerm === '' || worker.name?.toLowerCase().includes(searchTerm.toLowerCase()) || worker.skills?.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
             const ratingMatch = !filters.minRating || (worker.rating || 0) >= 4.0;
             const experienceMatch = !filters.isExperienced || (worker.successfulOrders || 0) >= 50;
-            return categoryMatch && searchMatch && ratingMatch && experienceMatch;
+            return searchMatch && ratingMatch && experienceMatch;
         });
-
+        
+        // Client-side sorting
         if (sortBy === 'near_me') {
             filtered.sort((a, b) => {
                 if (a.distance === null) return 1;
@@ -118,7 +115,8 @@ export default function FindWorkerPage() {
                 return a.distance - b.distance;
             });
         } else if (sortBy === 'price_low_high') {
-            filtered.sort((a, b) => (a.worker.startingPrice || 999) - (b.worker.startingPrice || 999));
+             // Assuming a 'startingPrice' field exists on the worker document
+            filtered.sort((a, b) => ((a.worker as any).startingPrice || 999) - ((b.worker as any).startingPrice || 999));
         } else if (sortBy === 'rating') {
             filtered.sort((a, b) => (b.worker.rating || 0) - (a.worker.rating || 0));
         } else if (sortBy === 'experience') {
@@ -126,7 +124,7 @@ export default function FindWorkerPage() {
         }
 
         return filtered;
-    }, [workers, isLoading, activeCategory, searchTerm, sortBy, filters, userLat, userLon]);
+    }, [workers, searchTerm, sortBy, filters, userLat, userLon]);
 
     return (
         <Drawer>
@@ -150,11 +148,11 @@ export default function FindWorkerPage() {
                         
                         <div>
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold font-headline text-white">{filteredAndSortedWorkers.length} Professionals Found</h2>
+                                <h2 className="text-xl font-bold font-headline text-white">{!isLoading ? `${filteredAndSortedWorkers.length} Professionals Found` : 'Finding Professionals...'}</h2>
                             </div>
-                            {isLoading && filteredAndSortedWorkers.length === 0 ? (
+                            {isLoading ? (
                                 <div className="space-y-4">
-                                    {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-32 w-full rounded-xl"/>)}
+                                    {[...Array(3)].map((_, i) => <ProfessionalCardSkeleton key={i} />)}
                                 </div>
                             ) : filteredAndSortedWorkers.length > 0 ? (
                                 <div className="space-y-4">

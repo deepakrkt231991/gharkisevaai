@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -6,27 +5,50 @@ import Link from 'next/link';
 import { Star, MessageSquare, Calendar, CheckCircle, MapPin } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import type { ImagePlaceholder } from '@/lib/placeholder-images';
 import type { Worker } from '@/lib/entities';
-
+import { Skeleton } from './ui/skeleton';
 
 interface ProfessionalCardProps {
-  worker: ImagePlaceholder | (Worker & { id: string });
+  worker: Worker & { id: string };
   distance?: number | null;
 }
 
+export function ProfessionalCardSkeleton() {
+  return (
+    <Card className="overflow-hidden bg-card/80 glass-card">
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex items-start gap-3">
+            <Skeleton className="h-16 w-16 rounded-full flex-shrink-0" />
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-32" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+          </div>
+          <div className="text-right space-y-2">
+            <Skeleton className="h-3 w-10 ml-auto" />
+            <Skeleton className="h-6 w-16 ml-auto" />
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-10" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function ProfessionalCard({ worker, distance }: ProfessionalCardProps) {
-  // Data normalization
   const id = worker.id;
   const name = worker.name || 'Verified Worker';
-  const specialty = (worker as any).specialty || (worker as Worker).skills?.[0] || 'Professional';
-  const experience = (worker as any).experience || `${(worker as Worker).successfulOrders || 0}+ jobs`;
+  const specialty = worker.skills?.[0] || 'Professional';
+  const experience = `${worker.successfulOrders || 0}+ jobs`;
   const rating = worker.rating?.toFixed(1) || 'New';
-  const reviews = (worker as any).reviews || (worker as Worker).successfulOrders || 0;
-  const startingPrice = (worker as any).startingPrice || 199; // Default price
+  const reviews = worker.successfulOrders || 0;
+  const startingPrice = (worker as any).startingPrice || 199;
   const imageUrl = (worker as any).imageUrl || `https://picsum.photos/seed/${worker.id}/150/150`;
-  const phone = (worker as any).phone;
-
 
   return (
     <Card className="overflow-hidden bg-card/80 glass-card">
@@ -40,14 +62,17 @@ export function ProfessionalCard({ worker, distance }: ProfessionalCardProps) {
                 fill
                 className="rounded-full object-cover"
                 sizes="64px"
+                loading="lazy"
               />
-              <div className="absolute bottom-0 right-0 rounded-full border-2 border-card bg-yellow-400 p-0.5 text-black">
-                <CheckCircle className="h-4 w-4" />
-              </div>
+              {worker.isVerified && (
+                <div className="absolute bottom-0 right-0 rounded-full border-2 border-card bg-green-400 p-0.5 text-black">
+                  <CheckCircle className="h-4 w-4" />
+                </div>
+              )}
             </div>
             <div>
               <h3 className="text-lg font-bold text-white">{name}</h3>
-              <p className="text-sm text-muted-foreground">{specialty} • {experience}</p>
+              <p className="text-sm text-muted-foreground capitalize">{specialty} • {experience}</p>
               <div className="mt-1 flex items-center gap-1.5">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 <span className="text-sm font-bold text-white">{rating}</span>
