@@ -56,7 +56,13 @@ export function LoginForm() {
       toast({ title: 'Login Successful', description: 'Welcome back!' });
       router.push('/profile');
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage = `Error: ${err.message} (Code: ${err.code})`;
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: errorMessage,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +77,13 @@ export function LoginForm() {
     setIsLoading(true);
     setError(null);
     if (!auth || !firestore) {
-        setError("Firebase not initialized correctly.");
+        const errorMessage = "Firebase not initialized correctly.";
+        setError(errorMessage);
+        toast({
+            variant: "destructive",
+            title: "Configuration Error",
+            description: errorMessage,
+        });
         setIsLoading(false);
         return;
     }
@@ -93,7 +105,13 @@ export function LoginForm() {
       router.push('/profile');
 
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage = `Error: ${err.message} (Code: ${err.code})`;
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Signup Failed",
+        description: errorMessage,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +121,13 @@ export function LoginForm() {
     setIsLoading(true);
     setError(null);
     if (!auth || !firestore) {
-        setError("Firebase not initialized correctly.");
+        const errorMessage = "Firebase not initialized correctly.";
+        setError(errorMessage);
+        toast({
+            variant: "destructive",
+            title: "Configuration Error",
+            description: errorMessage,
+        });
         setIsLoading(false);
         return;
     }
@@ -125,7 +149,13 @@ export function LoginForm() {
       router.push('/profile');
 
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage = `Error: ${err.message} (Code: ${err.code})`;
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Google Sign-In Failed",
+        description: errorMessage,
+      });
     } finally {
       setIsLoading(false);
     }
