@@ -1,3 +1,4 @@
+
 'use server';
 import { doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase/init';
@@ -71,6 +72,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
             sourceJobId: jobId,
             sourceType: 'job',
             timestamp: completionTimestamp,
+            status: 'processed'
         });
 
         // 2. GST on Platform Fee
@@ -81,6 +83,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
             sourceJobId: jobId,
             sourceType: 'job',
             timestamp: completionTimestamp,
+            status: 'processed'
         });
 
         // 3. Worker Payout
@@ -89,6 +92,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
                 userId: jobData.workerId,
                 amount: workerPayout,
                 type: 'payout',
+                status: 'pending',
                 sourceJobId: jobId,
                 sourceType: 'job',
                 timestamp: completionTimestamp,
@@ -107,6 +111,7 @@ export async function confirmDelivery(jobId: string): Promise<{success: boolean,
                     userId: customerData.referredBy,
                     amount: commission,
                     type: 'referral_commission',
+                    status: 'pending',
                     sourceJobId: jobId,
                     sourceType: 'job',
                     timestamp: completionTimestamp,
@@ -241,6 +246,7 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
             userId: dealData.sellerId,
             amount: sellerPayout,
             type: 'payout',
+            status: 'pending',
             sourceJobId: dealId,
             sourceType: 'deal',
             timestamp: completionTimestamp,
@@ -252,6 +258,7 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
             userId: PLATFORM_ADMIN_UID,
             amount: platformFeeNet,
             type: 'platform_fee',
+            status: 'processed',
             sourceJobId: dealId,
             sourceType: 'deal',
             timestamp: completionTimestamp,
@@ -262,6 +269,7 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
             userId: PLATFORM_GST_UID,
             amount: gstAmount,
             type: 'tax',
+            status: 'processed',
             sourceJobId: dealId,
             sourceType: 'deal',
             timestamp: completionTimestamp,
@@ -278,6 +286,7 @@ export async function confirmProductDelivery(dealId: string): Promise<{success: 
                     userId: buyerData.referredBy,
                     amount: commission,
                     type: 'referral_commission',
+                    status: 'pending',
                     sourceJobId: dealId,
                     sourceType: 'deal',
                     timestamp: completionTimestamp,
@@ -352,6 +361,7 @@ export async function completeToolRental(rentalId: string): Promise<{success: bo
             userId: rentalData.ownerId,
             amount: ownerPayout,
             type: 'payout',
+            status: 'pending',
             sourceJobId: rentalId,
             sourceType: 'rental',
             timestamp: completionTimestamp,
@@ -363,6 +373,7 @@ export async function completeToolRental(rentalId: string): Promise<{success: bo
             userId: PLATFORM_ADMIN_UID,
             amount: platformFeeNet,
             type: 'platform_fee',
+            status: 'processed',
             sourceJobId: rentalId,
             sourceType: 'rental',
             timestamp: completionTimestamp,
@@ -373,6 +384,7 @@ export async function completeToolRental(rentalId: string): Promise<{success: bo
             userId: PLATFORM_GST_UID,
             amount: gstAmount,
             type: 'tax',
+            status: 'processed',
             sourceJobId: rentalId,
             sourceType: 'rental',
             timestamp: completionTimestamp,
@@ -389,6 +401,7 @@ export async function completeToolRental(rentalId: string): Promise<{success: bo
                     userId: renterData.referredBy,
                     amount: commission,
                     type: 'referral_commission',
+                    status: 'pending',
                     sourceJobId: rentalId,
                     sourceType: 'rental',
                     timestamp: completionTimestamp,

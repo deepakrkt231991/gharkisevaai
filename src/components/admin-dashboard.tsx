@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo, useTransition, useActionState } from "react";
+import { useMemo, useTransition, useActionState, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,12 +9,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag } from "lucide-react";
-import { useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, where, orderBy } from "firebase/firestore";
+import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag, Send } from "lucide-react";
+import { useCollection, useDoc, useMemoFirebase } from "@/firebase";
+import { collection, query, where, orderBy, doc } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
 import type { SOSAlert, Worker, Transaction, Deal, Property } from "@/lib/entities";
-import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds, approvePropertyAndGenerateCertificate, rejectProperty } from "@/app/admin/actions";
+import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds, approvePropertyAndGenerateCertificate, rejectProperty, markPayoutAsProcessed } from "@/app/admin/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Label } from "./ui/label";
@@ -150,6 +150,98 @@ function PropertyVerificationCard({ property }: { property: Property & {id: stri
                 </Button>
                 <Button variant="destructive" onClick={handleReject} disabled={isPending}>Reject</Button>
             </div>
+        </Card>
+    )
+}
+
+function PayoutRow({ transaction }: { transaction: Transaction & { id: string } }) {
+    const firestore = useFirestore();
+    const { toast } = useToast();
+    const [isPending, startTransition] = useTransition();
+
+    const workerRef = useMemoFirebase(() => {
+        if (!firestore || !transaction.userId) return null;
+        return doc(firestore, 'workers', transaction.userId);
+    }, [firestore, transaction.userId]);
+    const { data: worker, isLoading } = useDoc<Worker>(workerRef);
+
+    const handleMarkAsPaid = () => {
+        startTransition(async () => {
+            const result = await markPayoutAsProcessed(transaction.id);
+            if (result.success) {
+                toast({ title: "Success", description: result.message, className: "bg-green-600 text-white" });
+            } else {
+                toast({ title: "Error", description: result.message, variant: "destructive" });
+            }
+        });
+    };
+
+    if (isLoading) {
+        return (
+            <TableRow>
+                <TableCell colSpan={4} className="text-center">
+                    <Loader2 className="mx-auto h-5 w-5 animate-spin" />
+                </TableCell>
+            </TableRow>
+        );
+    }
+    
+    return (
+        <TableRow>
+            <TableCell>
+                <div className="font-medium">{worker?.name || 'N/A'}</div>
+                <div className="text-xs text-muted-foreground font-mono">{transaction.userId}</div>
+            </TableCell>
+            <TableCell>
+                <div className="font-medium">{worker?.bankDetails?.upiId || 'Not Provided'}</div>
+                <div className="text-xs text-muted-foreground">UPI ID</div>
+            </TableCell>
+            <TableCell className="font-semibold text-lg text-white">₹{transaction.amount.toFixed(2)}</TableCell>
+            <TableCell>
+                <Button onClick={handleMarkAsPaid} disabled={isPending} size="sm">
+                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Send className="mr-2 h-4 w-4" />}
+                    Mark as Paid
+                </Button>
+            </TableCell>
+        </TableRow>
+    );
+}
+
+function PayoutsTab() {
+    const firestore = useFirestore();
+    const pendingPayoutsQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return query(collection(firestore, 'transactions'), where('type', '==', 'payout'), where('status', '==', 'pending'));
+    }, [firestore]);
+
+    const { data: pendingPayouts, isLoading } = useCollection<Transaction>(pendingPayoutsQuery);
+    
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Manual Payout Requests</CardTitle>
+                <CardDescription>Review and process pending payouts to workers. Click "Mark as Paid" after you complete the UPI transfer outside the app.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Worker</TableHead>
+                            <TableHead>UPI ID</TableHead>
+                            <TableHead>Amount</TableHead>
+                            <TableHead>Action</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {isLoading && <TableRow><TableCell colSpan={4} className="text-center"><Loader2 className="mx-auto h-6 w-6 animate-spin"/></TableCell></TableRow>}
+                        {pendingPayouts && pendingPayouts.length > 0 ? (
+                            pendingPayouts.map(tx => <PayoutRow key={tx.id} transaction={tx} />)
+                        ) : !isLoading && (
+                            <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">No pending payouts.</TableCell></TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </CardContent>
         </Card>
     )
 }
@@ -436,9 +528,10 @@ export function AdminDashboard() {
         <p className="text-muted-foreground">Welcome back! Here's your real-time business overview.</p>
       </div>
 
-      <Tabs defaultValue="finance">
-        <TabsList className="grid w-full grid-cols-5">
+      <Tabs defaultValue="finance" className="w-full">
+        <TabsList className="grid w-full grid-cols-6">
            <TabsTrigger value="finance"><IndianRupee className="mr-2 h-4 w-4" /> Finance</TabsTrigger>
+           <TabsTrigger value="payouts"><Send className="mr-2 h-4 w-4" /> Payouts</TabsTrigger>
            <TabsTrigger value="verification">
             <CheckCircle className="mr-2 h-4 w-4" /> Verification
              {((pendingVerifications?.length || 0) + (pendingProperties?.length || 0)) > 0 && (
@@ -554,6 +647,10 @@ export function AdminDashboard() {
                     </Table>
                 </CardContent>
             </Card>
+        </TabsContent>
+        
+        <TabsContent value="payouts" className="space-y-6">
+            <PayoutsTab />
         </TabsContent>
 
         <TabsContent value="verification" className="space-y-6">

@@ -18,6 +18,7 @@ const WorkerProfileSchema = z.object({
   accountHolderName: z.string().min(2, { message: "Please enter the account holder's name." }),
   accountNumber: z.string().min(9, { message: "Please enter a valid bank account number." }),
   ifscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, { message: "Please enter a valid IFSC code." }),
+  upiId: z.string().optional(),
   latitude: z.coerce.number().optional(),
   longitude: z.coerce.number().optional(),
   certificationsUploaded: z.string().optional(),
@@ -48,6 +49,7 @@ export async function createWorkerProfile(
     accountHolderName: formData.get('accountHolderName'),
     accountNumber: formData.get('accountNumber'),
     ifscCode: formData.get('ifscCode'),
+    upiId: formData.get('upiId'),
     latitude: formData.get('latitude'),
     longitude: formData.get('longitude'),
     certificationsUploaded: formData.get('certificationsUploaded'),
@@ -69,7 +71,7 @@ export async function createWorkerProfile(
   try {
     const { firestore } = initializeFirebase();
     
-    const { userId, accountHolderName, accountNumber, ifscCode, latitude, longitude, ...workerData } = validatedFields.data;
+    const { userId, accountHolderName, accountNumber, ifscCode, upiId, latitude, longitude, ...workerData } = validatedFields.data;
     
     const workerId = userId;
     const workerDocRef = doc(firestore, 'workers', workerId);
@@ -83,7 +85,8 @@ export async function createWorkerProfile(
       bankDetails: {
         accountHolderName,
         accountNumber,
-        ifscCode
+        ifscCode,
+        upiId,
       },
       location: {
         latitude: latitude || null,

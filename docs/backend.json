@@ -168,7 +168,8 @@
             "properties": {
                 "accountNumber": { "type": "string" },
                 "ifscCode": { "type": "string" },
-                "accountHolderName": { "type": "string"}
+                "accountHolderName": { "type": "string"},
+                "upiId": { "type": "string", "description": "Worker's UPI ID for direct payments." }
             }
         },
         "referredBy": {
@@ -284,6 +285,7 @@
         "userId": { "type": "string", "description": "The ID of the user/worker who this transaction belongs to." },
         "amount": { "type": "number" },
         "type": { "type": "string", "enum": ["referral_commission", "payout", "refund", "platform_fee", "tax", "admin_withdrawal"] },
+        "status": { "type": "string", "enum": ["pending", "processed", "failed"], "description": "The status of the payout transaction, managed by the admin."},
         "sourceJobId": { "type": "string", "description": "The job, deal, or rental ID that triggered this transaction." },
         "sourceType": { "type": "string", "enum": ["job", "deal", "rental"], "description": "The type of source that generated the transaction." },
         "timestamp": { "type": "string", "format": "date-time" },

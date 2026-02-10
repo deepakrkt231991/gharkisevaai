@@ -1,3 +1,4 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -85,8 +86,10 @@ service cloud.firestore {
         // Users can only list their own by querying on their userId.
         allow list: if request.auth != null && request.query.where[0][0] == 'userId' && request.query.where[0][2] == request.auth.uid;
         
-        // Writes are disabled from the client for security.
-        allow write: if false;
+        // Writes are disabled from the client, only admin can update.
+        allow create: if false;
+        allow update: if isAdmin();
+        allow delete: if isAdmin();
     }
     
      match /sos_alerts/{alertId} {

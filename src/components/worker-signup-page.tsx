@@ -59,6 +59,7 @@ export function WorkerSignupForm() {
   // Step 4 State
   const [skills, setSkills] = useState('');
   const [emergencyContact, setEmergencyContact] = useState('');
+  const [upiId, setUpiId] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
 
@@ -93,13 +94,14 @@ export function WorkerSignupForm() {
         if(portfolioImageUrls.length > 0) newProgress += 15;
     } else if (currentStep === 4) { // 100%
         newProgress = 75;
-        if(skills) newProgress += 6;
-        if(emergencyContact) newProgress += 6;
-        if (latitude && longitude) newProgress += 6;
-        if(agreedToTerms) newProgress += 7;
+        if(skills) newProgress += 5;
+        if(emergencyContact) newProgress += 5;
+        if(upiId) newProgress += 5;
+        if (latitude && longitude) newProgress += 5;
+        if(agreedToTerms) newProgress += 5;
     }
     setProgress(Math.min(100, newProgress));
-  }, [name, phone, referredBy, idCardUri, selfieUri, verificationResult, shopPhotoUrl, portfolioImageUrls, skills, emergencyContact, latitude, longitude, currentStep, agreedToTerms]);
+  }, [name, phone, referredBy, idCardUri, selfieUri, verificationResult, shopPhotoUrl, portfolioImageUrls, skills, emergencyContact, upiId, latitude, longitude, currentStep, agreedToTerms]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'id' | 'selfie' | 'portfolio' | 'shop') => {
@@ -535,6 +537,10 @@ export function WorkerSignupForm() {
                      <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">IFSC Code</Label>
                         <Input name="ifscCode" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">UPI ID</Label>
+                        <Input name="upiId" value={upiId} onChange={(e) => setUpiId(e.target.value)} placeholder="yourname@bank" />
                     </div>
                     <div className="flex items-center space-x-2 pt-4">
                         <Checkbox id="terms" onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} />

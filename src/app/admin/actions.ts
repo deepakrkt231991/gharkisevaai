@@ -1,3 +1,4 @@
+
 'use server';
 import { doc, updateDoc, deleteDoc, addDoc, collection, serverTimestamp, getDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase/init';
@@ -76,6 +77,7 @@ export async function generateAdminPromoPoster(
     const result = await createPromotionalContent({
       workerPhotoUri: base64data,
       workerName: validatedFields.data.workerName,
+      referralCode: 'ADMIN_PROMO'
     });
     
     return { success: true, message: 'Poster generated!', data: result };
@@ -132,6 +134,7 @@ export async function withdrawAdminFunds(amount: number): Promise<{ success: boo
             type: 'admin_withdrawal',
             sourceJobId: `ADMIN_WITHDRAWAL_${new Date().toISOString()}`,
             timestamp: serverTimestamp(),
+            status: 'processed'
         });
         
         revalidatePath('/admin'); // Revalidate to update the dashboard totals
@@ -209,5 +212,21 @@ export async function rejectProperty(propertyId: string): Promise<{ success: boo
         return { success: true, message: 'Property has been rejected.' };
     } catch (e: any) {
         return { success: false, message: e.message };
+    }
+}
+
+// --- PAYOUT ACTIONS ---
+export async function markPayoutAsProcessed(transactionId: string): Promise<{ success: boolean; message: string }> {
+    if (!transactionId) {
+        return { success: false, message: 'Transaction ID is required.' };
+    }
+    const { firestore } = initializeFirebase();
+    const transactionRef = doc(firestore, 'transactions', transactionId);
+    try {
+        await updateDoc(transactionRef, { status: 'processed' });
+        revalidatePath('/admin');
+        return { success: true, message: 'Payout marked as processed.' };
+    } catch (e: any) {
+        return { success: false, message: `Failed to update transaction: ${e.message}` };
     }
 }
