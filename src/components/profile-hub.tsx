@@ -30,7 +30,7 @@ const ProfileMenuItem = ({ icon: Icon, label, href }: { icon: React.ElementType,
     </Link>
 );
 
-const ADMIN_EMAIL = "gharkisevaai@gmail.com";
+const ADMIN_EMAIL = "deepakkadam231991@gmail.com";
 
 export function ProfileHub() {
     const { user, isUserLoading } = useUser();
