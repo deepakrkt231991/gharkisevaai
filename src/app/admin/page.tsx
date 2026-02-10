@@ -33,6 +33,9 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">You do not have permission to view this page. Please log in with the admin account.</p>
+              <p className="text-sm text-gray-400 mt-4">
+                Current user: {user ? user.email : "Not logged in"}
+              </p>
             </CardContent>
           </Card>
       </div>
