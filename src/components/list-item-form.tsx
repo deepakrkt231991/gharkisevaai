@@ -1,8 +1,9 @@
+
 "use client";
 
-import { useActionState, useEffect, useState, ChangeEvent } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import Image from 'next/image';
-import { useFormStatus } from 'react-dom';
 import { Loader2, AlertCircle, Upload, Sparkles, MapPin, IndianRupee, X, Video } from 'lucide-react';
 import { listItem } from '@/app/list-item/actions';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,7 @@ function SubmitButton() {
 
 export function ListItemForm() {
     const initialState = { message: '', success: false, errors: [] };
-    const [state, formAction] = useActionState(listItem, initialState);
+    const [state, formAction] = useFormState(listItem, initialState);
     const { toast } = useToast();
     const router = useRouter();
 

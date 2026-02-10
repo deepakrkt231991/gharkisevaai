@@ -2,9 +2,9 @@
 
 "use client";
 
-import { useActionState, useEffect, useState, ChangeEvent } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import Image from 'next/image';
-import { useFormStatus } from 'react-dom';
 import { Loader2, AlertCircle, Building, UploadCloud, Video, Sparkles } from 'lucide-react';
 import { listProperty, getPropertyMediaTips } from '@/app/list-property/actions';
 import { Button } from '@/components/ui/button';
@@ -39,7 +39,7 @@ function SubmitButton() {
 
 export function ListPropertyForm() {
     const initialState = { message: '', success: false, errors: [] };
-    const [state, formAction] = useActionState(listProperty, initialState);
+    const [state, formAction] = useFormState(listProperty, initialState);
     const { toast } = useToast();
     const router = useRouter();
 

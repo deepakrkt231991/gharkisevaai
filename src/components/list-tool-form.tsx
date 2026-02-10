@@ -1,8 +1,9 @@
+
 // src/components/list-tool-form.tsx
 "use client";
 
-import { useActionState, useEffect, useState, ChangeEvent } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useEffect, useState, ChangeEvent } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import { Loader2, AlertCircle, Wrench, IndianRupee, MapPin, UploadCloud } from 'lucide-react';
 import { listToolForRent } from '@/app/list-tool/actions';
@@ -36,7 +37,7 @@ function SubmitButton() {
 
 export function ListToolForm() {
     const initialState = { message: '', success: false, errors: [] };
-    const [state, formAction] = useActionState(listToolForRent, initialState);
+    const [state, formAction] = useFormState(listToolForRent, initialState);
     const { toast } = useToast();
     const router = useRouter();
     const [imagePreview, setImagePreview] = useState<string | null>(null);

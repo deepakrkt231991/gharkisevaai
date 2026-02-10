@@ -1,7 +1,9 @@
 
+
 "use client";
 
-import { useState, useRef, ChangeEvent, useActionState, startTransition } from 'react';
+import { useState, useRef, ChangeEvent, startTransition } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import { ArrowLeft, Share, Heart, Sparkles, Compass, Paintbrush, Lightbulb, CheckCircle, Loader2, UploadCloud, ScanSearch, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,8 +30,8 @@ const initialRenderState: {
 
 
 export function InteriorAnalyzer() {
-  const [analysisState, analysisAction, isAnalysisPending] = useActionState(analyzeInterior, initialAnalysisState);
-  const [renderState, renderAction, isRenderPending] = useActionState(generate3dRender, initialRenderState);
+  const [analysisState, analysisAction] = useFormState(analyzeInterior, initialAnalysisState);
+  const [renderState, renderAction] = useFormState(generate3dRender, initialRenderState);
   
   const [image, setImage] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState('Modern');
@@ -37,6 +39,11 @@ export function InteriorAnalyzer() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const analysisFormRef = useRef<HTMLFormElement>(null);
+  const renderFormRef = useRef<HTMLFormElement>(null);
+
+  const { pending: isAnalysisPending } = useFormStatus();
+  const { pending: isRenderPending } = useFormStatus();
+
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -50,9 +57,7 @@ export function InteriorAnalyzer() {
         if (analysisFormRef.current) {
           const formData = new FormData(analysisFormRef.current);
           formData.set('roomPhotoUri', dataUrl);
-          startTransition(() => {
-              analysisAction(formData);
-          });
+          analysisAction(formData);
         }
       };
       reader.readAsDataURL(file);
@@ -64,10 +69,8 @@ export function InteriorAnalyzer() {
       if (analysisFormRef.current) {
           analysisFormRef.current.reset();
       }
-      startTransition(() => {
-          analysisAction(new FormData());
-          renderAction(new FormData());
-      });
+      analysisAction(new FormData());
+      renderAction(new FormData());
   }
 
   const handleStartOver = () => {
@@ -76,6 +79,26 @@ export function InteriorAnalyzer() {
           fileInputRef.current.value = "";
       }
   };
+
+  function RenderSubmitButton() {
+      const { pending } = useFormStatus();
+      return (
+        <Button type="submit" size="lg" className="w-full h-14 bg-primary text-lg" disabled={pending}>
+            {pending ? (
+                <>
+                    <Loader2 className="mr-2 animate-spin"/>
+                    Generating...
+                </>
+            ) : (
+                <>
+                    <Sparkles className="mr-2"/>
+                    Generate 3D Render
+                </>
+            )}
+            <Badge className="ml-2 bg-accent text-accent-foreground">AI</Badge>
+        </Button>
+      )
+  }
 
   const AnalysisResults = () => {
     if (!analysisState.data) return null;
@@ -147,25 +170,12 @@ export function InteriorAnalyzer() {
             </div>
 
 
-            <form action={renderAction}>
+            <form action={renderAction} ref={renderFormRef}>
                 <input type="hidden" name="roomPhotoUri" value={image!} />
                 <input type="hidden" name="suggestions" value={JSON.stringify(analysisState.data?.suggestions)} />
                 <input type="hidden" name="style" value={selectedStyle} />
                 <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md p-4 z-20">
-                    <Button type="submit" size="lg" className="w-full h-14 bg-primary text-lg" disabled={isRenderPending}>
-                        {isRenderPending ? (
-                            <>
-                                <Loader2 className="mr-2 animate-spin"/>
-                                Generating...
-                            </>
-                        ) : (
-                            <>
-                                <Sparkles className="mr-2"/>
-                                Generate 3D Render
-                            </>
-                        )}
-                        <Badge className="ml-2 bg-accent text-accent-foreground">AI</Badge>
-                    </Button>
+                    <RenderSubmitButton />
                 </div>
             </form>
         </div>

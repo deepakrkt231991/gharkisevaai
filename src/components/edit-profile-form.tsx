@@ -1,7 +1,8 @@
+
 'use client';
 
-import { useActionState, useEffect } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { User as UserEntity } from '@/lib/entities';
@@ -38,7 +39,7 @@ function SubmitButton() {
 
 export function EditProfileForm() {
     const initialState = { message: '', success: false, errors: [] };
-    const [state, formAction] = useActionState(updateUserProfile, initialState);
+    const [state, formAction] = useFormState(updateUserProfile, initialState);
     const { toast } = useToast();
     const { user: authUser, isUserLoading: isAuthLoading } = useUser();
     const firestore = useFirestore();

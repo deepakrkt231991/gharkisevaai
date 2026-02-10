@@ -1,6 +1,7 @@
+
 'use client';
-import { useActionState, useEffect, useState } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useEffect, useState } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -55,7 +56,7 @@ function SubmitButton() {
 
 export function LanguageSelector() {
     const initialState = { message: '', success: false, errors: [] };
-    const [state, formAction] = useActionState(updateUserLanguage, initialState);
+    const [state, formAction] = useFormState(updateUserLanguage, initialState);
     const { toast } = useToast();
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();

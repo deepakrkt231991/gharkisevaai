@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useActionState } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import { Sparkles, Loader2, Download, Share2 } from 'lucide-react';
 import { generateSalePoster } from '@/app/share-sale/actions';
@@ -12,10 +13,31 @@ import { useUser } from '@/firebase/provider';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 
+function SubmitButton() {
+    const { pending } = useFormStatus();
+    return (
+        <Button type="submit" disabled={pending} size="lg">
+            {pending ? (
+            <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Generating...
+            </>
+            ) : (
+            <>
+                <Sparkles className="mr-2 h-5 w-5" />
+                Generate "Just Sold" Poster
+            </>
+            )}
+        </Button>
+    )
+}
+
 export function SalePosterGenerator() {
   const { user } = useUser();
   const initialState = { success: false, message: '', data: null };
-  const [state, formAction, isPending] = useActionState(generateSalePoster, initialState);
+  const [state, formAction] = useFormState(generateSalePoster, initialState);
+  const { pending } = useFormStatus();
+
 
   // Use user's display name as default, but allow editing.
   const sellerName = user?.displayName || "A Happy User";
@@ -24,7 +46,7 @@ export function SalePosterGenerator() {
     <Card className="max-w-xl mx-auto shadow-lg">
       <CardContent className="p-6 text-center">
         <form action={formAction} className="space-y-6">
-          {!state.data?.posterDataUri && !isPending && (
+          {!state.data?.posterDataUri && !pending && (
              <div className="flex flex-col items-center gap-4">
                 <Share2 className="w-16 h-16 text-primary" />
                 <p className="text-muted-foreground">Tell us what you sold to generate a cool poster for your WhatsApp Status!</p>
@@ -41,7 +63,7 @@ export function SalePosterGenerator() {
              </div>
           )}
           
-          {isPending && (
+          {pending && (
             <div className="space-y-4">
               <Skeleton className="w-full aspect-square rounded-lg" />
               <p className="text-muted-foreground animate-pulse">AI is creating your masterpiece...</p>
@@ -66,19 +88,7 @@ export function SalePosterGenerator() {
           )}
 
           {!state.data?.posterDataUri ? (
-            <Button type="submit" disabled={isPending} size="lg">
-              {isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  Generate "Just Sold" Poster
-                </>
-              )}
-            </Button>
+            <SubmitButton />
           ) : (
              <Button asChild size="lg">
                 <a href={state.data.posterDataUri} download="grihseva-ai-sold-poster.png">

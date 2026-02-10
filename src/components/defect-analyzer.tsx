@@ -1,8 +1,9 @@
 
+
 "use client";
 
-import { useState, useRef, ChangeEvent, useActionState, useEffect } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useState, useRef, ChangeEvent, useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import Link from 'next/link';
 import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package, ArrowLeft, History, CheckCircle, Download, UserCheck, ScanSearch, Star, MessageSquare, Phone, Film } from 'lucide-react';
@@ -60,6 +61,38 @@ function SubmitButton({ hasMedia }: { hasMedia: boolean }) {
   );
 }
 
+function VideoSubmitButton() {
+    const { pending } = useFormStatus();
+    return (
+        <Button type="submit" disabled={pending} className="w-full h-14 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg shadow-accent/20">
+        {pending ? (
+            <>
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            Generating Video (takes ~1 min)...
+            </>
+        ) : (
+            <>
+            <Film className="mr-2 h-5 w-5" />
+            See My New Home (AI Video)
+            </>
+        )}
+        </Button>
+    )
+}
+
+function AnalysisOverlay() {
+    const { pending } = useFormStatus();
+    if(!pending) return null;
+    return (
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden">
+            <div className="scan-line"></div>
+            <Loader2 className="h-8 w-8 animate-spin text-accent/80" />
+            <p className="font-bold tracking-widest text-accent">LIVE SCAN IN PROGRESS...</p>
+            <p className="text-xs text-muted-foreground">AI is analyzing the issue...</p>
+        </div>
+    )
+}
+
 // Worker Card Component
 const WorkerCard = ({ worker }: { worker: any }) => (
     <Card className="glass-card">
@@ -97,8 +130,8 @@ const WorkerCard = ({ worker }: { worker: any }) => (
 );
 
 export function DefectAnalyzer() {
-  const [analysisState, analysisAction, isAnalysisPending] = useActionState(analyzeDefect, initialState);
-  const [videoState, videoAction, isVideoPending] = useActionState(generateVideo, initialVideoState);
+  const [analysisState, analysisAction] = useFormState(analyzeDefect, initialState);
+  const [videoState, videoAction] = useFormState(generateVideo, initialVideoState);
   
   const [media, setMedia] = useState<Media | null>(null);
   const [description, setDescription] = useState('');
@@ -147,8 +180,6 @@ export function DefectAnalyzer() {
   };
 
   const AnalysisResult = () => {
-    if (isAnalysisPending) return null;
-
     if (analysisState.message && !analysisState.success) {
       return (
         <Alert variant="destructive">
@@ -200,19 +231,7 @@ export function DefectAnalyzer() {
                     <form action={videoAction}>
                       <input type="hidden" name="mediaDataUri" value={media.dataUrl} />
                       <input type="hidden" name="defect" value={result.defect} />
-                      <Button type="submit" disabled={isVideoPending} className="w-full h-14 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg shadow-accent/20">
-                        {isVideoPending ? (
-                          <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Generating Video (takes ~1 min)...
-                          </>
-                        ) : (
-                          <>
-                            <Film className="mr-2 h-5 w-5" />
-                            See My New Home (AI Video)
-                          </>
-                        )}
-                      </Button>
+                      <VideoSubmitButton />
                     </form>
                   )}
                   {videoState.message && !videoState.success && (
@@ -351,15 +370,7 @@ export function DefectAnalyzer() {
                     accept="image/png, image/jpeg, image/webp, video/mp4, video/quicktime"
                     onChange={handleFileChange}
                  />
-
-                {isAnalysisPending && (
-                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden">
-                        <div className="scan-line"></div>
-                        <Loader2 className="h-8 w-8 animate-spin text-accent/80" />
-                        <p className="font-bold tracking-widest text-accent">LIVE SCAN IN PROGRESS...</p>
-                        <p className="text-xs text-muted-foreground">AI is analyzing the issue...</p>
-                    </div>
-                )}
+                <AnalysisOverlay />
               </div>
 
                <div className="grid w-full items-center gap-1.5">

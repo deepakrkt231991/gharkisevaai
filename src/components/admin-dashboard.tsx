@@ -1,7 +1,9 @@
 
+
 "use client";
 
-import { useMemo, useTransition, useActionState, useState } from "react";
+import { useMemo, useTransition, useState } from "react";
+import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,7 +31,6 @@ import {
 } from "@/components/ui/chart";
 import { Logo } from "./logo";
 import Image from "next/image";
-import { useFormStatus } from "react-dom";
 
 
 function StatCard({ title, value, icon, description }: { title: string; value: string | number; icon: React.ReactNode, description?: string }) {
@@ -248,7 +249,7 @@ function PayoutsTab() {
 
 function PosterGenerator() {
     const initialState: PosterState = { success: false, message: '', data: null };
-    const [state, formAction] = useActionState(generateAdminPromoPoster, initialState);
+    const [state, formAction] = useFormState(generateAdminPromoPoster, initialState);
 
     const SubmitButton = () => {
         const { pending } = useFormStatus();

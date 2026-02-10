@@ -1,7 +1,7 @@
+
 'use client';
 
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useFormState, useFormStatus } from 'react-dom';
 import { AlertCircle, Bot, Film, Loader2, Sparkles } from 'lucide-react';
 import { generateVideoAd } from '@/app/create-video/actions';
 import { Textarea } from '@/components/ui/textarea';
@@ -46,7 +46,7 @@ function SubmitButton() {
 
 export function VideoGenerator() {
     const initialState = { success: false, message: '', data: null };
-    const [state, formAction] = useActionState(generateVideoAd, initialState);
+    const [state, formAction] = useFormState(generateVideoAd, initialState);
 
     return (
         <Card className="glass-card">
