@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React from 'react';
@@ -43,7 +42,7 @@ function ReserveButton({ product, isReserved } : { product: Product, isReserved?
   return (
     <Button type="submit" disabled={pending || isReserved} className="w-full">
       {pending ? <Loader2 className="mr-2 animate-spin" /> : <Lock className="mr-2"/>}
-      Pay ₹{(product.price * 0.07).toLocaleString('en-IN')} to Reserve (10 Days)
+      Pay ₹{((product?.price || 0) * 0.07).toLocaleString('en-IN')} to Reserve (10 Days)
     </Button>
   )
 }
@@ -158,7 +157,7 @@ export function ProductDetailPage() {
               <CarouselDots count={productImages.length} activeIndex={activeIndex} />
               <div className="absolute bottom-6 left-4">
                   <Badge variant="secondary" className="text-2xl font-bold p-3 rounded-lg bg-white/90 text-black shadow-lg">
-                    ₹{product.price?.toLocaleString('en-IN')}
+                    ₹{(product.price || 0).toLocaleString('en-IN')}
                   </Badge>
               </div>
             </Carousel>

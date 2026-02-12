@@ -140,7 +140,7 @@ export function PropertyDetailPage() {
                         </div>
                         <div className="flex items-baseline gap-2 pt-1">
                              <p className="text-4xl font-extrabold text-white">₹{property.price} {property.priceUnit}</p>
-                             <p className="text-muted-foreground font-medium">₹{Math.round((property.price * (property.priceUnit === 'Cr' ? 10000000 : 100000)) / property.sqft).toLocaleString('en-IN')} / sq.ft.</p>
+                             <p className="text-muted-foreground font-medium">₹{Math.round(((property.price || 0) * (property.priceUnit === 'Cr' ? 10000000 : 100000)) / (property.sqft || 1)).toLocaleString('en-IN')} / sq.ft.</p>
                         </div>
                     </div>
 

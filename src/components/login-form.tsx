@@ -139,8 +139,8 @@ export function LoginForm() {
       const userDocRef = doc(firestore, 'users', user.uid);
       await setDoc(userDocRef, {
         uid: user.uid,
-        name: user.displayName,
-        email: user.email,
+        name: user?.displayName || '',
+        email: user?.email || '',
         userType: 'customer',
         createdAt: serverTimestamp(),
       }, { merge: true }); // Use merge to avoid overwriting existing data

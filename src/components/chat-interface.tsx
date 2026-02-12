@@ -40,12 +40,12 @@ const AiSuggestions = () => (
     </div>
 );
 
-const WarrantyCertificateCard = ({ job, worker }: { job: Job, worker: OtherUser | null }) => {
+const WarrantyCertificateCard = ({ job, worker }: { job: Job | null, worker: OtherUser | null }) => {
     if (!job || job.status !== 'completed') {
         return null;
     }
 
-    const completionDate = job.completedAt ? (job.completedAt as any).toDate().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : 'N/A';
+    const completionDate = job?.completedAt ? (job.completedAt as any).toDate().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : 'N/A';
 
     return (
         <Card className="glass-card border-l-4 border-l-yellow-400 bg-gradient-to-br from-yellow-900/30 to-background">
@@ -55,7 +55,7 @@ const WarrantyCertificateCard = ({ job, worker }: { job: Job, worker: OtherUser 
                     CERTIFICATE OF ASSURED SERVICE
                 </CardTitle>
                 <CardDescription className="text-yellow-400/80">
-                    Order ID: #GKS-{job.id.substring(0, 6).toUpperCase()} | Date: {completionDate}
+                    Order ID: #GKS-{(job.id || '').substring(0, 6).toUpperCase()} | Date: {completionDate}
                 </CardDescription>
             </CardHeader>
             <CardContent className="p-4 space-y-4 text-sm">
@@ -115,9 +115,9 @@ const InvoiceCard = ({ job, contextType }: { job: Job | null, contextType: strin
         });
     }
 
-    const finalCost = job.final_cost || 0;
-    const platformFee = job.platformFee || 0;
-    const gst = job.gst || 0;
+    const finalCost = job?.final_cost || 0;
+    const platformFee = job?.platformFee || 0;
+    const gst = job?.gst || 0;
     const totalPaid = finalCost;
 
     return (
@@ -137,7 +137,7 @@ const InvoiceCard = ({ job, contextType }: { job: Job | null, contextType: strin
                 <div className="pl-4">
                     <div className="flex justify-between text-xs">
                         <p className="text-muted-foreground">Worker Payout</p>
-                        <p className="font-medium text-white">₹{(job.workerPayout || 0).toFixed(2)}</p>
+                        <p className="font-medium text-white">₹{(job?.workerPayout || 0).toFixed(2)}</p>
                     </div>
                      <div className="flex justify-between text-xs">
                         <p className="text-muted-foreground">Platform Fee (incl. GST)</p>
@@ -164,7 +164,7 @@ const InvoiceCard = ({ job, contextType }: { job: Job | null, contextType: strin
     );
 };
 
-const ProductDealFlowControls = ({ deal }: { deal: Deal }) => {
+const ProductDealFlowControls = ({ deal }: { deal: Deal | null }) => {
     const { user } = useUser();
     const { toast } = useToast();
     const [trackingNumber, setTrackingNumber] = useState('');
@@ -233,7 +233,7 @@ const ProductDealFlowControls = ({ deal }: { deal: Deal }) => {
                         <AlertTriangle className="mr-2 h-4 w-4" /> Raise Dispute (e.g. Buyer not confirming)
                     </Button>
                 )}
-                {(isBuyer || isSeller) && ['reserved', 'awaiting_shipment_payment'].includes(deal.status) && (
+                {(isBuyer || isSeller) && ['reserved', 'awaiting_shipment_payment'].includes(deal.status || '') && (
                     <Button onClick={() => handleAction(cancelDeal)} variant="destructive" className="w-full h-12">Cancel Deal &amp; Refund Advance</Button>
                 )}
                 <div className="flex items-start gap-2 text-xs text-muted-foreground p-2 rounded-lg bg-black/20">
@@ -245,7 +245,7 @@ const ProductDealFlowControls = ({ deal }: { deal: Deal }) => {
     );
 };
 
-const ToolRentalFlowControls = ({ rental }: { rental: Rental }) => {
+const ToolRentalFlowControls = ({ rental }: { rental: Rental | null }) => {
     const { user } = useUser();
     const { toast } = useToast();
 
@@ -491,7 +491,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
          switch(contextType) {
             case 'job': return (contextDoc as Job)?.ai_diagnosis || 'Service Request';
             case 'deal': return (contextDoc as Deal)?.productName || 'Product Deal';
-            case 'rental': return (contextDoc as Tool)?.name || 'Tool Rental';
+            case 'rental': return (contextDoc as Rental)?.toolId ? `Rental for ${contextDoc.id}` : 'Tool Rental';
             case 'tool': return (contextDoc as Tool)?.name || 'Tool Rental';
             case 'property': return (contextDoc as Property)?.title || 'Property Inquiry';
             case 'product': return (contextDoc as Product)?.name || 'Product Inquiry';
@@ -533,10 +533,10 @@ export function ChatInterface({ chatId }: { chatId: string }) {
             </header>
 
             <main className="flex-1 overflow-y-auto p-4 space-y-6">
-                {contextType === 'deal' && <ProductDealFlowControls deal={contextDoc as Deal} />}
-                {contextType === 'rental' && <ToolRentalFlowControls rental={contextDoc as Rental} />}
+                {contextType === 'deal' && <ProductDealFlowControls deal={contextDoc as Deal | null} />}
+                {contextType === 'rental' && <ToolRentalFlowControls rental={contextDoc as Rental | null} />}
                 {contextType === 'job' && <InvoiceCard job={contextDoc as Job | null} contextType={contextType} />}
-                {contextType === 'job' && <WarrantyCertificateCard job={contextDoc as Job} worker={otherUser} />}
+                {contextType === 'job' && <WarrantyCertificateCard job={contextDoc as Job | null} worker={otherUser} />}
                 
                 <PaymentSafetyNotice />
 

@@ -67,7 +67,7 @@ export function ProfessionalCard({ worker, distance }: ProfessionalCardProps) {
   } = worker;
 
   const isTopRated = rating >= 4.5;
-  const specialty = skills[0] || 'Professional';
+  const specialty = skills?.[0] || 'Professional';
 
   return (
     <Card className="overflow-hidden bg-card/80 glass-card">
@@ -77,7 +77,7 @@ export function ProfessionalCard({ worker, distance }: ProfessionalCardProps) {
           <div className="relative h-14 w-14 flex-shrink-0">
             <Image
               src={`https://picsum.photos/seed/${id}/150/150`}
-              alt={name}
+              alt={name || ''}
               fill
               className="rounded-full object-cover"
               sizes="56px"
@@ -102,12 +102,12 @@ export function ProfessionalCard({ worker, distance }: ProfessionalCardProps) {
         <div className='space-y-3'>
             <div className="flex flex-wrap gap-2 items-center">
                 {isTopRated && <Badge className="bg-yellow-400/20 text-yellow-300 border-yellow-400/40"><Award className="mr-1.5"/>Top Rated</Badge>}
-                <Badge variant="outline" className="text-white/70"><Briefcase className="mr-1.5"/>{successfulOrders}+ Jobs Completed</Badge>
+                <Badge variant="outline" className="text-white/70"><Briefcase className="mr-1.5"/>{successfulOrders || 0}+ Jobs Completed</Badge>
                 {distance !== null && distance !== undefined && (
                    <Badge variant="outline" className="text-primary/90 border-primary/50"><MapPin className="mr-1.5"/>{distance.toFixed(1)} km away</Badge>
                 )}
             </div>
-            <StarRating rating={rating} totalReviews={successfulOrders} />
+            <StarRating rating={rating || 0} totalReviews={successfulOrders || 0} />
         </div>
 
         {/* Portfolio Preview */}

@@ -82,9 +82,9 @@ export function WorkerDashboard() {
         const earnings = transactions.reduce((sum, tx) => (tx.type === 'payout' || tx.type === 'referral_commission' ? sum + tx.amount : sum), 0);
         
         // Smart Score Logic
-        const ratingScore = (workerProfile.rating || 0) * 20; // Max 100
-        const jobsScore = Math.min(100, (workerProfile.successfulOrders || 0) * 2); // 50 jobs = 100 score
-        const verificationScore = workerProfile.isVerified ? 100 : 0;
+        const ratingScore = (workerProfile?.rating || 0) * 20; // Max 100
+        const jobsScore = Math.min(100, (workerProfile?.successfulOrders || 0) * 2); // 50 jobs = 100 score
+        const verificationScore = workerProfile?.isVerified ? 100 : 0;
         
         const score = (ratingScore * 0.5) + (jobsScore * 0.3) + (verificationScore * 0.2);
 

@@ -77,12 +77,12 @@ export function EditProfileForm() {
       );
     }
     
-    if (!authUser || !userProfile) {
+    if (!authUser) {
         return (
             <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
-                <AlertDescription>Could not load user profile. Please try again.</AlertDescription>
+                <AlertDescription>Could not load user profile. Please log in and try again.</AlertDescription>
             </Alert>
         );
     }
@@ -101,24 +101,24 @@ export function EditProfileForm() {
 
             <div className="space-y-2">
                 <Label htmlFor="name" className="text-muted-foreground">Full Name</Label>
-                <Input id="name" name="name" defaultValue={userProfile.name || authUser.displayName || ''} required className="bg-input border-border-dark text-white"/>
+                <Input id="name" name="name" defaultValue={userProfile?.name || authUser?.displayName || ''} required className="bg-input border-border-dark text-white"/>
                 {getError('name') && <p className="text-sm text-destructive">{getError('name')}</p>}
             </div>
             
             <div className="space-y-2">
                 <Label htmlFor="email" className="text-muted-foreground">Email</Label>
-                <Input id="email" name="email" defaultValue={authUser.email || ''} disabled className="bg-input border-border-dark text-muted-foreground"/>
+                <Input id="email" name="email" defaultValue={authUser?.email || ''} disabled className="bg-input border-border-dark text-muted-foreground"/>
             </div>
             
             <div className="space-y-2">
                 <Label htmlFor="phone" className="text-muted-foreground">Phone Number</Label>
-                <Input id="phone" name="phone" defaultValue={userProfile.phone || ''} placeholder="Add your phone number" className="bg-input border-border-dark text-white"/>
+                <Input id="phone" name="phone" defaultValue={userProfile?.phone || ''} placeholder="Add your phone number" className="bg-input border-border-dark text-white"/>
                  {getError('phone') && <p className="text-sm text-destructive">{getError('phone')}</p>}
             </div>
 
             <div className="space-y-2">
                 <Label htmlFor="address" className="text-muted-foreground">Address</Label>
-                <Textarea id="address" name="address" defaultValue={userProfile.address || ''} placeholder="Your home address" className="bg-input border-border-dark text-white"/>
+                <Textarea id="address" name="address" defaultValue={userProfile?.address || ''} placeholder="Your home address" className="bg-input border-border-dark text-white"/>
                  {getError('address') && <p className="text-sm text-destructive">{getError('address')}</p>}
             </div>
 
