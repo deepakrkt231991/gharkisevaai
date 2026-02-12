@@ -74,7 +74,7 @@ export function VideoGenerator() {
                     <SubmitButton/>
                 </form>
 
-                 {state.message && !state.success && !state.data && (
+                 {state.message && !state.success && (
                     <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Generation Failed</AlertTitle>

@@ -1,3 +1,4 @@
+
 "use server";
 
 import { z } from 'zod';
@@ -91,7 +92,7 @@ export async function listProperty(
       ...validatedFields.data,
       ownerId: currentUser.uid,
       propertyId: newDocRef.id,
-      isAiVerified: false, // AI verification will be a separate process
+      verificationStatus: 'pending', // Default verification status
       createdAt: serverTimestamp(),
       // Add a default geo location for sorting if not provided
       geo: {

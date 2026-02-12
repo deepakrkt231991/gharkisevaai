@@ -1,3 +1,4 @@
+
 'use client';
     
 import { useState, useEffect } from 'react';
@@ -90,7 +91,13 @@ export function useDoc<T = any>(
       try {
         unsubscribe();
       } catch (e) {
-        console.warn('Failed to unsubscribe from document listener:', e);
+        // This is a failsafe for development environments where hot-reloading
+        // can sometimes cause issues with the unsubscribe function.
+        if ((e as Error).message.includes("unsubscribe")) {
+          console.warn("Firestore listener unsubscribe failed, likely due to hot-reloading:", e);
+        } else {
+          throw e;
+        }
       }
     };
   }, [memoizedDocRef]); // Re-run if the memoizedDocRef changes.

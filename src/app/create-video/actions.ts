@@ -1,3 +1,4 @@
+
 "use server";
 
 import { createVideoPost, CreateVideoOutput } from '@/ai/flows/video-creator-agent';
@@ -11,6 +12,7 @@ type State = {
   success: boolean;
   message: string;
   data: CreateVideoOutput | null;
+  errors?: any[];
 }
 
 export async function generateVideoAd(

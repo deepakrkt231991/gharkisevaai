@@ -20,7 +20,7 @@ export function initializeFirebase() {
   return getSdks(firebaseApp);
 }
 
-export function getSdks(firebaseApp: FirebaseApp) {
+function getSdks(firebaseApp: FirebaseApp) {
   return {
     firebaseApp,
     auth: getAuth(firebaseApp),

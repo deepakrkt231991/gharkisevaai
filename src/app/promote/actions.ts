@@ -1,3 +1,4 @@
+
 "use server";
 
 import { createPromotionalContent as createPromotionalContentFlow, CreateContentOutput } from '@/ai/flows/content-creator-agent';
@@ -15,6 +16,7 @@ type State = {
   success: boolean;
   message: string;
   data: CreateContentOutput | null;
+  errors?: any[];
 }
 
 export async function createPromoPoster(

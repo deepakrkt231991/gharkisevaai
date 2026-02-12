@@ -1,3 +1,4 @@
+
 "use server";
 
 import { createSalePoster as createSalePosterFlow, CreateSalePosterOutput } from '@/ai/flows/sale-poster-agent';
@@ -12,6 +13,7 @@ type State = {
   success: boolean;
   message: string;
   data: CreateSalePosterOutput | null;
+  errors?: any[];
 }
 
 export async function generateSalePoster(

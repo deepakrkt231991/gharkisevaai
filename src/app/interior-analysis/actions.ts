@@ -15,10 +15,11 @@ type State = {
   success: boolean;
   message: string;
   data: InteriorDesignOutput | null;
+  errors?: any[];
 }
 
 export async function analyzeInterior(
-  prevState: State | undefined,
+  prevState: State,
   formData: FormData,
 ): Promise<State> {
   
@@ -74,10 +75,11 @@ type RenderState = {
   success: boolean;
   message: string;
   renderData: InteriorRenderOutput | null;
+  errors?: any[];
 }
 
 export async function generate3dRender(
-  prevState: RenderState | undefined,
+  prevState: RenderState,
   formData: FormData,
 ): Promise<RenderState> {
     if (!formData.get('roomPhotoUri')) {

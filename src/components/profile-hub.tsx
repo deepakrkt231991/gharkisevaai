@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -52,7 +53,7 @@ export function ProfileHub() {
         router.push('/');
     };
     
-    if (isUserLoading || isProfileLoading) {
+    if (isUserLoading || (user && isProfileLoading)) {
         return (
             <>
                 <ProfileHeader />

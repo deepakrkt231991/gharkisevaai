@@ -3,7 +3,6 @@ import { Suspense } from 'react';
 import { ExploreMarketplace } from '@/components/explore-marketplace';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { MarketplaceHeader } from '@/components/marketplace-header';
-import { FilterBar } from '@/components/filter-bar';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function ExploreMarketplaceFallback() {
@@ -48,7 +47,6 @@ export default function ExplorePage() {
             <ExploreMarketplace />
           </Suspense>
         </main>
-        <FilterBar />
         <BottomNavBar />
       </div>
     </div>

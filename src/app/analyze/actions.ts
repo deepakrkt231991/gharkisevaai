@@ -17,10 +17,11 @@ type State = {
   success: boolean;
   message: string;
   data: AnalyzeDefectOutput | null;
+  errors?: any[];
 }
 
 export async function analyzeDefect(
-  prevState: State | undefined,
+  prevState: State,
   formData: FormData,
 ): Promise<State> {
   // Allow resetting state
@@ -101,10 +102,11 @@ type VideoState = {
     success: boolean;
     message: string;
     data: TransformationVideoOutput | null;
+    errors?: any[];
 }
 
 export async function generateVideo(
-    prevState: VideoState | undefined,
+    prevState: VideoState,
     formData: FormData,
 ): Promise<VideoState> {
     

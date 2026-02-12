@@ -50,6 +50,7 @@ export type PosterState = {
   success: boolean;
   message: string;
   data: CreateContentOutput | null;
+  errors?: any[];
 };
 
 export async function generateAdminPromoPoster(
@@ -91,6 +92,7 @@ export type AdState = {
     success: boolean;
     message: string;
     data: SocialMediaAdOutput | null;
+    errors?: any[];
 };
 
 const SocialMediaAdInputSchema = z.object({
