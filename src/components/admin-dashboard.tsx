@@ -75,6 +75,14 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
             }
         });
     };
+    
+    const handleViewDocuments = () => {
+        toast({
+            title: "Feature Coming Soon",
+            description: "A secure document viewer is being developed for this feature.",
+        });
+    };
+
 
     return (
          <Card className="flex flex-col md:flex-row items-center justify-between p-4">
@@ -90,7 +98,7 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
                 </div>
             </div>
             <div className="flex gap-2 mt-4 md:mt-0">
-                <Button variant="outline" disabled={isPending}>View Documents</Button>
+                <Button variant="outline" onClick={handleViewDocuments} disabled={isPending}>View Documents</Button>
                 <Button className="bg-green-600 hover:bg-green-700" onClick={handleApprove} disabled={isPending}>
                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4"/>}
                     Approve
