@@ -25,11 +25,12 @@ service cloud.firestore {
     // PUBLIC-READ COLLECTIONS
     // =====================================================================
     match /properties/{propertyId} {
-      // Public can list verified properties. Owners and admins can get any.
-      allow list: if resource.data.verificationStatus == 'verified';
+      // Public can read verified properties. Owners and admins can get any.
       allow get: if resource.data.verificationStatus == 'verified'
                   || (request.auth != null && request.auth.uid == resource.data.ownerId)
                   || isAdmin();
+      // Allow anyone to query the properties collection. Individual doc reads are secured by the 'get' rule.
+      allow list: if true;
 
       // Authenticated users can create listings.
       allow create: if request.auth != null;

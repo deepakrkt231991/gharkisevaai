@@ -1,7 +1,6 @@
 export const timeAgo = (timestamp: any): string => {
-    if (!timestamp) return '';
-    if (typeof timestamp.toDate !== 'function') {
-        // Not a Firestore timestamp, maybe it's already a Date object or string
+    if (!timestamp || typeof timestamp.toDate !== 'function') {
+        // Not a Firestore timestamp or it's null/undefined, return empty string or a default.
         return ''; 
     }
     const date = timestamp.toDate();
