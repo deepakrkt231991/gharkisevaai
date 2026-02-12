@@ -38,6 +38,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Ghar Ki Seva" />
+        <link rel="apple-touch-icon" href="/logo.png?v=2" />
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
         <FirebaseClientProvider>

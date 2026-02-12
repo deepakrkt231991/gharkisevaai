@@ -518,11 +518,13 @@ export function WorkerSignupForm() {
                     </div>
                     <div className="space-y-2">
                         <Label className="text-[#9ab9bc] text-xs font-semibold uppercase tracking-wider">Live Location</Label>
-                        <div className="flex items-center gap-2 bg-input border border-border rounded-lg p-3 h-14">
-                            <MapPin className="text-primary"/>
-                            {isGeoLoading && <span className="text-sm text-muted-foreground">Fetching location...</span>}
-                            {geoError && <span className="text-sm text-destructive">{geoError}</span>}
-                            {latitude && longitude && <span className="text-sm text-white">{latitude.toFixed(4)}, {longitude.toFixed(4)}</span>}
+                        <div className="flex items-center gap-2 bg-input border border-border rounded-lg p-3 h-14 text-sm">
+                            <MapPin className="text-primary flex-shrink-0"/>
+                            <div className='truncate'>
+                                {isGeoLoading && <span className="text-muted-foreground">Fetching location...</span>}
+                                {geoError && <span className="text-destructive">{geoError}</span>}
+                                {latitude && longitude && <span className="text-white">{latitude.toFixed(4)}, {longitude.toFixed(4)}</span>}
+                            </div>
                         </div>
                          <p className="text-xs text-muted-foreground">We need your location to show you relevant nearby jobs.</p>
                     </div>

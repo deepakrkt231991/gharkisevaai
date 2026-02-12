@@ -5,6 +5,7 @@
 // Client components that need it (like providers) should import it from there.
 
 export * from './provider';
+export { useStorage } from './provider';
 export * from './client-provider';
 export * from './firestore/use-collection';
 export * from './firestore/use-doc';
