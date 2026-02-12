@@ -116,9 +116,9 @@ export function ProductDetailPage() {
     );
   }
   
-  const productImages = product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls : ['https://placehold.co/800x800?text=No+Image'];
-  const chatLink = product.activeDealId ? `/chat/deal-${product.activeDealId}` : `/chat/product-${productId}`;
-  const whatsAppMessage = `Hi, I'm interested in your '${product.name}' listed on Ghar Ki Seva.`;
+  const productImages = product?.imageUrls && product.imageUrls.length > 0 ? product.imageUrls : ['https://placehold.co/800x800?text=No+Image'];
+  const chatLink = product?.activeDealId ? `/chat/deal-${product.activeDealId}` : `/chat/product-${productId}`;
+  const whatsAppMessage = `Hi, I'm interested in your '${product?.name}' listed on Ghar Ki Seva.`;
 
   return (
     <div className="flex flex-col h-screen bg-background text-white">
@@ -146,7 +146,7 @@ export function ProductDetailPage() {
                       <div className="relative w-full aspect-[1/1.1]">
                         <Image
                           src={url}
-                          alt={product.name || 'Product Image'}
+                          alt={product?.name || 'Product Image'}
                           fill
                           className="object-cover"
                         />
@@ -157,7 +157,7 @@ export function ProductDetailPage() {
               <CarouselDots count={productImages.length} activeIndex={activeIndex} />
               <div className="absolute bottom-6 left-4">
                   <Badge variant="secondary" className="text-2xl font-bold p-3 rounded-lg bg-white/90 text-black shadow-lg">
-                    ₹{(product.price || 0).toLocaleString('en-IN')}
+                    ₹{(product?.price || 0).toLocaleString('en-IN')}
                   </Badge>
               </div>
             </Carousel>
@@ -167,9 +167,9 @@ export function ProductDetailPage() {
         <div className="p-4 space-y-4 pb-24">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold font-headline">{product.name}</h1>
+              <h1 className="text-2xl font-bold font-headline">{product?.name}</h1>
               <p className="text-muted-foreground flex items-center gap-1">
-                <MapPin size={14} /> {product.location}
+                <MapPin size={14} /> {product?.location}
               </p>
             </div>
             <Badge variant="outline" className="border-green-500/50 text-green-400 bg-green-900/30">
@@ -177,7 +177,7 @@ export function ProductDetailPage() {
             </Badge>
           </div>
           
-          <p className="text-sm text-muted-foreground">{product.description}</p>
+          <p className="text-sm text-muted-foreground">{product?.description}</p>
 
           <Card className="glass-card">
             <CardContent className="p-3 flex justify-between items-center">
@@ -204,7 +204,7 @@ export function ProductDetailPage() {
             <AdsenseBanner adSlot="2001427785" />
           </Card>
           
-          {product.isReservedEnabled && (
+          {product?.isReservedEnabled && (
                <Card className="glass-card border-primary/50">
                   <form action={handleReservation}>
                     <CardContent className="p-4 space-y-3">

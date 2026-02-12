@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo } from 'react';
@@ -45,8 +46,8 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
   const handleShare = async () => {
     if (!worker) return;
     const shareData = {
-      title: `${worker.name} - Verified GrihSeva AI Professional`,
-      text: `Check out ${worker.name}, a verified ${worker.skills?.join(', ')} professional on GrihSeva AI.`,
+      title: `${worker?.name || 'Professional'} - Verified GrihSeva AI Professional`,
+      text: `Check out ${worker?.name || 'a professional'}, a verified ${worker?.skills?.join(', ')} professional on GrihSeva AI.`,
       url: window.location.href,
     };
     try {
@@ -81,11 +82,11 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
     );
   }
 
-  const portfolioImages = worker.portfolioImageUrls && worker.portfolioImageUrls.length > 0
+  const portfolioImages = worker?.portfolioImageUrls && worker.portfolioImageUrls.length > 0
     ? worker.portfolioImageUrls
     : [];
     
-  const whatsAppMessage = `Hi ${worker.name}, I'm interested in your ${worker.skills?.join(', ')} services from Ghar Ki Seva.`;
+  const whatsAppMessage = `Hi ${worker?.name}, I'm interested in your ${worker?.skills?.join(', ')} services from Ghar Ki Seva.`;
 
   return (
     <div className="flex flex-col h-screen bg-background text-white">
@@ -104,22 +105,22 @@ export function WorkerProfilePage({ workerId }: { workerId: string }) {
           <CardContent className="p-4">
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20 border-4 border-primary">
-                <AvatarImage src={`https://picsum.photos/seed/${worker.id}/150/150`} />
-                <AvatarFallback>{worker.name?.charAt(0) || 'W'}</AvatarFallback>
+                <AvatarImage src={`https://picsum.photos/seed/${worker?.id}/150/150`} />
+                <AvatarFallback>{worker?.name?.charAt(0) || 'W'}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold font-headline">{worker.name}</h2>
-                <p className="font-semibold text-primary capitalize">{worker.skills?.join(', ')}</p>
+                <h2 className="text-2xl font-bold font-headline">{worker?.name}</h2>
+                <p className="font-semibold text-primary capitalize">{worker?.skills?.join(', ')}</p>
                 <div className="flex items-center gap-4 mt-1">
                     <div className="flex items-center gap-1.5 text-yellow-400 text-sm">
                         <Star className="h-4 w-4 fill-current" />
-                        <span className="font-bold text-white">{worker.rating?.toFixed(1) || 'New'}</span>
+                        <span className="font-bold text-white">{(worker?.rating || 0).toFixed(1)}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground">{worker.successfulOrders || 0}+ Jobs Done</p>
+                    <p className="text-sm text-muted-foreground">{worker?.successfulOrders || 0}+ Jobs Done</p>
                 </div>
               </div>
             </div>
-            {worker.isVerified && (
+            {worker?.isVerified && (
                 <div className="mt-4 flex items-center gap-2 text-green-400 border border-green-500/30 bg-green-900/20 p-2 rounded-lg text-sm">
                     <ShieldCheck className="h-5 w-5"/>
                     <p className="font-semibold">AI Verified Professional</p>

@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,7 @@ import { useUser, useFirestore } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 
 export function HomeHeader() {
-  const { latitude, error, isLoading } = useGeolocation();
+  const { latitude, longitude, error, isLoading } = useGeolocation();
   const [displayLocation, setDisplayLocation] = useState<string>('');
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [manualLocationInput, setManualLocationInput] = useState('');
@@ -65,10 +66,6 @@ export function HomeHeader() {
           const userDocRef = doc(firestore, 'users', user.uid);
           await updateDoc(userDocRef, {
             address: newLocation, // Using the 'address' field from the User entity
-            location: { // Also save geo-coordinates if available
-                latitude: latitude || null,
-                longitude: longitude || null
-            }
           });
         } catch (e) {
           console.error("Failed to save location to profile:", e);

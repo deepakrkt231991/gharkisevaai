@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -64,9 +65,9 @@ export function ProfessionalCard({ worker, distance }: ProfessionalCardProps) {
     rating = 0,
     isVerified = false,
     portfolioImageUrls = []
-  } = worker;
+  } = worker || {};
 
-  const isTopRated = rating >= 4.5;
+  const isTopRated = (rating || 0) >= 4.5;
   const specialty = skills?.[0] || 'Professional';
 
   return (
