@@ -6,11 +6,12 @@ import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle, FileLock, Handshake, Languages, LayoutDashboard, Building } from 'lucide-react';
+import { ChevronRight, LogOut, User as UserIcon, Settings, Shield, HelpCircle, FileLock, Handshake, Languages, LayoutDashboard, Building, Share2 } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import Link from 'next/link';
 import { doc } from 'firebase/firestore';
 import type { User as UserEntity } from '@/lib/entities';
+import { useToast } from '@/hooks/use-toast';
 
 
 function ProfileHeader() {
@@ -38,6 +39,7 @@ export function ProfileHub() {
     const auth = useAuth();
     const router = useRouter();
     const firestore = useFirestore();
+    const { toast } = useToast();
 
     const userDocRef = useMemoFirebase(() => {
         if (!firestore || !user?.uid) return null;
@@ -49,8 +51,33 @@ export function ProfileHub() {
     const handleLogout = async () => {
         if (!auth) return;
         await auth.signOut();
-        // Redirect to home page after logout
         router.push('/');
+    };
+
+    const handleShare = async () => {
+        const shareData = {
+            title: 'Ghar Ki Seva',
+            text: 'Check out Ghar Ki Seva - The smartest way to Repair, Rent & Sell with AI!',
+            url: window.location.origin
+        };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(shareData.url);
+                toast({
+                    title: "Link Copied!",
+                    description: "App link has been copied to your clipboard.",
+                });
+            }
+        } catch (error) {
+            console.error("Error sharing:", error);
+            toast({
+                title: "Error",
+                description: "Could not share the app.",
+                variant: "destructive"
+            });
+        }
     };
     
     if (isUserLoading || (user && isProfileLoading)) {
@@ -123,6 +150,13 @@ export function ProfileHub() {
                         <ProfileMenuItem icon={HelpCircle} label="Help & Support" href="/support" />
                         {!isWorker && <ProfileMenuItem icon={Handshake} label="Become a Worker" href="/worker-signup" />}
                         <ProfileMenuItem icon={Languages} label="Change Language" href="/language" />
+                         <div onClick={handleShare} className="flex items-center justify-between p-4 hover:bg-white/5 rounded-lg cursor-pointer">
+                            <div className="flex items-center gap-4">
+                                <Share2 className="h-5 w-5 text-muted-foreground" />
+                                <span className="font-semibold text-white">Share App</span>
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                        </div>
                     </CardContent>
                 </Card>
 

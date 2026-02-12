@@ -14,12 +14,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useUser, useFirestore } from '@/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export function HomeHeader() {
   const { latitude, error, isLoading } = useGeolocation();
   const [displayLocation, setDisplayLocation] = useState<string>('');
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [manualLocationInput, setManualLocationInput] = useState('');
+  const { user } = useUser();
+  const firestore = useFirestore();
+
 
   useEffect(() => {
     // Priority: Manual Location > Geolocation > Fallback
@@ -48,11 +53,27 @@ export function HomeHeader() {
     setDisplayLocation("New Delhi, India"); // Fallback
   }, [latitude, error, isLoading]);
 
-  const handleLocationSave = () => {
+  const handleLocationSave = async () => {
     if (manualLocationInput.trim()) {
       const newLocation = manualLocationInput.trim();
       setDisplayLocation(newLocation);
       localStorage.setItem('manualLocation', newLocation);
+
+      // Save location to user's Firebase profile
+      if (user && firestore) {
+        try {
+          const userDocRef = doc(firestore, 'users', user.uid);
+          await updateDoc(userDocRef, {
+            address: newLocation, // Using the 'address' field from the User entity
+            location: { // Also save geo-coordinates if available
+                latitude: latitude || null,
+                longitude: longitude || null
+            }
+          });
+        } catch (e) {
+          console.error("Failed to save location to profile:", e);
+        }
+      }
       setIsLocationModalOpen(false);
     }
   };
