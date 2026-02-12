@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Product } from '@/lib/entities';
 import { timeAgo } from '@/lib/time-helpers';
+import { useState, useEffect } from 'react';
 
 interface ProductCardProps {
     product: Product & { id: string };
@@ -14,6 +15,14 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
+    const [timeDisplay, setTimeDisplay] = useState('');
+
+    useEffect(() => {
+        if (product.createdAt) {
+            setTimeDisplay(timeAgo(product.createdAt));
+        }
+    }, [product.createdAt]);
+
     return (
         <Link href={`/product-detail?id=${product.id}`} className={className}>
             <Card className="rounded-xl overflow-hidden glass-card border-border group h-full">
@@ -31,9 +40,9 @@ export function ProductCard({ product, className }: ProductCardProps) {
                         <div className="absolute top-2 right-2 rounded-full h-8 w-8 bg-black/30 backdrop-blur-sm flex items-center justify-center text-white">
                             <Heart className="h-4 w-4" />
                         </div>
-                        {product.createdAt && (
+                        {product.createdAt && timeDisplay && (
                             <Badge variant="secondary" className="absolute bottom-2 left-2 bg-black/50 text-white backdrop-blur-sm border-none text-xs">
-                                {timeAgo(product.createdAt)}
+                                {timeDisplay}
                             </Badge>
                         )}
                     </div>

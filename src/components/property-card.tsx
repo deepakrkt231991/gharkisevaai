@@ -7,12 +7,21 @@ import { Button } from './ui/button';
 import Link from 'next/link';
 import type { Property } from '@/lib/entities';
 import { timeAgo } from '@/lib/time-helpers';
+import { useState, useEffect } from 'react';
 
 interface PropertyCardProps {
     property: Property & {id: string};
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
+    const [timeDisplay, setTimeDisplay] = useState('');
+
+    useEffect(() => {
+        if (property.createdAt) {
+            setTimeDisplay(timeAgo(property.createdAt));
+        }
+    }, [property.createdAt]);
+
     return (
         <Link href={`/property-detail?id=${property.id}`} className="block space-y-3">
              <Card className="relative h-60 w-full overflow-hidden rounded-2xl group border-2 border-transparent hover:border-primary transition-all duration-300">
@@ -30,9 +39,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                 AI VERIFIED
                             </Badge>
                          )}
-                         {property.createdAt && (
+                         {property.createdAt && timeDisplay && (
                             <Badge variant="secondary" className="bg-black/50 text-white backdrop-blur-sm border-none text-xs">
-                                {timeAgo(property.createdAt)}
+                                {timeDisplay}
                             </Badge>
                         )}
                     </div>

@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useMemo, useTransition, useState } from "react";
+import { useMemo, useTransition, useState, useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +32,33 @@ import {
 import { Logo } from "./logo";
 import Image from "next/image";
 
+// New component to handle client-side time rendering to prevent hydration errors
+const TimeAgo = ({ timestamp }: { timestamp: any }) => {
+  const [time, setTime] = useState<string>('...');
+
+  useEffect(() => {
+    if (!timestamp?.toDate) {
+      setTime('N/A');
+      return;
+    }
+    const date = timestamp.toDate();
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    let interval = seconds / 31536000;
+
+    if (interval > 1) { setTime(Math.floor(interval) + " years ago"); return; }
+    interval = seconds / 2592000;
+    if (interval > 1) { setTime(Math.floor(interval) + " months ago"); return; }
+    interval = seconds / 86400;
+    if (interval > 1) { setTime(Math.floor(interval) + " days ago"); return; }
+    interval = seconds / 3600;
+    if (interval > 1) { setTime(Math.floor(interval) + " hours ago"); return; }
+    interval = seconds / 60;
+    if (interval > 1) { setTime(Math.floor(interval) + " minutes ago"); return; }
+    setTime(Math.floor(seconds) + " seconds ago");
+  }, [timestamp]);
+
+  return <>{time}</>;
+};
 
 function StatCard({ title, value, icon, description }: { title: string; value: string | number; icon: React.ReactNode, description?: string }) {
   return (
@@ -508,25 +535,6 @@ export function AdminDashboard() {
     };
   }, [transactions]);
 
-
-  const getTimeAgo = (timestamp: any) => {
-    if (!timestamp) return 'N/A';
-    const date = timestamp.toDate();
-    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-    let interval = seconds / 31536000;
-    if (interval > 1) return Math.floor(interval) + " years ago";
-    interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + " months ago";
-    interval = seconds / 86400;
-    if (interval > 1) return Math.floor(interval) + " days ago";
-    interval = seconds / 3600;
-    if (interval > 1) return Math.floor(interval) + " hours ago";
-    interval = seconds / 60;
-    if (interval > 1) return Math.floor(interval) + " minutes ago";
-    return Math.floor(seconds) + " seconds ago";
-  };
-
-
   return (
     <div className="space-y-6">
       <div>
@@ -646,7 +654,7 @@ export function AdminDashboard() {
                                             {tx.amount < 0 ? `- ₹${Math.abs(tx.amount).toFixed(2)}` : `+ ₹${tx.amount.toFixed(2)}`}
                                         </TableCell>
                                         <TableCell className="font-mono text-xs capitalize">{tx.sourceType || 'Job'} / {tx.sourceJobId?.substring(0,6)}...</TableCell>
-                                        <TableCell>{getTimeAgo(tx.timestamp)}</TableCell>
+                                        <TableCell><TimeAgo timestamp={tx.timestamp} /></TableCell>
                                     </TableRow>
                                 ))
                             ) : !transactionsLoading && (
@@ -733,7 +741,7 @@ export function AdminDashboard() {
                       <TableRow key={alert.id}>
                         <TableCell className="font-medium font-mono text-xs">{alert.userId}</TableCell>
                         <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location.latitude?.toFixed(4)}, ${alert.location.longitude?.toFixed(4)}`} </TableCell>
-                        <TableCell>{getTimeAgo(alert.timestamp)}</TableCell>
+                        <TableCell><TimeAgo timestamp={alert.timestamp} /></TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm">View Details</Button>
                         </TableCell>
