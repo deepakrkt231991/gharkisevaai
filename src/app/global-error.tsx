@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 export default function GlobalError({
   error,
@@ -13,18 +13,18 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <div className="dark bg-background text-foreground flex min-h-screen flex-col items-center justify-center p-4 text-center">
-            <div className="glass-card max-w-md w-full p-8 rounded-xl">
-                <AlertTriangle className="h-16 w-16 text-destructive mx-auto mb-4" />
-                <h1 className="text-2xl font-bold font-headline text-white">An Error Occurred</h1>
-                <p className="mt-2 text-muted-foreground">
-                    We're sorry, but something went wrong. Please try again.
-                </p>
-                <Button onClick={() => reset()} className="mt-6 w-full">
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Try again
-                </Button>
-            </div>
+        <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-blue-50">
+          <h1 className="text-3xl font-bold font-headline text-blue-900">Oops! Kuch Problem Hui 🛠️</h1>
+          <p className="mt-2 text-gray-600">
+            Hum ise theek kar rahe hain. Kirpaya niche diye button par click karein.
+          </p>
+          <Button 
+            onClick={() => reset()} 
+            className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-full font-semibold h-auto text-base hover:bg-blue-700"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            App Refresh Karein
+          </Button>
         </div>
       </body>
     </html>
