@@ -5,10 +5,10 @@ import { createPromotionalContent as createPromotionalContentFlow, CreateContent
 import { z } from 'zod';
 
 const schema = z.object({
-  workerPhotoUri: z.string().refine(val => val.startsWith('data:'), {
-    message: 'Invalid data URI for worker photo.',
+  userPhotoUri: z.string().refine(val => val.startsWith('data:'), {
+    message: 'Invalid data URI for user photo.',
   }),
-  workerName: z.string().min(1, { message: 'Worker name is required.' }),
+  userName: z.string().min(1, { message: 'User name is required.' }),
   userId: z.string().min(1, { message: 'User must be logged in.' }),
 });
 
@@ -25,8 +25,8 @@ export async function createPromoPoster(
 ): Promise<State> {
   
   const validatedFields = schema.safeParse({
-    workerPhotoUri: formData.get('workerPhotoUri'),
-    workerName: formData.get('workerName'),
+    userPhotoUri: formData.get('userPhotoUri'),
+    userName: formData.get('userName'),
     userId: formData.get('userId'),
   });
 
@@ -40,8 +40,8 @@ export async function createPromoPoster(
 
   try {
     const result = await createPromotionalContentFlow({
-      workerPhotoUri: validatedFields.data.workerPhotoUri,
-      workerName: validatedFields.data.workerName,
+      userPhotoUri: validatedFields.data.userPhotoUri,
+      userName: validatedFields.data.userName,
       referralCode: validatedFields.data.userId,
     });
     return {

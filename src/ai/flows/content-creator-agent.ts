@@ -2,7 +2,7 @@
 /**
  * @fileOverview The Gemini Content Creator - An AI agent for generating promotional content.
  *
- * - createPromotionalContent - A function to generate a promotional poster for a worker.
+ * - createPromotionalContent - A function to generate a promotional poster for a user.
  * - CreateContentInput - The input type for the content creation function.
  * - CreateContentOutput - The return type for the content creation function.
  */
@@ -11,12 +11,12 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const CreateContentInputSchema = z.object({
-  workerPhotoUri: z
+  userPhotoUri: z
     .string()
     .describe(
-      "A photo of the worker, as a data URI that must include a MIME type and use Base64 encoding."
+      "A photo of the user, as a data URI that must include a MIME type and use Base64 encoding."
     ),
-  workerName: z.string().describe("The name of the worker."),
+  userName: z.string().describe("The name of the user."),
   referralCode: z.string().describe("The user's unique referral code (usually their user ID)."),
 });
 export type CreateContentInput = z.infer<typeof CreateContentInputSchema>;
@@ -39,20 +39,20 @@ const contentCreatorFlow = ai.defineFlow(
     inputSchema: CreateContentInputSchema,
     outputSchema: CreateContentOutputSchema,
   },
-  async ({ workerName, workerPhotoUri, referralCode }) => {
+  async ({ userName, userPhotoUri, referralCode }) => {
     const referralUrl = `https://studio-6508019671-d10f2.web.app/worker-signup?ref=${referralCode}`;
 
     const { media } = await ai.generate({
       model: 'googleai/imagen-4.0-fast-generate-001',
-      prompt: `Create a professional and eye-catching promotional poster for a verified home service worker named ${workerName} for the "GrihSeva AI" app. The poster is intended to be shared on WhatsApp Status.
+      prompt: `Create a professional and eye-catching promotional poster for a user named ${userName} for the "GrihSeva AI" app. The poster is intended to be shared on WhatsApp Status to refer new users and workers.
 
-      It must include the following text in a prominent, stylish Hindi font: "मैं GrihSeva AI पर वेरिफाइड वर्कर हूँ, मुझे जॉइन करें!"
+      It must include the following text in a prominent, stylish Hindi font: "GrihSeva AI जॉइन करें और कमाएं!" (Join GrihSeva AI and Earn!)
 
       **Crucially, you must include a scannable QR code in the bottom right corner of the poster. This QR code must encode the following URL: ${referralUrl}**
 
-      The design should be clean, modern, and trustworthy. Use a color palette that aligns with home services (e.g., blues, greens, oranges). The overall tone should be professional and inviting.
+      The design should be clean, modern, and trustworthy. Use a color palette that aligns with the app's theme (e.g., blues, greens, and a vibrant accent color). The overall tone should be professional and inviting.
 
-      Incorporate the provided worker's photo seamlessly into the design. The worker should look friendly and competent.
+      Incorporate the provided user's photo seamlessly into the design. The user should look friendly and trustworthy.
       `,
       config: {
         // You can add more configuration here if needed, like aspectRatio

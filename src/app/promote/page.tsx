@@ -8,9 +8,9 @@ export default function PromotePage() {
       <main className="flex-1 py-12 md:py-16">
         <div className="container">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Grow Your Network</h1>
+            <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Share Your Referral QR Code</h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              Generate a personalized poster to share with your friends and on social media. Earn lifetime commission for every new user or worker you refer!
+              Generate a personalized poster with your unique QR code. Share it with friends to earn a lifetime commission when they sign up!
             </p>
           </div>
           <PromoGenerator />
