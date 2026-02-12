@@ -55,7 +55,7 @@ const interiorRenderFlow = ai.defineFlow(
     const styleText = style ? `Apply a **${style}** design style.` : '';
 
     const { media } = await ai.generate({
-      model: 'googleai/gemini-1.5-flash-latest',
+      model: 'googleai/gemini-2.5-flash-image',
       prompt: [
         { media: { url: roomPhotoUri } },
         { text: `Based on the provided image of a room and the following design suggestions, generate a new, photorealistic 3D render of the improved space. The render should look like a professionally designed space, incorporating the suggested changes realistically.
