@@ -33,6 +33,88 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 };
 
 
+const AiPriceEstimatorCard = () => (
+    <Card className="bg-gradient-to-br from-primary/90 to-primary/60 border-none text-white">
+        <CardContent className="p-5 space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-white/80">
+                <Bot /> PREMIUM TOOL
+            </div>
+            <h3 className="text-2xl font-bold font-headline">AI Price Estimator</h3>
+            <p className="text-sm text-white/80">Get a precise, real-time market valuation for any property using local data & neural trends.</p>
+            <Button variant="secondary" className="bg-white text-primary rounded-lg font-bold hover:bg-white/90">
+                Check Valuation Now <ArrowRight className="ml-2" />
+            </Button>
+        </CardContent>
+    </Card>
+);
+
+const PropertyList = ({properties, isLoading}: {properties: (Property & { id: string })[], isLoading: boolean}) => (
+    <div>
+        <div className="flex justify-between items-center my-4">
+            <h2 className="text-xl font-bold font-headline text-white">Curated for You</h2>
+            <button className="text-sm font-bold text-primary">See All</button>
+        </div>
+        
+        <div className="space-y-6">
+            {isLoading && properties.length === 0 && (
+                <>
+                    {[...Array(2)].map((_, i) => (
+                         <div className="space-y-3" key={i}>
+                            <Skeleton className="h-60 w-full rounded-2xl" />
+                            <div className="flex justify-around">
+                                <Skeleton className="h-4 w-20" />
+                                <Skeleton className="h-4 w-20" />
+                                <Skeleton className="h-4 w-20" />
+                            </div>
+                        </div>
+                    ))}
+                </>
+            )}
+            
+            {!isLoading && properties.flatMap((prop, index) => {
+                const content = [<PropertyCard key={prop.id} property={prop} />];
+                if ((index + 1) % 4 === 0) {
+                    content.push(
+                        <div key={`ad-${index}`} className="my-4 rounded-xl overflow-hidden glass-card p-2">
+                            <AdsenseBanner adSlot="2001427785" />
+                        </div>
+                    );
+                }
+                return content;
+            })}
+
+             {!isLoading && properties.length === 0 && (
+                <div className="text-center py-8">
+                    <p className="text-muted-foreground">No properties found for this category.</p>
+                     <p className="text-xs text-muted-foreground/50 mt-2">Check back later or list your own property!</p>
+                </div>
+            )}
+        </div>
+    </div>
+);
+
+const ListPropertyCtaCard = ({ forRent }: { forRent?: boolean }) => (
+    <Card className="glass-card mt-6">
+        <CardContent className="p-5 space-y-3 text-center">
+             <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit">
+                <Building className="w-8 h-8 text-primary"/>
+            </div>
+            <h3 className="text-xl font-bold font-headline text-white">{forRent ? "Have a Property to Rent Out?" : "Ready to Sell?"}</h3>
+            <p className="text-sm text-muted-foreground">
+                {forRent 
+                    ? "List your room, flat, or house on GrihSeva AI to connect with verified tenants quickly and securely."
+                    : "List your property on GrihSeva AI to reach thousands of verified buyers. Our AI tools will help you get the best price."
+                }
+            </p>
+            <Button asChild className="mt-2">
+                <Link href="/list-property">
+                    {forRent ? "List Your Property for Rent" : "List Your Property for Sale"}
+                </Link>
+            </Button>
+        </CardContent>
+    </Card>
+);
+
 export function ExploreMarketplace() {
     const firestore = useFirestore();
     const { latitude: userLat, longitude: userLon } = useGeolocation();
@@ -122,109 +204,28 @@ export function ExploreMarketplace() {
     }, [rentProperties, userLat, userLon]);
 
 
-    const AiPriceEstimatorCard = () => (
-        <Card className="bg-gradient-to-br from-primary/90 to-primary/60 border-none text-white">
-            <CardContent className="p-5 space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold text-white/80">
-                    <Bot /> PREMIUM TOOL
-                </div>
-                <h3 className="text-2xl font-bold font-headline">AI Price Estimator</h3>
-                <p className="text-sm text-white/80">Get a precise, real-time market valuation for any property using local data & neural trends.</p>
-                <Button variant="secondary" className="bg-white text-primary rounded-lg font-bold hover:bg-white/90">
-                    Check Valuation Now <ArrowRight className="ml-2" />
-                </Button>
-            </CardContent>
-        </Card>
-    );
-    
-    const PropertyList = ({properties, isLoading}: {properties: (Property & { id: string })[], isLoading: boolean}) => (
-        <div>
-            <div className="flex justify-between items-center my-4">
-                <h2 className="text-xl font-bold font-headline text-white">Curated for You</h2>
-                <button className="text-sm font-bold text-primary">See All</button>
-            </div>
-            
-            <div className="space-y-6">
-                {isLoading && combinedSaleProperties.length === 0 && combinedRentProperties.length === 0 && (
-                    <>
-                        {[...Array(2)].map((_, i) => (
-                             <div className="space-y-3" key={i}>
-                                <Skeleton className="h-60 w-full rounded-2xl" />
-                                <div className="flex justify-around">
-                                    <Skeleton className="h-4 w-20" />
-                                    <Skeleton className="h-4 w-20" />
-                                    <Skeleton className="h-4 w-20" />
-                                </div>
-                            </div>
-                        ))}
-                    </>
-                )}
-                
-                {!isLoading && properties.flatMap((prop, index) => {
-                    const content = [<PropertyCard key={prop.id} property={prop} />];
-                    if ((index + 1) % 4 === 0) {
-                        content.push(
-                            <div key={`ad-${index}`} className="my-4 rounded-xl overflow-hidden glass-card p-2">
-                                <AdsenseBanner adSlot="2001427785" />
-                            </div>
-                        );
-                    }
-                    return content;
-                })}
-
-                 {!isLoading && properties.length === 0 && (
-                    <div className="text-center py-8">
-                        <p className="text-muted-foreground">No properties found for this category.</p>
-                         <p className="text-xs text-muted-foreground/50 mt-2">Check back later or list your own property!</p>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-    
-    const ListPropertyCtaCard = ({ forRent }: { forRent?: boolean }) => (
-        <Card className="glass-card mt-6">
-            <CardContent className="p-5 space-y-3 text-center">
-                 <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit">
-                    <Building className="w-8 h-8 text-primary"/>
-                </div>
-                <h3 className="text-xl font-bold font-headline text-white">{forRent ? "Have a Property to Rent Out?" : "Ready to Sell?"}</h3>
-                <p className="text-sm text-muted-foreground">
-                    {forRent 
-                        ? "List your room, flat, or house on GrihSeva AI to connect with verified tenants quickly and securely."
-                        : "List your property on GrihSeva AI to reach thousands of verified buyers. Our AI tools will help you get the best price."
-                    }
-                </p>
-                <Button asChild className="mt-2">
-                    <Link href="/list-property">
-                        {forRent ? "List Your Property for Rent" : "List Your Property for Sale"}
-                    </Link>
-                </Button>
-            </CardContent>
-        </Card>
-    );
-
     return (
         <div className="space-y-6">
             <Tabs defaultValue={defaultTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 bg-card h-14 rounded-xl p-1">
-                    <TabsTrigger value="buy" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                        <ShoppingBag /> Buy Home
-                    </TabsTrigger>
-                    <TabsTrigger value="sell" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                        <Tag /> Sell Home
-                    </TabsTrigger>
-                    <TabsTrigger value="rent" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                        <KeyRound /> Rent Home
-                    </TabsTrigger>
-                </TabsList>
+                 <div className="flex justify-center">
+                    <TabsList className="inline-flex h-auto items-center justify-center rounded-full bg-card p-1">
+                        <TabsTrigger value="buy" className="rounded-full px-8 py-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                            Buy
+                        </TabsTrigger>
+                        <TabsTrigger value="sell" className="rounded-full px-8 py-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                            Sell
+                        </TabsTrigger>
+                        <TabsTrigger value="rent" className="rounded-full px-8 py-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                            Rent
+                        </TabsTrigger>
+                    </TabsList>
+                </div>
                 
                 <TabsContent value="buy" className="pt-6 space-y-6">
                     <AiPriceEstimatorCard />
                     <PropertyList properties={combinedSaleProperties} isLoading={isSaleLoading} />
                 </TabsContent>
                 <TabsContent value="sell" className="pt-6 space-y-6">
-                    <AiPriceEstimatorCard />
                     <ListPropertyCtaCard />
                     <PropertyList properties={combinedSaleProperties} isLoading={isSaleLoading} />
                 </TabsContent>
