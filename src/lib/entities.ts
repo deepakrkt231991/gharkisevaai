@@ -118,6 +118,7 @@ export interface SOSAlert {
 }
 
 export interface AppSettings {
+    isMaintenanceMode?: boolean;
     lastUpdated?: any; // Firestore Timestamp
 }
 

@@ -319,8 +319,12 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "App Settings",
       "type": "object",
-      "description": "Stores global app settings.",
+      "description": "Stores global app settings, including maintenance mode status.",
       "properties": {
+        "isMaintenanceMode": {
+          "type": "boolean",
+          "description": "When true, the app will be locked for regular users, showing only a maintenance page."
+        },
         "lastUpdated": { "type": "string", "format": "date-time" }
       }
     },
@@ -538,7 +542,7 @@
         "definition": {
           "entityName": "AppSettings",
           "schema": { "$ref": "#/backend/entities/AppSettings" },
-          "description": "Stores global app settings. This is now separate from the rotating banners."
+          "description": "Stores global app settings, like maintenance mode. A single document with ID 'global' is expected."
         }
       },
       {

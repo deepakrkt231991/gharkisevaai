@@ -1,13 +1,9 @@
 
 import type {Metadata} from 'next';
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase/client-provider';
-import { PwaLoader } from '@/components/pwa-loader';
-import { PwaUpdateNotifier } from '@/components/pwa-update-notifier';
-import { FloatingAiAssistant } from '@/components/floating-ai-assistant';
+import { AppShell } from '@/components/app-shell';
 import Script from 'next/script';
-import { InstallPwaBanner } from '@/components/install-pwa-banner';
 import { Button } from '@/components/ui/button';
 
 
@@ -42,11 +38,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
         <FirebaseClientProvider>
-          <PwaLoader />
-          <PwaUpdateNotifier />
-          {children}
-          <FloatingAiAssistant />
-          <Toaster />
+          <AppShell>
+            {children}
+          </AppShell>
         </FirebaseClientProvider>
         <Script
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
