@@ -209,3 +209,5 @@ export interface Deal {
     reservationExpiresAt?: any; // Firestore Timestamp
     shippedAt?: any; // Firestore Timestamp
 }
+
+    

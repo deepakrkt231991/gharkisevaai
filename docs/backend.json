@@ -1,592 +1,594 @@
 
 {
-  "entities": {
-    "User": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "User",
-      "type": "object",
-      "description": "Represents a user of the GrihSeva AI app.",
-      "properties": {
-        "uid": {
-          "type": "string",
-          "description": "Firebase Authentication user ID."
-        },
-        "name": {
-          "type": "string",
-          "description": "User's full name."
-        },
-        "phone": {
-          "type": "string",
-          "description": "User's phone number."
-        },
-        "address": {
-          "type": "string",
-          "description": "User's address."
-        },
-        "userType": {
-          "type": "string",
-          "description": "Type of user.",
-          "enum": ["customer", "worker", "doctor"]
-        },
-        "referredBy": {
-          "type": "string",
-          "description": "The ID of the user or worker who referred this user."
-        },
-        "walletBalance": {
-            "type": "number",
-            "description": "The balance of referral earnings for the user."
-        },
-        "language": {
+    "entities": {
+      "User": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "User",
+        "type": "object",
+        "description": "Represents a user of the GrihSeva AI app.",
+        "properties": {
+          "uid": {
             "type": "string",
-            "description": "The user's preferred language code (e.g., 'en', 'hi')."
-        }
-      },
-      "required": ["uid", "userType"]
-    },
-    "Job": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Job",
-      "type": "object",
-      "description": "Represents a job booking in the GrihSeva AI app.",
-      "properties": {
-        "jobId": {
-          "type": "string",
-          "description": "Unique identifier for the job."
-        },
-        "customerId": {
-          "type": "string",
-          "description": "ID of the customer who created the job."
-        },
-        "workerId": {
-            "type": "string",
-            "description": "ID of the worker assigned to the job."
-        },
-        "problem_image_url": {
-          "type": "string",
-          "description": "URL of the uploaded problem image."
-        },
-        "completion_image_url": {
-            "type": "string",
-            "description": "URL of the image uploaded by the worker upon completion."
-        },
-        "ai_diagnosis": {
-          "type": "string",
-          "description": "Diagnosis provided by the AI."
-        },
-        "estimated_cost": {
-          "type": "string",
-          "description": "Estimated cost provided by the AI."
-        },
-        "final_cost": {
-            "type": "number",
-            "description": "The final agreed-upon cost for the job."
-        },
-        "paymentId": {
-            "type": "string",
-            "description": "ID of the payment transaction from the payment gateway."
-        },
-        "paymentStatus": {
-            "type": "string",
-            "enum": ["pending", "held_in_escrow", "paid_to_worker", "refunded"],
-            "description": "The status of the payment."
-        },
-        "status": {
-          "type": "string",
-          "description": "Current status of the job.",
-          "enum": ["pending_diagnosis", "awaiting_payment", "worker_assigned", "in_progress", "pending_confirmation", "completed", "disputed", "cancelled"]
-        },
-        "otp": {
-          "type": "string",
-          "description": "A one-time password sent to the user to verify the start of the job."
-        },
-        "platformFee": {
-          "type": "number",
-          "description": "Platform fee charged for the job."
-        },
-        "gst": {
-          "type": "number",
-          "description": "GST applied to the job."
-        },
-        "workerPayout": {
-          "type": "number",
-          "description": "Amount paid out to the worker."
-        },
-        "completedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Timestamp of when the job was marked as completed."
-        },
-        "rating": {
-          "type": "number",
-          "description": "The star rating (1-5) given by the customer upon job completion."
-        },
-        "reviewText": {
-          "type": "string",
-          "description": "The written review or comment from the customer."
-        }
-      },
-      "required": ["jobId", "customerId", "status"]
-    },
-    "Worker": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Worker",
-      "type": "object",
-      "description": "Represents a service worker.",
-      "properties": {
-        "uid": {
-          "type": "string",
-          "description": "Firebase Authentication user ID."
-        },
-        "workerId": {
-          "type": "string",
-          "description": "Unique identifier for the worker (same as their uid)."
-        },
-        "skills": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "List of worker's skills (e.g., plumber, electrician)."
-        },
-        "rating": {
-          "type": "number",
-          "description": "Average rating of the worker."
-        },
-        "location": {
-          "type": "object",
-          "properties": {
-            "latitude": { "type": "number" },
-            "longitude": { "type": "number" }
+            "description": "Firebase Authentication user ID."
           },
-          "description": "Geographical location of the worker."
-        },
-        "isVerified": {
-          "type": "boolean",
-          "description": "Whether the worker is verified by an admin."
-        },
-        "bankDetails": {
-            "type": "object",
-            "description": "Bank account details for payouts.",
-            "properties": {
-                "accountNumber": { "type": "string" },
-                "ifscCode": { "type": "string" },
-                "accountHolderName": { "type": "string"},
-                "upiId": { "type": "string", "description": "Worker's UPI ID for direct payments." }
-            }
-        },
-        "referredBy": {
+          "name": {
             "type": "string",
-            "description": "The ID of the user or worker who referred this worker."
-        },
-        "walletBalance": {
-            "type": "number",
-            "description": "The balance of referral earnings for the worker."
-        },
-        "certificationsUploaded": {
-            "type": "boolean",
-            "description": "Indicates if the worker has uploaded professional certifications."
-        },
-        "shopLicenseUploaded": {
-            "type": "boolean",
-            "description": "Indicates if the worker has uploaded a shop/establishment license."
-        },
-        "successfulOrders": {
-            "type": "number",
-            "description": "The total number of successfully completed orders."
-        },
-        "portfolioImageUrls": {
-            "type": "array",
-            "items": { "type": "string" },
-            "description": "URLs of images for the worker's portfolio."
-        },
-        "shopPhotoUrl": {
-          "type": "string",
-          "description": "URL of the worker's shop, visiting card, or certificate photo."
-        },
-        "bio": {
-          "type": "string",
-          "description": "A short bio or description written by the worker."
-        }
-      },
-      "required": ["uid", "workerId", "isVerified"]
-    },
-    "Health": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Health",
-      "type": "object",
-      "description": "Stores appliance health and AMC data for a user.",
-      "properties": {
-        "userId": {
-          "type": "string",
-          "description": "ID of the user this record belongs to."
-        },
-        "appliance_name": {
-          "type": "string",
-          "description": "Name of the appliance (e.g., AC, Fridge)."
-        },
-        "last_service_date": {
-          "type": "string",
-          "format": "date",
-          "description": "Last service date of the appliance."
-        },
-        "next_service_due_date": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Next scheduled service date."
-        },
-        "amc_status": {
-            "type": "string",
-            "enum": ["active", "inactive"],
-            "description": "Status of the Annual Maintenance Contract."
-        }
-      },
-      "required": ["userId", "appliance_name"]
-    },
-    "Tool": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Tool",
-      "type": "object",
-      "description": "Represents a tool available for rent.",
-      "properties": {
-        "toolId": { "type": "string" },
-        "ownerId": { "type": "string", "description": "The worker ID of the tool owner." },
-        "name": { "type": "string" },
-        "description": { "type": "string" },
-        "rental_price_per_day": { "type": "number" },
-        "is_available": { "type": "boolean" },
-        "imageUrl": { "type": "string", "description": "URL of the tool's image." },
-        "location": { "type": "string", "description": "Location of the tool owner." },
-        "deposit": { "type": "number", "description": "Security deposit amount for the tool." }
-      },
-      "required": ["toolId", "ownerId", "name", "rental_price_per_day"]
-    },
-    "Rental": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Rental",
-      "type": "object",
-      "description": "Represents a tool rental transaction.",
-      "properties": {
-        "rentalId": { "type": "string" },
-        "toolId": { "type": "string" },
-        "renterId": { "type": "string", "description": "The user ID of the person renting the tool." },
-        "ownerId": { "type": "string", "description": "The worker ID of the tool owner." },
-        "startDate": { "type": "string", "format": "date-time" },
-        "endDate": { "type": "string", "format": "date-time" },
-        "totalCost": { "type": "number", "description": "Total calculated cost for the rental period." },
-        "status": { "type": "string", "enum": ["requested", "accepted", "payment_pending", "active", "completed", "cancelled", "disputed"] }
-      },
-      "required": ["rentalId", "toolId", "renterId", "ownerId", "startDate", "totalCost"]
-    },
-    "Transaction": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Transaction",
-      "type": "object",
-      "description": "Represents a single financial transaction in a user's or worker's wallet.",
-      "properties": {
-        "transactionId": { "type": "string" },
-        "userId": { "type": "string", "description": "The ID of the user/worker who this transaction belongs to." },
-        "amount": { "type": "number" },
-        "type": { "type": "string", "enum": ["referral_commission", "payout", "refund", "platform_fee", "tax", "admin_withdrawal"] },
-        "status": { "type": "string", "enum": ["pending", "processed", "failed"], "description": "The status of the payout transaction, managed by the admin."},
-        "sourceJobId": { "type": "string", "description": "The job, deal, or rental ID that triggered this transaction." },
-        "sourceType": { "type": "string", "enum": ["job", "deal", "rental"], "description": "The type of source that generated the transaction." },
-        "timestamp": { "type": "string", "format": "date-time" },
-        "jobCompletedAt": { "type": "string", "format": "date-time", "description": "Timestamp for when the source job was completed, used for payout rules."}
-      },
-      "required": ["transactionId", "userId", "amount", "type"]
-    },
-    "SOSAlert": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "SOSAlert",
-      "type": "object",
-      "description": "Represents an emergency SOS alert.",
-      "properties": {
-        "alertId": { "type": "string" },
-        "userId": { "type": "string", "description": "The ID of the user/worker who triggered the alert." },
-        "location": {
-          "type": "object",
-          "properties": {
-            "latitude": { "type": "number" },
-            "longitude": { "type": "number" }
+            "description": "User's full name."
           },
-          "description": "Geographical location where the alert was triggered."
-        },
-        "timestamp": { "type": "string", "format": "date-time" },
-        "status": { "type": "string", "enum": ["active", "resolved"] },
-        "audio_url": { "type": "string", "description": "URL of the background audio recording."}
-      },
-      "required": ["alertId", "userId", "location", "timestamp", "status"]
-    },
-    "AppSettings": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "App Settings",
-      "type": "object",
-      "description": "Stores global app settings, including maintenance mode status.",
-      "properties": {
-        "isMaintenanceMode": {
-          "type": "boolean",
-          "description": "When true, the app will be locked for regular users, showing only a maintenance page."
-        },
-        "lastUpdated": { "type": "string", "format": "date-time" }
-      }
-    },
-    "Banner": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Banner",
-      "type": "object",
-      "description": "Represents a single rotating banner slide on the home page.",
-      "properties": {
-        "title": { "type": "string" },
-        "subtitle": { "type": "string" },
-        "imageUrl": { "type": "string", "description": "URL of the banner's background image." },
-        "link": { "type": "string", "description": "The destination URL when the banner is clicked." }
-      },
-      "required": ["title", "subtitle", "imageUrl", "link"]
-    },
-    "LegalAgreement": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Legal Agreement",
-      "type": "object",
-      "description": "Represents a legally binding digital agreement for a deal.",
-      "properties": {
-        "agreementId": { "type": "string", "description": "Unique ID for the agreement." },
-        "dealId": { "type": "string", "description": "The associated Deal ID." },
-        "buyerId": { "type": "string" },
-        "sellerId": { "type": "string" },
-        "buyerName": { "type": "string" },
-        "sellerName": { "type": "string" },
-        "itemName": { "type": "string" },
-        "itemCondition": { "type": "string" },
-        "finalPrice": { "type": "number" },
-        "status": { "type": "string", "enum": ["active", "completed"] },
-        "createdAt": { "type": "string", "format": "date-time", "description": "Firestore Timestamp of when the agreement was created." }
-      },
-      "required": ["agreementId", "dealId", "buyerId", "sellerId", "itemName", "finalPrice", "status", "createdAt"]
-    },
-    "Product": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Product",
-      "type": "object",
-      "description": "Represents a used item for sale in the marketplace.",
-      "properties": {
-        "productId": { "type": "string" },
-        "ownerId": { "type": "string", "description": "The user ID of the seller." },
-        "name": { "type": "string" },
-        "category": { "type": "string", "enum": ["Furniture", "Electronics", "Appliances", "Other"] },
-        "price": { "type": "number" },
-        "description": { "type": "string" },
-        "location": { "type": "string" },
-        "imageUrls": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "videoUrl": { "type": "string", "description": "URL of the product video." },
-        "isReserved": { "type": "boolean", "description": "Whether an advance has been paid to reserve the item." },
-        "isReservedEnabled": { "type": "boolean", "description": "Whether the seller allows reserving the item." },
-        "reservedUntil": { "type": "string", "format": "date-time", "description": "Timestamp until which the product is reserved." },
-        "activeDealId": { "type": "string", "description": "ID of the active deal if the item is reserved or sold." },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["productId", "ownerId", "name", "category", "price"]
-    },
-    "Property": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Property",
-      "type": "object",
-      "description": "Represents a property listing in the marketplace.",
-      "properties": {
-        "propertyId": { "type": "string", "description": "Unique ID for the property." },
-        "ownerId": { "type": "string", "description": "The user ID of the person who listed the property." },
-        "title": { "type": "string", "description": "Title of the listing, e.g., '4 BHK Luxury Suite'." },
-        "location": { "type": "string", "description": "City and area, e.g., 'Worli, Mumbai'." },
-        "geo": {
-          "type": "object",
-          "description": "Geographical coordinates of the property.",
-          "properties": {
-            "latitude": { "type": "number" },
-            "longitude": { "type": "number" }
+          "phone": {
+            "type": "string",
+            "description": "User's phone number."
+          },
+          "address": {
+            "type": "string",
+            "description": "User's address."
+          },
+          "userType": {
+            "type": "string",
+            "description": "Type of user.",
+            "enum": ["customer", "worker", "doctor"]
+          },
+          "referredBy": {
+            "type": "string",
+            "description": "The ID of the user or worker who referred this user."
+          },
+          "walletBalance": {
+              "type": "number",
+              "description": "The balance of referral earnings for the user."
+          },
+          "language": {
+              "type": "string",
+              "description": "The user's preferred language code (e.g., 'en', 'hi')."
           }
         },
-        "price": { "type": "number", "description": "Price for sale listings, in a numerical format (e.g., 4.20 for crores)." },
-        "priceUnit": { "type": "string", "description": "Unit for the price (e.g., 'Cr'), for sale listings." },
-        "rentAmount": { "type": "number", "description": "The monthly rent amount for a rental property." },
-        "depositAmount": { "type": "number", "description": "The security deposit amount for a rental property." },
-        "agreementYears": { "type": "number", "description": "The duration of the rental agreement in years." },
-        "sqft": { "type": "number" },
-        "parking": { "type": "number" },
-        "imageUrl": { "type": "string" },
-        "videoUrl": { "type": "string", "description": "URL of the property video walkthrough." },
-        "listingType": { "type": "string", "enum": ["sale", "rent"], "description": "Whether the property is for sale or for rent." },
-        "vastuScore": { "type": "number", "description": "Vastu compliance score from 0 to 10." },
-        "verificationStatus": {
-            "type": "string",
-            "enum": ["pending", "verified", "rejected", "review_needed"],
-            "description": "The verification status of the property, managed by admin."
-        },
-        "verificationNotes": {
-            "type": "string",
-            "description": "Notes from the user or admin regarding verification."
-        },
-        "utilityBillUrl": { "type": "string", "description": "URL of the uploaded utility bill." },
-        "taxPaperUrl": { "type": "string", "description": "URL of the uploaded property tax paper." },
-        "aadharUrl": { "type": "string", "description": "URL of the uploaded Aadhar card." },
-        "panUrl": { "type": "string", "description": "URL of the uploaded PAN card." },
-        "certificateUrl": { "type": "string", "description": "URL of the generated verification certificate." },
-        "certificateGeneratedAt": { "type": "string", "format": "date-time", "description": "Timestamp for when the certificate was generated." }
+        "required": ["uid", "userType"]
       },
-      "required": ["propertyId", "ownerId", "title", "location", "sqft", "parking", "listingType", "verificationStatus"]
-    },
-    "Deal": {
+      "Job": {
         "$schema": "http://json-schema.org/draft-07/schema#",
-        "title": "Deal",
-        "description": "Represents a marketplace transaction for a product.",
+        "title": "Job",
         "type": "object",
+        "description": "Represents a job booking in the GrihSeva AI app.",
         "properties": {
-            "dealId": { "type": "string", "description": "Unique ID for the deal." },
-            "productId": { "type": "string" },
-            "sellerId": { "type": "string" },
-            "buyerId": { "type": "string" },
-            "productName": { "type": "string" },
-            "productImage": { "type": "string" },
-            "totalPrice": { "type": "number" },
-            "status": {
+          "jobId": {
             "type": "string",
-            "enum": ["negotiating", "reserved", "awaiting_shipment_payment", "awaiting_shipment", "shipped", "delivery_confirmed", "completed", "cancelled", "refunded", "disputed"]
-            },
-            "advancePaid": { "type": "number" },
-            "finalPaymentPaid": { "type": "number" },
-            "deliveryMethod": { "type": "string", "enum": ["pickup", "courier"] },
-            "trackingNumber": { "type": "string" },
-            "createdAt": { "type": "string", "format": "date-time" },
-            "reservedAt": { "type": "string", "format": "date-time" },
-            "reservationExpiresAt": { "type": "string", "format": "date-time" },
-            "shippedAt": { "type": "string", "format": "date-time" }
+            "description": "Unique identifier for the job."
+          },
+          "customerId": {
+            "type": "string",
+            "description": "ID of the customer who created the job."
+          },
+          "workerId": {
+              "type": "string",
+              "description": "ID of the worker assigned to the job."
+          },
+          "problem_image_url": {
+            "type": "string",
+            "description": "URL of the uploaded problem image."
+          },
+          "completion_image_url": {
+              "type": "string",
+              "description": "URL of the image uploaded by the worker upon completion."
+          },
+          "ai_diagnosis": {
+            "type": "string",
+            "description": "Diagnosis provided by the AI."
+          },
+          "estimated_cost": {
+            "type": "string",
+            "description": "Estimated cost provided by the AI."
+          },
+          "final_cost": {
+              "type": "number",
+              "description": "The final agreed-upon cost for the job."
+          },
+          "paymentId": {
+              "type": "string",
+              "description": "ID of the payment transaction from the payment gateway."
+          },
+          "paymentStatus": {
+              "type": "string",
+              "enum": ["pending", "held_in_escrow", "paid_to_worker", "refunded"],
+              "description": "The status of the payment."
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the job.",
+            "enum": ["pending_diagnosis", "awaiting_payment", "worker_assigned", "in_progress", "pending_confirmation", "completed", "disputed", "cancelled"]
+          },
+          "otp": {
+            "type": "string",
+            "description": "A one-time password sent to the user to verify the start of the job."
+          },
+          "platformFee": {
+            "type": "number",
+            "description": "Platform fee charged for the job."
+          },
+          "gst": {
+            "type": "number",
+            "description": "GST applied to the job."
+          },
+          "workerPayout": {
+            "type": "number",
+            "description": "Amount paid out to the worker."
+          },
+          "completedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Timestamp of when the job was marked as completed."
+          },
+          "rating": {
+            "type": "number",
+            "description": "The star rating (1-5) given by the customer upon job completion."
+          },
+          "reviewText": {
+            "type": "string",
+            "description": "The written review or comment from the customer."
+          }
         },
-        "required": ["dealId", "productId", "sellerId", "buyerId", "totalPrice", "status"]
-    }
-  },
-  "auth": {
-    "providers": [
-      "password",
-      "anonymous",
-      "phone",
-      "google.com"
-    ]
-  },
-  "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": { "$ref": "#/backend/entities/User" },
-          "description": "Stores user profiles."
+        "required": ["jobId", "customerId", "status"]
+      },
+      "Worker": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Worker",
+        "type": "object",
+        "description": "Represents a service worker.",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "description": "Firebase Authentication user ID."
+          },
+          "workerId": {
+            "type": "string",
+            "description": "Unique identifier for the worker (same as their uid)."
+          },
+          "skills": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of worker's skills (e.g., plumber, electrician)."
+          },
+          "rating": {
+            "type": "number",
+            "description": "Average rating of the worker."
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": { "type": "number" },
+              "longitude": { "type": "number" }
+            },
+            "description": "Geographical location of the worker."
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether the worker is verified by an admin."
+          },
+          "bankDetails": {
+              "type": "object",
+              "description": "Bank account details for payouts.",
+              "properties": {
+                  "accountNumber": { "type": "string" },
+                  "ifscCode": { "type": "string" },
+                  "accountHolderName": { "type": "string"},
+                  "upiId": { "type": "string", "description": "Worker's UPI ID for direct payments." }
+              }
+          },
+          "referredBy": {
+              "type": "string",
+              "description": "The ID of the user or worker who referred this worker."
+          },
+          "walletBalance": {
+              "type": "number",
+              "description": "The balance of referral earnings for the worker."
+          },
+          "certificationsUploaded": {
+              "type": "boolean",
+              "description": "Indicates if the worker has uploaded professional certifications."
+          },
+          "shopLicenseUploaded": {
+              "type": "boolean",
+              "description": "Indicates if the worker has uploaded a shop/establishment license."
+          },
+          "successfulOrders": {
+              "type": "number",
+              "description": "The total number of successfully completed orders."
+          },
+          "portfolioImageUrls": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "URLs of images for the worker's portfolio."
+          },
+          "shopPhotoUrl": {
+            "type": "string",
+            "description": "URL of the worker's shop, visiting card, or certificate photo."
+          },
+          "bio": {
+            "type": "string",
+            "description": "A short bio or description written by the worker."
+          }
+        },
+        "required": ["uid", "workerId", "isVerified"]
+      },
+      "Health": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Health",
+        "type": "object",
+        "description": "Stores appliance health and AMC data for a user.",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "ID of the user this record belongs to."
+          },
+          "appliance_name": {
+            "type": "string",
+            "description": "Name of the appliance (e.g., AC, Fridge)."
+          },
+          "last_service_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Last service date of the appliance."
+          },
+          "next_service_due_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Next scheduled service date."
+          },
+          "amc_status": {
+              "type": "string",
+              "enum": ["active", "inactive"],
+              "description": "Status of the Annual Maintenance Contract."
+          }
+        },
+        "required": ["userId", "appliance_name"]
+      },
+      "Tool": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Tool",
+        "type": "object",
+        "description": "Represents a tool available for rent.",
+        "properties": {
+          "toolId": { "type": "string" },
+          "ownerId": { "type": "string", "description": "The worker ID of the tool owner." },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "rental_price_per_day": { "type": "number" },
+          "is_available": { "type": "boolean" },
+          "imageUrl": { "type": "string", "description": "URL of the tool's image." },
+          "location": { "type": "string", "description": "Location of the tool owner." },
+          "deposit": { "type": "number", "description": "Security deposit amount for the tool." }
+        },
+        "required": ["toolId", "ownerId", "name", "rental_price_per_day"]
+      },
+      "Rental": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Rental",
+        "type": "object",
+        "description": "Represents a tool rental transaction.",
+        "properties": {
+          "rentalId": { "type": "string" },
+          "toolId": { "type": "string" },
+          "renterId": { "type": "string", "description": "The user ID of the person renting the tool." },
+          "ownerId": { "type": "string", "description": "The worker ID of the tool owner." },
+          "startDate": { "type": "string", "format": "date-time" },
+          "endDate": { "type": "string", "format": "date-time" },
+          "totalCost": { "type": "number", "description": "Total calculated cost for the rental period." },
+          "status": { "type": "string", "enum": ["requested", "accepted", "payment_pending", "active", "completed", "cancelled", "disputed"] }
+        },
+        "required": ["rentalId", "toolId", "renterId", "ownerId", "startDate", "totalCost"]
+      },
+      "Transaction": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Transaction",
+        "type": "object",
+        "description": "Represents a single financial transaction in a user's or worker's wallet.",
+        "properties": {
+          "transactionId": { "type": "string" },
+          "userId": { "type": "string", "description": "The ID of the user/worker who this transaction belongs to." },
+          "amount": { "type": "number" },
+          "type": { "type": "string", "enum": ["referral_commission", "payout", "refund", "platform_fee", "tax", "admin_withdrawal"] },
+          "status": { "type": "string", "enum": ["pending", "processed", "failed"], "description": "The status of the payout transaction, managed by the admin."},
+          "sourceJobId": { "type": "string", "description": "The job, deal, or rental ID that triggered this transaction." },
+          "sourceType": { "type": "string", "enum": ["job", "deal", "rental"], "description": "The type of source that generated the transaction." },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "jobCompletedAt": { "type": "string", "format": "date-time", "description": "Timestamp for when the source job was completed, used for payout rules."}
+        },
+        "required": ["transactionId", "userId", "amount", "type"]
+      },
+      "SOSAlert": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "SOSAlert",
+        "type": "object",
+        "description": "Represents an emergency SOS alert.",
+        "properties": {
+          "alertId": { "type": "string" },
+          "userId": { "type": "string", "description": "The ID of the user/worker who triggered the alert." },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": { "type": "number" },
+              "longitude": { "type": "number" }
+            },
+            "description": "Geographical location where the alert was triggered."
+          },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "status": { "type": "string", "enum": ["active", "resolved"] },
+          "audio_url": { "type": "string", "description": "URL of the background audio recording."}
+        },
+        "required": ["alertId", "userId", "location", "timestamp", "status"]
+      },
+      "AppSettings": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "App Settings",
+        "type": "object",
+        "description": "Stores global app settings, including maintenance mode status.",
+        "properties": {
+          "isMaintenanceMode": {
+            "type": "boolean",
+            "description": "When true, the app will be locked for regular users, showing only a maintenance page."
+          },
+          "lastUpdated": { "type": "string", "format": "date-time" }
         }
       },
-      {
-        "path": "/jobs/{jobId}",
-        "definition": {
-          "entityName": "Job",
-          "schema": { "$ref": "#/backend/entities/Job" },
-          "description": "Stores details of all jobs."
-        }
+      "Banner": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Banner",
+        "type": "object",
+        "description": "Represents a single rotating banner slide on the home page.",
+        "properties": {
+          "title": { "type": "string" },
+          "subtitle": { "type": "string" },
+          "imageUrl": { "type": "string", "description": "URL of the banner's background image." },
+          "link": { "type": "string", "description": "The destination URL when the banner is clicked." }
+        },
+        "required": ["title", "subtitle", "imageUrl", "link"]
       },
-      {
-        "path": "/workers/{workerId}",
-        "definition": {
-          "entityName": "Worker",
-          "schema": { "$ref": "#/backend/entities/Worker" },
-          "description": "Stores public profiles for verified workers."
-        }
+      "LegalAgreement": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Legal Agreement",
+        "type": "object",
+        "description": "Represents a legally binding digital agreement for a deal.",
+        "properties": {
+          "agreementId": { "type": "string", "description": "Unique ID for the agreement." },
+          "dealId": { "type": "string", "description": "The associated Deal ID." },
+          "buyerId": { "type": "string" },
+          "sellerId": { "type": "string" },
+          "buyerName": { "type": "string" },
+          "sellerName": { "type": "string" },
+          "itemName": { "type": "string" },
+          "itemCondition": { "type": "string" },
+          "finalPrice": { "type": "number" },
+          "status": { "type": "string", "enum": ["active", "completed"] },
+          "createdAt": { "type": "string", "format": "date-time", "description": "Firestore Timestamp of when the agreement was created." }
+        },
+        "required": ["agreementId", "dealId", "buyerId", "sellerId", "itemName", "finalPrice", "status", "createdAt"]
       },
-      {
-        "path": "/health/{healthId}",
-        "definition": {
-          "entityName": "Health",
-          "schema": { "$ref": "#/backend/entities/Health" },
-          "description": "Stores appliance health and AMC data for users."
-        }
+      "Product": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Product",
+        "type": "object",
+        "description": "Represents a used item for sale in the marketplace.",
+        "properties": {
+          "productId": { "type": "string" },
+          "ownerId": { "type": "string", "description": "The user ID of the seller." },
+          "name": { "type": "string" },
+          "category": { "type": "string", "enum": ["Furniture", "Electronics", "Appliances", "Other"] },
+          "price": { "type": "number" },
+          "description": { "type": "string" },
+          "location": { "type": "string" },
+          "imageUrls": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "videoUrl": { "type": "string", "description": "URL of the product video." },
+          "isReserved": { "type": "boolean", "description": "Whether an advance has been paid to reserve the item." },
+          "isReservedEnabled": { "type": "boolean", "description": "Whether the seller allows reserving the item." },
+          "reservedUntil": { "type": "string", "format": "date-time", "description": "Timestamp until which the product is reserved." },
+          "activeDealId": { "type": "string", "description": "ID of the active deal if the item is reserved or sold." },
+          "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["productId", "ownerId", "name", "category", "price"]
       },
-      {
-        "path": "/tools/{toolId}",
-        "definition": {
-          "entityName": "Tool",
-          "schema": { "$ref": "#/backend/entities/Tool" },
-          "description": "Stores tools available for rent by workers."
-        }
+      "Property": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Property",
+        "type": "object",
+        "description": "Represents a property listing in the marketplace.",
+        "properties": {
+          "propertyId": { "type": "string", "description": "Unique ID for the property." },
+          "ownerId": { "type": "string", "description": "The user ID of the person who listed the property." },
+          "title": { "type": "string", "description": "Title of the listing, e.g., '4 BHK Luxury Suite'." },
+          "location": { "type": "string", "description": "City and area, e.g., 'Worli, Mumbai'." },
+          "geo": {
+            "type": "object",
+            "description": "Geographical coordinates of the property.",
+            "properties": {
+              "latitude": { "type": "number" },
+              "longitude": { "type": "number" }
+            }
+          },
+          "price": { "type": "number", "description": "Price for sale listings, in a numerical format (e.g., 4.20 for crores)." },
+          "priceUnit": { "type": "string", "description": "Unit for the price (e.g., 'Cr'), for sale listings." },
+          "rentAmount": { "type": "number", "description": "The monthly rent amount for a rental property." },
+          "depositAmount": { "type": "number", "description": "The security deposit amount for a rental property." },
+          "agreementYears": { "type": "number", "description": "The duration of the rental agreement in years." },
+          "sqft": { "type": "number" },
+          "parking": { "type": "number" },
+          "imageUrl": { "type": "string" },
+          "videoUrl": { "type": "string", "description": "URL of the property video walkthrough." },
+          "listingType": { "type": "string", "enum": ["sale", "rent"], "description": "Whether the property is for sale or for rent." },
+          "vastuScore": { "type": "number", "description": "Vastu compliance score from 0 to 10." },
+          "verificationStatus": {
+              "type": "string",
+              "enum": ["pending", "verified", "rejected", "review_needed"],
+              "description": "The verification status of the property, managed by admin."
+          },
+          "verificationNotes": {
+              "type": "string",
+              "description": "Notes from the user or admin regarding verification."
+          },
+          "utilityBillUrl": { "type": "string", "description": "URL of the uploaded utility bill." },
+          "taxPaperUrl": { "type": "string", "description": "URL of the uploaded property tax paper." },
+          "aadharUrl": { "type": "string", "description": "URL of the uploaded Aadhar card." },
+          "panUrl": { "type": "string", "description": "URL of the uploaded PAN card." },
+          "certificateUrl": { "type": "string", "description": "URL of the generated verification certificate." },
+          "certificateGeneratedAt": { "type": "string", "format": "date-time", "description": "Timestamp for when the certificate was generated." }
+        },
+        "required": ["propertyId", "ownerId", "title", "location", "sqft", "parking", "listingType", "verificationStatus"]
       },
-      {
-        "path": "/rentals/{rentalId}",
-        "definition": {
-          "entityName": "Rental",
-          "schema": { "$ref": "#/backend/entities/Rental" },
-          "description": "Stores tool rental transactions."
-        }
-      },
-      {
-        "path": "/transactions/{transactionId}",
-        "definition": {
-          "entityName": "Transaction",
-          "schema": { "$ref": "#/backend/entities/Transaction" },
-          "description": "Stores wallet transactions like referral commissions."
-        }
-      },
-      {
-        "path": "/sos_alerts/{alertId}",
-        "definition": {
-          "entityName": "SOSAlert",
-          "schema": { "$ref": "#/backend/entities/SOSAlert" },
-          "description": "Stores emergency SOS alerts."
-        }
-      },
-       {
-        "path": "/app_settings/{docId}",
-        "definition": {
-          "entityName": "AppSettings",
-          "schema": { "$ref": "#/backend/entities/AppSettings" },
-          "description": "Stores global app settings, like maintenance mode. A single document with ID 'global' is expected."
-        }
-      },
-      {
-        "path": "/banners/{bannerId}",
-        "definition": {
-          "entityName": "Banner",
-          "schema": { "$ref": "#/backend/entities/Banner" },
-          "description": "Stores the rotating banners for the home page."
-        }
-      },
-      {
-        "path": "/legal_agreements/{agreementId}",
-        "definition": {
-          "entityName": "LegalAgreement",
-          "schema": { "$ref": "#/backend/entities/LegalAgreement" },
-          "description": "Stores all generated legal agreements for deals."
-        }
-      },
-      {
-        "path": "/products/{productId}",
-        "definition": {
-          "entityName": "Product",
-          "schema": { "$ref": "#/backend/entities/Product" },
-          "description": "Stores used products for sale in the marketplace."
-        }
-      },
-      {
-        "path": "/properties/{propertyId}",
-        "definition": {
-          "entityName": "Property",
-          "schema": { "$ref": "#/backend/entities/Property" },
-          "description": "Stores property listings for the marketplace."
-        }
-      },
-      {
-        "path": "/deals/{dealId}",
-        "definition": {
-          "entityName": "Deal",
-          "schema": { "$ref": "#/backend/entities/Deal" },
-          "description": "Stores all marketplace deals and their statuses."
-        }
+      "Deal": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "title": "Deal",
+          "description": "Represents a marketplace transaction for a product.",
+          "type": "object",
+          "properties": {
+              "dealId": { "type": "string", "description": "Unique ID for the deal." },
+              "productId": { "type": "string" },
+              "sellerId": { "type": "string" },
+              "buyerId": { "type": "string" },
+              "productName": { "type": "string" },
+              "productImage": { "type": "string" },
+              "totalPrice": { "type": "number" },
+              "status": {
+              "type": "string",
+              "enum": ["negotiating", "reserved", "awaiting_shipment_payment", "awaiting_shipment", "shipped", "delivery_confirmed", "completed", "cancelled", "refunded", "disputed"]
+              },
+              "advancePaid": { "type": "number" },
+              "finalPaymentPaid": { "type": "number" },
+              "deliveryMethod": { "type": "string", "enum": ["pickup", "courier"] },
+              "trackingNumber": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" },
+              "reservedAt": { "type": "string", "format": "date-time" },
+              "reservationExpiresAt": { "type": "string", "format": "date-time" },
+              "shippedAt": { "type": "string", "format": "date-time" }
+          },
+          "required": ["dealId", "productId", "sellerId", "buyerId", "totalPrice", "status"]
       }
-    ]
+    },
+    "auth": {
+      "providers": [
+        "password",
+        "anonymous",
+        "phone",
+        "google.com"
+      ]
+    },
+    "firestore": {
+      "structure": [
+        {
+          "path": "/users/{userId}",
+          "definition": {
+            "entityName": "User",
+            "schema": { "$ref": "#/backend/entities/User" },
+            "description": "Stores user profiles."
+          }
+        },
+        {
+          "path": "/jobs/{jobId}",
+          "definition": {
+            "entityName": "Job",
+            "schema": { "$ref": "#/backend/entities/Job" },
+            "description": "Stores details of all jobs."
+          }
+        },
+        {
+          "path": "/workers/{workerId}",
+          "definition": {
+            "entityName": "Worker",
+            "schema": { "$ref": "#/backend/entities/Worker" },
+            "description": "Stores public profiles for verified workers."
+          }
+        },
+        {
+          "path": "/health/{healthId}",
+          "definition": {
+            "entityName": "Health",
+            "schema": { "$ref": "#/backend/entities/Health" },
+            "description": "Stores appliance health and AMC data for users."
+          }
+        },
+        {
+          "path": "/tools/{toolId}",
+          "definition": {
+            "entityName": "Tool",
+            "schema": { "$ref": "#/backend/entities/Tool" },
+            "description": "Stores tools available for rent by workers."
+          }
+        },
+        {
+          "path": "/rentals/{rentalId}",
+          "definition": {
+            "entityName": "Rental",
+            "schema": { "$ref": "#/backend/entities/Rental" },
+            "description": "Stores tool rental transactions."
+          }
+        },
+        {
+          "path": "/transactions/{transactionId}",
+          "definition": {
+            "entityName": "Transaction",
+            "schema": { "$ref": "#/backend/entities/Transaction" },
+            "description": "Stores wallet transactions like referral commissions."
+          }
+        },
+        {
+          "path": "/sos_alerts/{alertId}",
+          "definition": {
+            "entityName": "SOSAlert",
+            "schema": { "$ref": "#/backend/entities/SOSAlert" },
+            "description": "Stores emergency SOS alerts."
+          }
+        },
+         {
+          "path": "/app_settings/{docId}",
+          "definition": {
+            "entityName": "AppSettings",
+            "schema": { "$ref": "#/backend/entities/AppSettings" },
+            "description": "Stores global app settings, like maintenance mode. A single document with ID 'global' is expected."
+          }
+        },
+        {
+          "path": "/banners/{bannerId}",
+          "definition": {
+            "entityName": "Banner",
+            "schema": { "$ref": "#/backend/entities/Banner" },
+            "description": "Stores the rotating banners for the home page."
+          }
+        },
+        {
+          "path": "/legal_agreements/{agreementId}",
+          "definition": {
+            "entityName": "LegalAgreement",
+            "schema": { "$ref": "#/backend/entities/LegalAgreement" },
+            "description": "Stores all generated legal agreements for deals."
+          }
+        },
+        {
+          "path": "/products/{productId}",
+          "definition": {
+            "entityName": "Product",
+            "schema": { "$ref": "#/backend/entities/Product" },
+            "description": "Stores used products for sale in the marketplace."
+          }
+        },
+        {
+          "path": "/properties/{propertyId}",
+          "definition": {
+            "entityName": "Property",
+            "schema": { "$ref": "#/backend/entities/Property" },
+            "description": "Stores property listings for the marketplace."
+          }
+        },
+        {
+          "path": "/deals/{dealId}",
+          "definition": {
+            "entityName": "Deal",
+            "schema": { "$ref": "#/backend/entities/Deal" },
+            "description": "Stores all marketplace deals and their statuses."
+          }
+        }
+      ]
+    }
   }
-}
+  
+      
 
     
