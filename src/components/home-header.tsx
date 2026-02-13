@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Bell, ChevronDown, MapPin, Loader2, AlertCircle } from 'lucide-react';
+import { Bell, ChevronDown, MapPin, Loader2, AlertCircle, LocateFixed } from 'lucide-react';
 import { AppWebSwitch } from './app-web-switch';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import {
@@ -21,16 +21,14 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 
 export function HomeHeader() {
-  const { latitude, longitude, error, isLoading } = useGeolocation();
+  const { latitude, longitude, error, isLoading, fetchLocation } = useGeolocation();
   const [displayLocation, setDisplayLocation] = useState<string>('Detecting Location...');
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [manualLocationInput, setManualLocationInput] = useState('');
   const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
-  const hasGeolocationError = !!error;
-
-
+  
   useEffect(() => {
     const storedLocation = localStorage.getItem('manualLocation');
     if (storedLocation) {
@@ -41,16 +39,17 @@ export function HomeHeader() {
 
     if (!isLoading) {
         if (latitude && longitude) {
-            // In a real app, reverse geocode would be better.
             setDisplayLocation("Near You");
+            setIsLocationModalOpen(false); // Close modal on successful detection
         } else if (error) {
-            // Only open the modal automatically on error (like permission denial)
             setDisplayLocation("Set Location");
-            setIsLocationModalOpen(true);
+            // Automatically open modal only if it's not already open and no location is set
+            if (!localStorage.getItem('manualLocation')) {
+                setIsLocationModalOpen(true);
+            }
         } else {
-            // If no error but also no location, just show "Set Location"
-            // and let the user click to open the modal.
-            setDisplayLocation("Set Location");
+            // This is the initial state before any location is determined
+            setDisplayLocation("Detecting Location...");
         }
     }
   }, [isLoading, latitude, longitude, error]);
@@ -61,7 +60,6 @@ export function HomeHeader() {
       setDisplayLocation(newLocation);
       localStorage.setItem('manualLocation', newLocation);
 
-      // Save location to user's Firebase profile if they are logged in
       if (user && firestore) {
         try {
           const userDocRef = doc(firestore, 'users', user.uid);
@@ -84,6 +82,11 @@ export function HomeHeader() {
       setIsLocationModalOpen(false);
     }
   };
+  
+  const handleLiveLocationClick = () => {
+    toast({ title: 'Detecting live location...' });
+    fetchLocation();
+  };
 
   return (
     <>
@@ -95,7 +98,7 @@ export function HomeHeader() {
               Your Location <ChevronDown className="h-3 w-3" />
             </div>
             <p className="font-bold text-foreground">
-              {isLoading && displayLocation === 'Detecting Location...' ? (
+              {isLoading ? (
                 <span className="flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Detecting...</span>
               ) : (
                 displayLocation
@@ -120,35 +123,47 @@ export function HomeHeader() {
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl text-white">Change Location</DialogTitle>
             <DialogDescription>
-               Enter your area or city to find services near you. This will be saved for future visits.
+               Enter your area or city to find services near you.
             </DialogDescription>
           </DialogHeader>
 
-           {hasGeolocationError && (
+           {error && (
                 <Alert variant="destructive" className="text-left">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Live Location Failed</AlertTitle>
                     <AlertDescription>
-                        To automatically detect your location, please enable location access for this site in your browser settings.
+                        {error} Please enable location access for this site in your browser settings or enter your location manually.
                     </AlertDescription>
                 </Alert>
             )}
 
-          <div className="py-4">
-            <div className="space-y-2">
-              <Label htmlFor="location-input" className="text-white">
-                Enter Location Manually
-              </Label>
-              <Input
-                id="location-input"
-                value={manualLocationInput}
-                onChange={(e) => setManualLocationInput(e.target.value)}
-                placeholder="e.g., Koramangala, Bangalore"
-                className="bg-input border-border-dark text-white"
-                onKeyDown={(e) => e.key === 'Enter' && handleLocationSave()}
-              />
+            <div className="py-4 space-y-4">
+                <Button onClick={handleLiveLocationClick} variant="outline" className="w-full h-12 text-base">
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <LocateFixed className="mr-2 h-4 w-4" />}
+                    Use Live Location
+                </Button>
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">Or</span>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                <Label htmlFor="location-input" className="text-white">
+                    Enter Location Manually
+                </Label>
+                <Input
+                    id="location-input"
+                    value={manualLocationInput}
+                    onChange={(e) => setManualLocationInput(e.target.value)}
+                    placeholder="e.g., Koramangala, Bangalore"
+                    className="bg-input border-border-dark text-white"
+                    onKeyDown={(e) => e.key === 'Enter' && handleLocationSave()}
+                />
+                </div>
             </div>
-          </div>
           <DialogFooter>
             <Button onClick={handleLocationSave} className="w-full">Save Location</Button>
           </DialogFooter>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface GeolocationState {
   latitude: number | null;
@@ -14,40 +14,41 @@ export const useGeolocation = () => {
     latitude: null,
     longitude: null,
     error: null,
-    isLoading: true,
+    isLoading: false, // Start with false, as we might not fetch if manual location exists
   });
 
-  useEffect(() => {
+  const fetchLocation = useCallback(() => {
     if (typeof window === 'undefined' || !navigator.geolocation) {
       setLocation(prev => ({ ...prev, error: 'Geolocation is not supported by your browser.', isLoading: false }));
       return;
     }
 
-    let isMounted = true;
+    setLocation({ latitude: null, longitude: null, error: null, isLoading: true });
 
-    const onSuccess = (position: GeolocationPosition) => {
-      if (isMounted) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
         setLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           error: null,
           isLoading: false,
         });
+        // Clear manual location on successful live detection
+        localStorage.removeItem('manualLocation');
+      },
+      (error) => {
+        setLocation(prev => ({ ...prev, latitude: null, longitude: null, error: error.message, isLoading: false }));
       }
-    };
-
-    const onError = (error: GeolocationPositionError) => {
-      if (isMounted) {
-        setLocation(prev => ({ ...prev, error: error.message, isLoading: false }));
-      }
-    };
-
-    navigator.geolocation.getCurrentPosition(onSuccess, onError);
-
-    return () => {
-      isMounted = false;
-    };
+    );
   }, []);
 
-  return location;
+  // On initial mount, check for manual location or fetch live location
+  useEffect(() => {
+    const storedLocation = localStorage.getItem('manualLocation');
+    if (!storedLocation) {
+        fetchLocation();
+    }
+  }, [fetchLocation]);
+
+  return { ...location, fetchLocation };
 };
