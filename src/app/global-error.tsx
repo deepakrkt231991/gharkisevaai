@@ -25,6 +25,7 @@ export default function GlobalError({
             <RefreshCw className="mr-2 h-4 w-4" />
             App Refresh Karein
           </Button>
+           <p className="mt-6 text-xs text-gray-400">Error: {error.message}</p>
         </div>
       </body>
     </html>

@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -17,18 +16,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser, useFirestore } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 export function HomeHeader() {
   const { latitude, longitude, error, isLoading } = useGeolocation();
-  const [displayLocation, setDisplayLocation] = useState<string>('');
+  const [displayLocation, setDisplayLocation] = useState<string>('Detecting Location...');
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [manualLocationInput, setManualLocationInput] = useState('');
   const { user } = useUser();
   const firestore = useFirestore();
+  const { toast } = useToast();
 
 
   useEffect(() => {
-    // Priority: Manual Location > Geolocation > Fallback
+    // This effect runs once on initial load to set the location
     const storedLocation = localStorage.getItem('manualLocation');
     if (storedLocation) {
       setDisplayLocation(storedLocation);
@@ -36,23 +37,20 @@ export function HomeHeader() {
       return;
     }
 
-    if (isLoading) {
-      setDisplayLocation('Fetching...');
-      return;
+    // If no manual location is stored, decide what to do next.
+    // We will wait for the geolocation hook to finish.
+    if (!isLoading) {
+        if (latitude && longitude) {
+            // In a real app, reverse geocode to get city name.
+            // For now, "Near You" is a good indicator that it worked.
+            setDisplayLocation("Near You");
+        } else {
+            // If geolocation fails or is denied, and no manual location is set, open the modal.
+            setDisplayLocation("Set Location");
+            setIsLocationModalOpen(true);
+        }
     }
-    if (error) {
-      setDisplayLocation("Location Disabled");
-      return;
-    }
-    if (latitude) {
-      // In a real app, you would use reverse geocoding here.
-      // For now, we'll just show a generic "Near You".
-      setDisplayLocation("Near You");
-      return;
-    }
-    
-    setDisplayLocation("New Delhi, India"); // Fallback
-  }, [latitude, error, isLoading]);
+  }, [isLoading, latitude, longitude, error]);
 
   const handleLocationSave = async () => {
     if (manualLocationInput.trim()) {
@@ -60,15 +58,24 @@ export function HomeHeader() {
       setDisplayLocation(newLocation);
       localStorage.setItem('manualLocation', newLocation);
 
-      // Save location to user's Firebase profile
+      // Save location to user's Firebase profile if they are logged in
       if (user && firestore) {
         try {
           const userDocRef = doc(firestore, 'users', user.uid);
           await updateDoc(userDocRef, {
-            address: newLocation, // Using the 'address' field from the User entity
+            address: newLocation,
+          });
+           toast({
+            title: "Location Saved!",
+            description: `Your location has been set to ${newLocation}.`,
           });
         } catch (e) {
           console.error("Failed to save location to profile:", e);
+           toast({
+            title: "Save Failed",
+            description: "Could not save location to your profile.",
+            variant: "destructive"
+          });
         }
       }
       setIsLocationModalOpen(false);
@@ -85,8 +92,8 @@ export function HomeHeader() {
               Your Location <ChevronDown className="h-3 w-3" />
             </div>
             <p className="font-bold text-foreground">
-              {isLoading && displayLocation === 'Fetching...' ? (
-                <span className="flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Fetching...</span>
+              {isLoading && displayLocation === 'Detecting Location...' ? (
+                <span className="flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Detecting...</span>
               ) : (
                 displayLocation
               )}
@@ -110,7 +117,7 @@ export function HomeHeader() {
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl text-white">Change Location</DialogTitle>
             <DialogDescription>
-              Enter your area or city to find services near you.
+              Enter your area or city to find services near you. This will be saved to your profile.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
