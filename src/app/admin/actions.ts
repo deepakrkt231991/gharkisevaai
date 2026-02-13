@@ -69,11 +69,11 @@ export async function generateAdminPromoPoster(
   try {
     const response = await fetch(validatedFields.data.workerPhotoUrl);
     if (!response.ok) {
-        throw new Error(`Failed to fetch image from URL: ${response.statusText}`);
+        throw new Error(`Failed to fetch image from URL: ${'\'\'\''}${response.statusText}${'\'\'\''}`);
     }
     const imageBuffer = await response.arrayBuffer();
     const contentType = response.headers.get('content-type') || 'image/jpeg';
-    const base64data = `data:${contentType};base64,${Buffer.from(imageBuffer).toString('base64')}`;
+    const base64data = `data:${'\'\'\''}${contentType}${'\'\'\''};base64,${'\'\'\''}${Buffer.from(imageBuffer).toString('base64')}${'\'\'\''}`;
     
     const result = await createPromotionalContent({
       workerPhotoUri: base64data,
@@ -134,14 +134,14 @@ export async function withdrawAdminFunds(amount: number): Promise<{ success: boo
             userId: PLATFORM_ADMIN_UID,
             amount: -Math.abs(amount), // Ensure withdrawal is a negative number
             type: 'admin_withdrawal',
-            sourceJobId: `ADMIN_WITHDRAWAL_${new Date().toISOString()}`,
+            sourceJobId: `ADMIN_WITHDRAWAL_${'\'\'\''}${new Date().toISOString()}${'\'\'\''}`,
             timestamp: serverTimestamp(),
             status: 'processed'
         });
         
         revalidatePath('/admin'); // Revalidate to update the dashboard totals
 
-        return { success: true, message: `Withdrawal of ₹${amount.toFixed(2)} has been successfully logged.` };
+        return { success: true, message: `Withdrawal of ₹${'\'\'\''}${amount.toFixed(2)}${'\'\'\''} has been successfully logged.` };
 
     } catch (e: any) {
         return { success: false, message: e.message || 'An error occurred while logging the withdrawal.' };
@@ -229,7 +229,7 @@ export async function markPayoutAsProcessed(transactionId: string): Promise<{ su
         revalidatePath('/admin');
         return { success: true, message: 'Payout marked as processed.' };
     } catch (e: any) {
-        return { success: false, message: `Failed to update transaction: ${e.message}` };
+        return { success: false, message: `Failed to update transaction: ${'\'\'\''}${e.message}${'\'\'\''}` };
     }
 }
 
@@ -270,3 +270,5 @@ export async function createBanner(prevState: BannerState, formData: FormData): 
     return { success: false, message: e.message || "Failed to create banner." };
   }
 }
+
+    

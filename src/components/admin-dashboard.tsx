@@ -11,9 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag, Send, Image as ImageIcon } from "lucide-react";
+import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag, Send, Image as ImageIcon, Edit } from "lucide-react";
 import { useCollection, useDoc, useMemoFirebase } from "@/firebase";
-import { collection, query, where, orderBy, doc } from "firebase/firestore";
+import { collection, query, where, orderBy, doc, updateDoc } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
 import type { SOSAlert, Worker, Transaction, Deal, Property, Banner } from "@/lib/entities";
 import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds, approvePropertyAndGenerateCertificate, rejectProperty, markPayoutAsProcessed, createBanner, type BannerState } from "@/app/admin/actions";
@@ -22,13 +22,15 @@ import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog"
 import { Logo } from "./logo";
 import Image from "next/image";
 
@@ -75,9 +77,65 @@ function StatCard({ title, value, icon, description }: { title: string; value: s
   )
 }
 
+function EditWorkerDialog({ worker }: { worker: Worker & {id: string} }) {
+    const { toast } = useToast();
+    const firestore = useFirestore();
+    const [name, setName] = useState(worker.name || '');
+    const [skills, setSkills] = useState(worker.skills?.join(', ') || '');
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        if (!firestore) {
+            toast({ title: "Error", description: "Firestore not available.", variant: "destructive" });
+            setIsSaving(false);
+            return;
+        }
+        const workerRef = doc(firestore, 'workers', worker.id);
+        try {
+            await updateDoc(workerRef, {
+                name: name,
+                skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+            });
+            toast({ title: "Success", description: "Worker profile updated.", className: "bg-green-600 text-white" });
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message, variant: "destructive" });
+        } finally {
+            setIsSaving(false);
+        }
+    }
+    
+    return (
+        <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+            <DialogTitle>Edit Worker: {worker.name}</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">Name</Label>
+                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="skills" className="text-right">Skills</Label>
+                    <Input id="skills" value={skills} onChange={(e) => setSkills(e.target.value)} className="col-span-3" placeholder="plumber, electrician"/>
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button onClick={handleSave} disabled={isSaving}>
+                         {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                        Save changes
+                    </Button>
+                </DialogClose>
+            </DialogFooter>
+        </DialogContent>
+    )
+}
+
 function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     const handleApprove = () => {
         startTransition(async () => {
@@ -112,20 +170,24 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
 
 
     return (
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
          <Card className="flex flex-col md:flex-row items-center justify-between p-4">
             <div className="flex items-center gap-4 mb-4 md:mb-0">
                 <Avatar className="h-12 w-12">
-                    <AvatarImage src={`https://picsum.photos/seed/${worker.workerId}/150/150`} alt={(worker as any).name} />
-                    <AvatarFallback>{(worker as any).name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={`https://picsum.photos/seed/${worker.workerId}/150/150`} alt={worker.name || ''} />
+                    <AvatarFallback>{worker.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                    <p className="font-semibold">{(worker as any).name}</p>
+                    <p className="font-semibold">{worker.name}</p>
                     <p className="text-sm text-muted-foreground">ID: {worker.workerId}</p>
                     <p className="text-sm font-bold text-primary capitalize">{worker.skills?.join(', ')}</p>
                 </div>
             </div>
             <div className="flex gap-2 mt-4 md:mt-0">
                 <Button variant="outline" onClick={handleViewDocuments} disabled={isPending}>View Documents</Button>
+                <DialogTrigger asChild>
+                    <Button variant="outline" disabled={isPending}><Edit className="mr-2 h-4 w-4"/> Edit</Button>
+                </DialogTrigger>
                 <Button className="bg-green-600 hover:bg-green-700" onClick={handleApprove} disabled={isPending}>
                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4"/>}
                     Approve
@@ -133,6 +195,8 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
                 <Button variant="destructive" onClick={handleReject} disabled={isPending}>Reject</Button>
             </div>
         </Card>
+        <EditWorkerDialog worker={worker} />
+        </Dialog>
     )
 }
 
@@ -735,7 +799,7 @@ export function AdminDashboard() {
                                         <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
                                         <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge></TableCell>
                                         <TableCell className={cn("font-semibold", tx.amount < 0 ? "text-destructive" : "text-green-500")}>
-                                            {tx.amount < 0 ? `- ₹${Math.abs(tx.amount).toFixed(2)}` : `+ ₹${tx.amount.toFixed(2)}`}
+                                            {tx.amount < 0 ? `- ₹${'\'\'\''}${Math.abs(tx.amount).toFixed(2)}${'\'\'\''}` : `+ ₹${'\'\'\''}${tx.amount.toFixed(2)}${'\'\'\''}`}
                                         </TableCell>
                                         <TableCell className="font-mono text-xs capitalize">{tx.sourceType || 'Job'} / {tx.sourceJobId?.substring(0,6)}...</TableCell>
                                         <TableCell><TimeAgo timestamp={tx.timestamp} /></TableCell>
@@ -828,7 +892,7 @@ export function AdminDashboard() {
                     sosAlerts.map((alert) => (
                       <TableRow key={alert.id}>
                         <TableCell className="font-medium font-mono text-xs">{alert.userId}</TableCell>
-                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location.latitude?.toFixed(4)}, ${alert.location.longitude?.toFixed(4)}`} </TableCell>
+                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${'\'\'\''}${alert.location.latitude?.toFixed(4)}${'\'\'\''}, ${'\'\'\''}${alert.location.longitude?.toFixed(4)}${'\'\'\''}`} </TableCell>
                         <TableCell><TimeAgo timestamp={alert.timestamp} /></TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm">View Details</Button>
@@ -874,7 +938,7 @@ export function AdminDashboard() {
                                   <TableCell className="font-mono text-xs">{deal.sellerId}</TableCell>
                                   <TableCell>
                                       <Button asChild variant="outline" size="sm">
-                                         <Link href={`/chat/deal-${deal.id}`}>View Chat</Link>
+                                         <Link href={`/chat/deal-${'\'\'\''}${deal.id}${'\'\'\''}`}>View Chat</Link>
                                       </Button>
                                   </TableCell>
                               </TableRow>
@@ -891,3 +955,5 @@ export function AdminDashboard() {
     </div>
   );
 }
+
+    
