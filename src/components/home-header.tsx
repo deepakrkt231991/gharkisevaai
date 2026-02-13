@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Bell, ChevronDown, MapPin, Loader2 } from 'lucide-react';
+import { Bell, ChevronDown, MapPin, Loader2, AlertCircle } from 'lucide-react';
 import { AppWebSwitch } from './app-web-switch';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import {
@@ -17,6 +17,8 @@ import { Label } from "@/components/ui/label";
 import { useUser, useFirestore } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+
 
 export function HomeHeader() {
   const { latitude, longitude, error, isLoading } = useGeolocation();
@@ -26,10 +28,10 @@ export function HomeHeader() {
   const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const hasGeolocationError = !!error;
 
 
   useEffect(() => {
-    // This effect runs once on initial load to set the location
     const storedLocation = localStorage.getItem('manualLocation');
     if (storedLocation) {
       setDisplayLocation(storedLocation);
@@ -37,17 +39,18 @@ export function HomeHeader() {
       return;
     }
 
-    // If no manual location is stored, decide what to do next.
-    // We will wait for the geolocation hook to finish.
     if (!isLoading) {
         if (latitude && longitude) {
-            // In a real app, reverse geocode to get city name.
-            // For now, "Near You" is a good indicator that it worked.
+            // In a real app, reverse geocode would be better.
             setDisplayLocation("Near You");
-        } else {
-            // If geolocation fails or is denied, and no manual location is set, open the modal.
+        } else if (error) {
+            // Only open the modal automatically on error (like permission denial)
             setDisplayLocation("Set Location");
             setIsLocationModalOpen(true);
+        } else {
+            // If no error but also no location, just show "Set Location"
+            // and let the user click to open the modal.
+            setDisplayLocation("Set Location");
         }
     }
   }, [isLoading, latitude, longitude, error]);
@@ -117,13 +120,24 @@ export function HomeHeader() {
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl text-white">Change Location</DialogTitle>
             <DialogDescription>
-              Enter your area or city to find services near you. This will be saved to your profile.
+               Enter your area or city to find services near you. This will be saved for future visits.
             </DialogDescription>
           </DialogHeader>
+
+           {hasGeolocationError && (
+                <Alert variant="destructive" className="text-left">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Live Location Failed</AlertTitle>
+                    <AlertDescription>
+                        To automatically detect your location, please enable location access for this site in your browser settings.
+                    </AlertDescription>
+                </Alert>
+            )}
+
           <div className="py-4">
             <div className="space-y-2">
               <Label htmlFor="location-input" className="text-white">
-                Enter Location
+                Enter Location Manually
               </Label>
               <Input
                 id="location-input"
