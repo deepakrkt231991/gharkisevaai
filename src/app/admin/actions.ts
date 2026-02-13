@@ -232,3 +232,41 @@ export async function markPayoutAsProcessed(transactionId: string): Promise<{ su
         return { success: false, message: `Failed to update transaction: ${e.message}` };
     }
 }
+
+
+// --- BANNER MANAGEMENT ---
+const BannerSchema = z.object({
+  title: z.string().min(3, "Title is required."),
+  subtitle: z.string().min(3, "Subtitle is required."),
+  imageUrl: z.string().url("Please enter a valid image URL."),
+  link: z.string().url("Please enter a valid destination link."),
+});
+
+export type BannerState = {
+  success: boolean;
+  message: string;
+  errors?: any[];
+};
+
+export async function createBanner(prevState: BannerState, formData: FormData): Promise<BannerState> {
+  const validatedFields = BannerSchema.safeParse({
+    title: formData.get('title'),
+    subtitle: formData.get('subtitle'),
+    imageUrl: formData.get('imageUrl'),
+    link: formData.get('link'),
+  });
+
+  if (!validatedFields.success) {
+    return { success: false, message: "Invalid data provided.", errors: validatedFields.error.flatten().fieldErrors };
+  }
+
+  try {
+    const { firestore } = initializeFirebase();
+    await addDoc(collection(firestore, 'banners'), validatedFields.data);
+    revalidatePath('/'); // For the home page banner
+    revalidatePath('/admin'); // To refresh the banner list in admin
+    return { success: true, message: "Banner created successfully!" };
+  } catch (e: any) {
+    return { success: false, message: e.message || "Failed to create banner." };
+  }
+}

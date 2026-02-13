@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useMemo, useTransition, useState, useEffect } from "react";
+import { useMemo, useTransition, useState, useEffect, useRef } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,12 +11,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag, Send } from "lucide-react";
+import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag, Send, Image as ImageIcon } from "lucide-react";
 import { useCollection, useDoc, useMemoFirebase } from "@/firebase";
 import { collection, query, where, orderBy, doc } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
-import type { SOSAlert, Worker, Transaction, Deal, Property } from "@/lib/entities";
-import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds, approvePropertyAndGenerateCertificate, rejectProperty, markPayoutAsProcessed } from "@/app/admin/actions";
+import type { SOSAlert, Worker, Transaction, Deal, Property, Banner } from "@/lib/entities";
+import { approveWorker, rejectWorker, generateAdminPromoPoster, type PosterState, withdrawAdminFunds, approvePropertyAndGenerateCertificate, rejectProperty, markPayoutAsProcessed, createBanner, type BannerState } from "@/app/admin/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Label } from "./ui/label";
@@ -439,6 +439,89 @@ function WeeklyGrowthReport() {
     )
 }
 
+function BannerManager() {
+    const firestore = useFirestore();
+    const bannersQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return query(collection(firestore, 'banners'));
+    }, [firestore]);
+    const { data: banners, isLoading } = useCollection<Banner>(bannersQuery);
+    const formRef = useRef<HTMLFormElement>(null);
+
+    const initialState: BannerState = { success: false, message: '' };
+    const [state, formAction] = useFormState(createBanner, initialState);
+    const { toast } = useToast();
+    
+    useEffect(() => {
+        if (state.message) {
+            if (state.success) {
+                toast({ title: "Success!", description: state.message, className: "bg-green-600 text-white" });
+                formRef.current?.reset();
+            } else {
+                toast({ title: "Error", description: state.message, variant: "destructive" });
+            }
+        }
+    }, [state, toast]);
+
+    const SubmitButton = () => {
+        const { pending } = useFormStatus();
+        return <Button type="submit" disabled={pending} className="w-full">{pending ? <Loader2 className="animate-spin" /> : 'Add Banner'}</Button>
+    }
+
+    return (
+        <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Add New Banner</CardTitle>
+                    <CardDescription>Add a new promotional banner to the home page carousel.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form ref={formRef} action={formAction} className="space-y-4">
+                        <div className="space-y-1">
+                            <Label htmlFor="title">Banner Title</Label>
+                            <Input id="title" name="title" placeholder="e.g., Diwali Sale" required />
+                        </div>
+                         <div className="space-y-1">
+                            <Label htmlFor="subtitle">Subtitle</Label>
+                            <Input id="subtitle" name="subtitle" placeholder="e.g., Flat 20% off on all services" required />
+                        </div>
+                         <div className="space-y-1">
+                            <Label htmlFor="imageUrl">Image URL</Label>
+                            <Input id="imageUrl" name="imageUrl" type="url" placeholder="https://images.unsplash.com/..." required />
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="link">Destination Link</Label>
+                            <Input id="link" name="link" type="url" placeholder="/explore" defaultValue="/" required />
+                        </div>
+                        <SubmitButton />
+                    </form>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader>
+                    <CardTitle>Current Banners</CardTitle>
+                    <CardDescription>This is a live feed of banners on your home page.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    {isLoading && <p>Loading banners...</p>}
+                    {banners && banners.length > 0 ? (
+                        banners.map((banner, index) => (
+                            <div key={index} className="flex items-center gap-4 p-2 rounded-lg border bg-secondary/50">
+                                <Image src={banner.imageUrl} alt={banner.title} width={80} height={45} className="rounded-md object-cover aspect-video" />
+                                <div>
+                                    <p className="font-semibold">{banner.title}</p>
+                                    <p className="text-xs text-muted-foreground">{banner.subtitle}</p>
+                                    <Link href={banner.link} className="text-xs text-primary hover:underline" target="_blank">{banner.link}</Link>
+                                </div>
+                            </div>
+                        ))
+                    ) : !isLoading && <p className="text-center text-muted-foreground py-8">No banners found.</p>}
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
+
 export function AdminDashboard() {
   const firestore = useFirestore();
 
@@ -546,7 +629,7 @@ export function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="finance" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
            <TabsTrigger value="finance"><IndianRupee className="mr-2 h-4 w-4" /> Finance</TabsTrigger>
            <TabsTrigger value="payouts"><Send className="mr-2 h-4 w-4" /> Payouts</TabsTrigger>
            <TabsTrigger value="verification">
@@ -556,6 +639,7 @@ export function AdminDashboard() {
             )}
           </TabsTrigger>
            <TabsTrigger value="marketing"><Share2 className="mr-2 h-4 w-4" /> Marketing</TabsTrigger>
+           <TabsTrigger value="content"><ImageIcon className="mr-2 h-4 w-4" /> Content</TabsTrigger>
           <TabsTrigger value="sos">
             <AlertTriangle className="mr-2 h-4 w-4" /> SOS Alerts
              {sosAlerts && sosAlerts.length > 0 && (
@@ -712,6 +796,10 @@ export function AdminDashboard() {
 
         <TabsContent value="marketing">
             <MarketingHub />
+        </TabsContent>
+
+        <TabsContent value="content">
+            <BannerManager />
         </TabsContent>
 
         <TabsContent value="sos">
