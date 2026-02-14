@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -160,8 +161,8 @@ export default function FindWorkerPage() {
                             ) : (
                                 <div className="text-center py-16 text-muted-foreground">
                                     <Wrench className="mx-auto h-12 w-12" />
-                                    <h3 className="mt-4 text-lg font-semibold">No Workers Found</h3>
-                                    <p className="mt-1 text-sm">Try adjusting your filters or search terms.</p>
+                                    <h3 className="mt-4 text-lg font-semibold">No workers found in your area yet</h3>
+                                    <p className="mt-1 text-sm">We are expanding our network. Please check back soon or try a different location.</p>
                                 </div>
                             )}
                         </div>

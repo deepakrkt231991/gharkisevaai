@@ -10,7 +10,7 @@ import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRu
 
 import { analyzeDefect, findNearbyWorkers, generateVideo } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -268,11 +268,16 @@ export function DefectAnalyzer() {
           </div>
           
           <Card className="glass-card border-l-4 border-l-primary/80">
-            <CardContent className="p-4">
-                <p className="text-xs text-primary font-bold uppercase tracking-wider">Issue Identified</p>
-                <h3 className="text-2xl font-bold font-headline text-white mt-1">{result?.defect}</h3>
-                <p className="text-sm text-muted-foreground mt-2">{result?.analysisDetails}</p>
-                 <div className="w-28 text-center mt-3">
+            <CardContent className="p-4 space-y-3">
+                <div>
+                    <p className="text-xs text-primary font-bold uppercase tracking-wider">Issue Identified</p>
+                    <h3 className="text-2xl font-bold font-headline text-white mt-1">{result?.defect}</h3>
+                </div>
+                 <div>
+                    <h4 className="text-xs text-muted-foreground font-bold uppercase tracking-wider">AI's Detailed Analysis</h4>
+                    <p className="text-sm text-white/90 mt-1">{result?.analysisDetails}</p>
+                </div>
+                <div className="w-28 text-center pt-2">
                     <p className="text-[10px] font-bold text-green-400/80 tracking-wider">AI CONFIDENCE</p>
                     <Progress value={result?.confidence || 0} className="h-1.5 mt-1 [&>div]:bg-green-400" />
                     <p className="text-xs font-bold text-green-400 mt-0.5">{result?.confidence}%</p>

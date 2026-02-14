@@ -1,4 +1,5 @@
 
+
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
@@ -137,7 +138,7 @@ export function HomeHeader() {
             <div className="py-4 space-y-4">
                 <Button onClick={handleLiveLocationClick} variant="outline" className="w-full h-12 text-base">
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <LocateFixed className="mr-2 h-4 w-4" />}
-                    Use Live Location
+                    Use Live Location (Try Again)
                 </Button>
                 <div className="relative">
                     <div className="absolute inset-0 flex items-center">
@@ -155,7 +156,7 @@ export function HomeHeader() {
                     id="location-input"
                     value={manualLocationInput}
                     onChange={(e) => setManualLocationInput(e.target.value)}
-                    placeholder="e.g., Koramangala, Bangalore"
+                    placeholder="e.g., Kalyan, Mumbai"
                     className="bg-input border-border-dark text-white"
                     onKeyDown={(e) => e.key === 'Enter' && handleLocationSave()}
                 />
