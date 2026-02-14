@@ -799,7 +799,7 @@ export function AdminDashboard() {
                                         <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
                                         <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge></TableCell>
                                         <TableCell className={cn("font-semibold", tx.amount < 0 ? "text-destructive" : "text-green-500")}>
-                                            {tx.amount < 0 ? `- ₹${'\'\'\''}${Math.abs(tx.amount).toFixed(2)}${'\'\'\''}` : `+ ₹${'\'\'\''}${tx.amount.toFixed(2)}${'\'\'\''}`}
+                                            {tx.amount < 0 ? `- ₹${Math.abs(tx.amount).toFixed(2)}` : `+ ₹${tx.amount.toFixed(2)}`}
                                         </TableCell>
                                         <TableCell className="font-mono text-xs capitalize">{tx.sourceType || 'Job'} / {tx.sourceJobId?.substring(0,6)}...</TableCell>
                                         <TableCell><TimeAgo timestamp={tx.timestamp} /></TableCell>
@@ -892,7 +892,7 @@ export function AdminDashboard() {
                     sosAlerts.map((alert) => (
                       <TableRow key={alert.id}>
                         <TableCell className="font-medium font-mono text-xs">{alert.userId}</TableCell>
-                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${'\'\'\''}${alert.location.latitude?.toFixed(4)}${'\'\'\''}, ${'\'\'\''}${alert.location.longitude?.toFixed(4)}${'\'\'\''}`} </TableCell>
+                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location?.latitude?.toFixed(4)}, ${alert.location?.longitude?.toFixed(4)}`} </TableCell>
                         <TableCell><TimeAgo timestamp={alert.timestamp} /></TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm">View Details</Button>
@@ -938,7 +938,7 @@ export function AdminDashboard() {
                                   <TableCell className="font-mono text-xs">{deal.sellerId}</TableCell>
                                   <TableCell>
                                       <Button asChild variant="outline" size="sm">
-                                         <Link href={`/chat/deal-${'\'\'\''}${deal.id}${'\'\'\''}`}>View Chat</Link>
+                                         <Link href={`/chat/deal-${deal.id}`}>View Chat</Link>
                                       </Button>
                                   </TableCell>
                               </TableRow>
@@ -955,7 +955,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-
-    
-
-    

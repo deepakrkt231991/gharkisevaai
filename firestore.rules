@@ -71,7 +71,7 @@ service cloud.firestore {
 
     // --- USER-OWNED COLLECTIONS ---
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null && request.auth.uid == userId || isAdmin();
     }
      match /health/{healthId} {
        // Assuming health data has a 'userId' field
@@ -82,7 +82,7 @@ service cloud.firestore {
     match /transactions/{transactionId} {
         // Admins can get/list any transaction. Users can only get/list their own.
         allow get: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
-        allow list: if isAdmin() || (request.auth != null && 'where' in request.query && request.query.where[0][0] == 'userId' && request.query.where[0][2] == request.auth.uid);
+        allow list: if isAdmin() || (request.query.limit <= 100 && request.auth != null && request.query.get('where', [])[0] == ['userId', '==', request.auth.uid]);
         
         // Writes are disabled from the client, only admin can update.
         allow create: if false;
@@ -93,7 +93,7 @@ service cloud.firestore {
      match /sos_alerts/{alertId} {
         // Admins can get/list all alerts. Users can only access their own.
         allow get: if isAdmin() || (request.auth != null && resource.data.userId == request.auth.uid);
-        allow list: if isAdmin() || (request.auth != null && 'where' in request.query && request.query.where[0][0] == 'userId' && request.query.where[0][2] == request.auth.uid);
+        allow list: if isAdmin() || (request.auth != null && request.query.get('where', [])[0] == ['userId', '==', request.auth.uid]);
 
         // Users can create their own alerts. Admins can update any.
         allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
@@ -129,7 +129,3 @@ service cloud.firestore {
     }
   }
 }
-
-    
-
-    
