@@ -2,6 +2,7 @@
 
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Bell, ChevronDown, MapPin, Loader2, AlertCircle, LocateFixed } from 'lucide-react';
 import { AppWebSwitch } from './app-web-switch';
@@ -23,6 +24,7 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 
 export function HomeHeader() {
+  const router = useRouter();
   const { latitude, longitude, error, isLoading, fetchLocation } = useGeolocation();
   const [displayLocation, setDisplayLocation] = useState<string>('Detecting Location...');
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -54,7 +56,6 @@ export function HomeHeader() {
   const handleLocationSave = async () => {
     if (manualLocationInput.trim()) {
       const newLocation = manualLocationInput.trim();
-      setDisplayLocation(newLocation);
       localStorage.setItem('manualLocation', newLocation);
 
       if (user && firestore) {
@@ -77,6 +78,7 @@ export function HomeHeader() {
         }
       }
       setIsLocationModalOpen(false);
+      router.push('/');
     }
   };
   
@@ -162,8 +164,9 @@ export function HomeHeader() {
                 />
                 </div>
             </div>
-          <DialogFooter>
+          <DialogFooter className="sm:justify-start flex-col sm:flex-col sm:space-x-0 gap-2">
             <Button onClick={handleLocationSave} className="w-full">Save Location</Button>
+            <Button onClick={() => setIsLocationModalOpen(false)} variant="ghost" className="w-full">Skip for now</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
