@@ -792,7 +792,7 @@ export function AdminDashboard() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {transactionsLoading && <TableRow><TableCell colSpan={5} className="text-center">Loading transactions...</TableCell></TableRow>}
+                            {transactionsLoading && <TableRow><TableCell colSpan={5} className="text-center"><Loader2 className="h-6 w-6 animate-spin"/></TableCell></TableRow>}
                             {transactions && transactions.length > 0 ? (
                                 transactions.slice(0, 10).map(tx => (
                                     <TableRow key={tx.id}>
@@ -806,7 +806,7 @@ export function AdminDashboard() {
                                     </TableRow>
                                 ))
                             ) : !transactionsLoading && (
-                                <TableRow><TableCell colSpan={5} className="text-center">No transactions yet.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">No transactions yet.</TableCell></TableRow>
                             )}
                         </TableBody>
                     </Table>
@@ -827,11 +827,10 @@ export function AdminDashboard() {
             <CardContent>
               <div className="space-y-4">
                  {pendingLoading && <div className="text-center p-8 flex items-center justify-center gap-2"><Loader2 className="animate-spin"/> Loading pending verifications...</div>}
-                 {pendingVerifications && pendingVerifications.length > 0 ? (
-                    pendingVerifications.map((p) => (
-                      <WorkerVerificationRow key={p.id} worker={p} />
-                    ))
-                 ) : !pendingLoading && (
+                 {pendingVerifications?.map((p) => (
+                    <WorkerVerificationRow key={p.id} worker={p} />
+                 ))}
+                 {!pendingLoading && !pendingVerifications?.length && (
                     <p className="text-center text-muted-foreground p-8">No pending worker verifications.</p>
                  )}
               </div>
@@ -846,11 +845,10 @@ export function AdminDashboard() {
             <CardContent>
               <div className="space-y-4">
                  {propertiesLoading && <div className="text-center p-8 flex items-center justify-center gap-2"><Loader2 className="animate-spin"/> Loading pending properties...</div>}
-                 {pendingProperties && pendingProperties.length > 0 ? (
-                    pendingProperties.map((p) => (
-                      <PropertyVerificationCard key={p.id} property={p} />
-                    ))
-                 ) : !propertiesLoading && (
+                 {pendingProperties?.map((p) => (
+                    <PropertyVerificationCard key={p.id} property={p} />
+                 ))}
+                 {!propertiesLoading && !pendingProperties?.length && (
                     <p className="text-center text-muted-foreground p-8">No pending property verifications.</p>
                  )}
               </div>
@@ -888,8 +886,7 @@ export function AdminDashboard() {
                       <TableCell colSpan={4} className="text-center flex items-center justify-center gap-2"><Loader2 className="animate-spin"/> Loading alerts...</TableCell>
                     </TableRow>
                   )}
-                  {sosAlerts && sosAlerts.length > 0 ? (
-                    sosAlerts.map((alert) => (
+                  {sosAlerts?.map((alert) => (
                       <TableRow key={alert.id}>
                         <TableCell className="font-medium font-mono text-xs">{alert.userId}</TableCell>
                         <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location?.latitude?.toFixed(4)}, ${alert.location?.longitude?.toFixed(4)}`} </TableCell>
@@ -898,10 +895,10 @@ export function AdminDashboard() {
                           <Button variant="outline" size="sm">View Details</Button>
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : !sosLoading && (
+                    ))}
+                   {!sosLoading && !sosAlerts?.length && (
                      <TableRow>
-                      <TableCell colSpan={4} className="text-center">No active SOS alerts.</TableCell>
+                      <TableCell colSpan={4} className="text-center text-muted-foreground py-8">No active SOS alerts.</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -928,23 +925,22 @@ export function AdminDashboard() {
                       </TableRow>
                   </TableHeader>
                   <TableBody>
-                      {disputesLoading && <TableRow><TableCell colSpan={5} className="text-center">Loading disputes...</TableCell></TableRow>}
-                      {disputedDeals && disputedDeals.length > 0 ? (
-                          disputedDeals.map(deal => (
-                              <TableRow key={deal.id}>
-                                  <TableCell className="font-mono text-xs">{deal.id}</TableCell>
-                                  <TableCell>{deal.productName}</TableCell>
-                                  <TableCell className="font-mono text-xs">{deal.buyerId}</TableCell>
-                                  <TableCell className="font-mono text-xs">{deal.sellerId}</TableCell>
-                                  <TableCell>
-                                      <Button asChild variant="outline" size="sm">
-                                         <Link href={`/chat/deal-${deal.id}`}>View Chat</Link>
-                                      </Button>
-                                  </TableCell>
-                              </TableRow>
-                          ))
-                      ) : !disputesLoading && (
-                          <TableRow><TableCell colSpan={5} className="text-center">No active disputes.</TableCell></TableRow>
+                      {disputesLoading && <TableRow><TableCell colSpan={5} className="text-center"><Loader2 className="animate-spin"/></TableCell></TableRow>}
+                      {disputedDeals?.map(deal => (
+                          <TableRow key={deal.id}>
+                              <TableCell className="font-mono text-xs">{deal.id}</TableCell>
+                              <TableCell>{deal.productName}</TableCell>
+                              <TableCell className="font-mono text-xs">{deal.buyerId}</TableCell>
+                              <TableCell className="font-mono text-xs">{deal.sellerId}</TableCell>
+                              <TableCell>
+                                  <Button asChild variant="outline" size="sm">
+                                     <Link href={`/chat/deal-${deal.id}`}>View Chat</Link>
+                                  </Button>
+                              </TableCell>
+                          </TableRow>
+                      ))}
+                      {!disputesLoading && !disputedDeals?.length && (
+                          <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">No active disputes.</TableCell></TableRow>
                       )}
                   </TableBody>
                </Table>
