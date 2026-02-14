@@ -22,6 +22,51 @@ import { Badge } from './ui/badge';
 import type { AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
 import type { TransformationVideoOutput } from '@/ai/flows/transformation-video-agent';
 
+// Define a max size for the compressed image
+const MAX_IMAGE_SIZE = 1024; // pixels
+
+// Image compression function
+const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = document.createElement('img');
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let { width, height } = img;
+
+                if (width > height) {
+                    if (width > MAX_IMAGE_SIZE) {
+                        height *= MAX_IMAGE_SIZE / width;
+                        width = MAX_IMAGE_SIZE;
+                    }
+                } else {
+                    if (height > MAX_IMAGE_SIZE) {
+                        width *= MAX_IMAGE_SIZE / height;
+                        height = MAX_IMAGE_SIZE;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    return reject(new Error('Could not get canvas context'));
+                }
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Use 'image/jpeg' for compression, 0.7 is a good quality/size balance
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                resolve(dataUrl);
+            };
+            img.onerror = reject;
+            img.src = event.target?.result as string;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+};
+
 
 type Media = {
   dataUrl: string;
@@ -87,8 +132,8 @@ function AnalysisOverlay() {
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden">
             <div className="scan-line"></div>
             <Loader2 className="h-8 w-8 animate-spin text-accent/80" />
-            <p className="font-bold tracking-widest text-accent">LIVE SCAN IN PROGRESS...</p>
-            <p className="text-xs text-muted-foreground">AI is analyzing the issue...</p>
+            <p className="font-bold tracking-widest text-accent">AI IS ANALYZING...</p>
+            <p className="text-xs text-muted-foreground">Please wait while we process the image.</p>
         </div>
     )
 }
@@ -152,17 +197,34 @@ export function DefectAnalyzer() {
     }
   }, [analysisState.success, analysisState.data]);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       handleReset();
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result as string;
-        const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
-        setMedia({ dataUrl, type: mediaType });
-      };
-      reader.readAsDataURL(file);
+      
+      const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+
+      if (mediaType === 'image') {
+          try {
+              const compressedDataUrl = await compressImage(file);
+              setMedia({ dataUrl: compressedDataUrl, type: 'image' });
+          } catch (error) {
+              console.error("Image compression failed:", error);
+              // Fallback to uncompressed if compression fails
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                  setMedia({ dataUrl: reader.result as string, type: 'image' });
+              };
+              reader.readAsDataURL(file);
+          }
+      } else {
+          // For video, we don't compress on client-side for now
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              setMedia({ dataUrl: reader.result as string, type: 'video' });
+          };
+          reader.readAsDataURL(file);
+      }
     }
   };
   
@@ -367,7 +429,8 @@ export function DefectAnalyzer() {
                     type="file"
                     name="imageFile"
                     className="hidden"
-                    accept="image/png, image/jpeg, image/webp, video/mp4, video/quicktime"
+                    accept="image/*"
+                    capture="environment"
                     onChange={handleFileChange}
                  />
                 <AnalysisOverlay />
@@ -411,4 +474,3 @@ export function DefectAnalyzer() {
   );
 }
 
-    
