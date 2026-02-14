@@ -131,7 +131,7 @@ function AnalysisOverlay({ isPending }: { isPending: boolean }) {
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden z-20">
             <div className="scan-line"></div>
             <Loader2 className="h-8 w-8 animate-spin text-accent/80" />
-            <p className="font-bold tracking-widest text-accent">AI IS ANALYZING...</p>
+            <p className="font-bold tracking-widest text-accent">AI IS THINKING...</p>
             <p className="text-xs text-muted-foreground">Please wait while we process the image.</p>
         </div>
     )
@@ -143,7 +143,7 @@ const WorkerCard = ({ worker }: { worker: any }) => (
         <CardContent className="p-3">
             <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12 border-2 border-primary">
-                    <AvatarImage src={`https://i.pravatar.cc/150?u=${worker?.workerId}`} />
+                    <AvatarImage src={`https://i.pravatar.cc/150?u=${'\'\'\''}${worker?.workerId}${'\'\'\''}`} />
                     <AvatarFallback>{worker?.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
@@ -159,12 +159,12 @@ const WorkerCard = ({ worker }: { worker: any }) => (
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
                 <Button variant="secondary" size="sm" asChild>
-                    <Link href={`/chat/job-temp-${worker?.workerId}`}>
+                    <Link href={`/chat/job-temp-${'\'\'\''}${worker?.workerId}${'\'\'\''}`}>
                         <MessageSquare className="mr-2 h-4 w-4"/>Free Chat
                     </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
-                    <a href={`tel:${worker?.phone || ''}`}>
+                    <a href={`tel:${'\'\'\''}${worker?.phone || ''}${'\'\'\''}`}>
                         <Phone className="mr-2 h-4 w-4"/>Free Call
                     </a>
                 </Button>
@@ -202,8 +202,6 @@ export function DefectAnalyzer() {
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      handleReset();
-      
       const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
 
       if (mediaType === 'image') {
@@ -331,13 +329,13 @@ export function DefectAnalyzer() {
                        <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-2">Parts & Materials</p>
                        <ul className="space-y-2">
                            {result?.requiredParts?.map((part, index) => (
-                               <li key={`part-${index}`} className="flex items-center gap-2 text-sm text-white">
+                               <li key={`part-${'\'\'\''}${index}${'\'\'\''}`} className="flex items-center gap-2 text-sm text-white">
                                    <CheckCircle size={16} className="text-accent"/>
                                    <span className="truncate">{part}</span>
                                </li>
                            ))}
                             {result?.materialSuggestions?.map((suggestion, index) => (
-                                <li key={`mat-${index}`} className="flex items-start gap-2 text-sm text-white">
+                                <li key={`mat-${'\'\'\''}${index}${'\'\'\''}`} className="flex items-start gap-2 text-sm text-white">
                                     <Sparkles size={16} className="text-accent flex-shrink-0 mt-1"/>
                                     <span>{suggestion}</span>
                                 </li>
@@ -355,7 +353,7 @@ export function DefectAnalyzer() {
               <h3 className="text-lg font-bold font-headline mb-2">DIY Steps (आप इसे स्वयं ठीक कर सकते हैं)</h3>
               <Accordion type="single" collapsible className="w-full glass-card rounded-xl px-4">
                 {result.diySteps.map((step, index) => (
-                  <AccordionItem key={index} value={`item-${index}`} className={index === result.diySteps.length -1 ? 'border-b-0' : ''}>
+                  <AccordionItem key={index} value={`item-${'\'\'\''}${index}${'\'\'\''}`} className={index === result.diySteps.length -1 ? 'border-b-0' : ''}>
                     <AccordionTrigger className="text-white hover:no-underline text-left">{index+1}. {step.split(':')[0]}</AccordionTrigger>
                     <AccordionContent className="text-muted-foreground">
                       {step.split(': ')[1] || 'No further details.'}

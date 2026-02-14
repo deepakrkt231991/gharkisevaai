@@ -29,17 +29,13 @@ export function HomeHeader() {
   const [displayLocation, setDisplayLocation] = useState<string>('Detecting Location...');
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [manualLocationInput, setManualLocationInput] = useState('');
-  const [isSavingManual, setIsSavingManual] = useState(false);
-  const { user } = useUser();
-  const firestore = useFirestore();
-  const { toast } = useToast();
   
   useEffect(() => {
-    const storedLocation = localStorage.getItem('manualLocation');
+    const storedLocation = localStorage.getItem('userLocation');
     if (storedLocation) {
       setDisplayLocation(storedLocation);
       setManualLocationInput(storedLocation);
-      setIsLocationModalOpen(false);
+      setIsLocationModalOpen(false); // Close modal if location exists
       return; 
     }
 
@@ -52,42 +48,18 @@ export function HomeHeader() {
       setDisplayLocation("Set Location");
       setIsLocationModalOpen(true);
     }
-  }, [isGeoLoading, latitude, longitude, error, isLocationModalOpen]);
+  }, [isGeoLoading, latitude, longitude, error]); // Removed isLocationModalOpen from deps
 
-  const handleLocationSave = async () => {
+  const handleLocationSave = () => {
     if (!manualLocationInput.trim()) return;
-    
-    setIsSavingManual(true);
-    const newLocation = manualLocationInput.trim();
-    localStorage.setItem('manualLocation', newLocation);
-
-    if (user && firestore) {
-      try {
-        const userDocRef = doc(firestore, 'users', user.uid);
-        await updateDoc(userDocRef, {
-          address: newLocation,
-        });
-         toast({
-          title: "Location Saved!",
-          description: `Your location has been set to ${newLocation}.`,
-        });
-      } catch (e) {
-        console.error("Failed to save location to profile:", e);
-         toast({
-          title: "Save Failed",
-          description: "Could not save location to your profile.",
-          variant: "destructive"
-        });
-      }
-    }
-    window.location.href = '/';
+    localStorage.setItem('userLocation', manualLocationInput.trim());
+    window.location.href = '/'; // Force a full page reload to re-evaluate everything
   };
   
   const handleLiveLocationClick = useCallback(() => {
-    localStorage.removeItem('manualLocation');
-    toast({ title: 'Detecting your live location...' });
+    localStorage.removeItem('userLocation');
     fetchLocation();
-  }, [fetchLocation, toast]);
+  }, [fetchLocation]);
 
   return (
     <>
@@ -99,7 +71,7 @@ export function HomeHeader() {
               Your Location <ChevronDown className="h-3 w-3" />
             </div>
             <p className="font-bold text-foreground">
-              {isGeoLoading && !localStorage.getItem('manualLocation') ? ( 
+              {isGeoLoading && !localStorage.getItem('userLocation') ? ( 
                 <span className="flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Detecting...</span>
               ) : (
                 displayLocation
@@ -133,8 +105,9 @@ export function HomeHeader() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Live Location Failed</AlertTitle>
                     <AlertDescription>
-                        {error} To fix this, go to your browser's site settings for this page, find the 'Location' permission, and set it to 'Allow'. Then try again.
+                        {error} Please enable location in your browser settings to use this feature.
                     </AlertDescription>
+                    <Button onClick={handleLiveLocationClick} variant="outline" className="w-full mt-2 border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive">Try Again</Button>
                 </Alert>
             )}
 
@@ -166,8 +139,7 @@ export function HomeHeader() {
                 </div>
             </div>
           <DialogFooter className="sm:justify-start flex-col sm:flex-col sm:space-x-0 gap-2">
-            <Button onClick={handleLocationSave} className="w-full" disabled={isSavingManual || !manualLocationInput.trim()}>
-              {isSavingManual && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button onClick={handleLocationSave} className="w-full" disabled={!manualLocationInput.trim()}>
               Save & Continue
             </Button>
             <Button onClick={() => setIsLocationModalOpen(false)} variant="ghost" className="w-full">Skip for now</Button>

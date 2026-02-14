@@ -34,7 +34,7 @@ export const useGeolocation = () => {
           error: null,
           isLoading: false,
         });
-        localStorage.removeItem('manualLocation');
+        localStorage.removeItem('userLocation');
       },
       (error) => {
         let errorMessage = 'An unknown error occurred.';
@@ -56,7 +56,7 @@ export const useGeolocation = () => {
   }, []);
 
   useEffect(() => {
-    const storedLocation = localStorage.getItem('manualLocation');
+    const storedLocation = localStorage.getItem('userLocation');
     if (storedLocation) {
         // If manual location exists, we are not loading and have no error.
         // We don't have lat/lon, but the display will use the manual string.
