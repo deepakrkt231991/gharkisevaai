@@ -141,7 +141,7 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
         startTransition(async () => {
             const result = await approveWorker(worker.id);
             if(result.success) {
-                toast({ title: "Success", description: `Worker ${worker.name} has been approved.`, className: "bg-green-600 text-white" });
+                toast({ title: "Success", description: `Worker ${worker?.name} has been approved.`, className: "bg-green-600 text-white" });
             } else {
                 toast({ title: "Error", description: result.message, variant: "destructive" });
             }
@@ -150,10 +150,10 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
 
     const handleReject = () => {
          startTransition(async () => {
-            if (confirm(`Are you sure you want to reject and delete the profile for ${worker.name}? This action cannot be undone.`)) {
+            if (confirm(`Are you sure you want to reject and delete the profile for ${worker?.name}? This action cannot be undone.`)) {
                 const result = await rejectWorker(worker.id);
                  if(result.success) {
-                    toast({ title: "Success", description: `Worker ${worker.name} has been rejected.` });
+                    toast({ title: "Success", description: `Worker ${worker?.name} has been rejected.` });
                 } else {
                     toast({ title: "Error", description: result.message, variant: "destructive" });
                 }
@@ -792,12 +792,12 @@ export function AdminDashboard() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {transactionsLoading && <TableRow><TableCell colSpan={5} className="text-center"><Loader2 className="h-6 w-6 animate-spin"/></TableCell></TableRow>}
+                            {transactionsLoading && <TableRow><TableCell colSpan={5} className="text-center"><Loader2 className="mx-auto h-6 w-6 animate-spin"/></TableCell></TableRow>}
                             {transactions && transactions.length > 0 ? (
                                 transactions.slice(0, 10).map(tx => (
                                     <TableRow key={tx.id}>
                                         <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
-                                        <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge></TableCell>
+                                        <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type?.replace('_', ' ')}</Badge></TableCell>
                                         <TableCell className={cn("font-semibold", tx.amount < 0 ? "text-destructive" : "text-green-500")}>
                                             {tx.amount < 0 ? `- ₹${Math.abs(tx.amount).toFixed(2)}` : `+ ₹${tx.amount.toFixed(2)}`}
                                         </TableCell>

@@ -125,9 +125,8 @@ function VideoSubmitButton() {
     )
 }
 
-function AnalysisOverlay() {
-    const { pending } = useFormStatus();
-    if(!pending) return null;
+function AnalysisOverlay({ isPending }: { isPending: boolean }) {
+    if(!isPending) return null;
     return (
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden">
             <div className="scan-line"></div>
@@ -145,11 +144,11 @@ const WorkerCard = ({ worker }: { worker: any }) => (
             <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12 border-2 border-primary">
                     <AvatarImage src={`https://i.pravatar.cc/150?u=${worker.workerId}`} />
-                    <AvatarFallback>{worker.name.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{worker.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                     <h4 className="font-bold text-white">{worker.name}</h4>
-                    <p className="text-xs text-muted-foreground capitalize">{worker.skills.join(', ')}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{worker.skills?.join(', ')}</p>
                     <div className="flex items-center gap-1.5 text-yellow-400 text-xs">
                         <Star className="h-3 w-3 fill-current" />
                         <span className="font-bold text-white">4.8</span>
@@ -183,6 +182,9 @@ export function DefectAnalyzer() {
   const [workers, setWorkers] = useState<any[]>([]);
   const [isLoadingWorkers, setIsLoadingWorkers] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const { pending } = useFormStatus();
   
   useEffect(() => {
     if (analysisState.success && analysisState.data?.recommendedWorkerType) {
@@ -236,9 +238,9 @@ export function DefectAnalyzer() {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    const emptyFormData = new FormData();
-    analysisAction(emptyFormData);
-    videoAction(emptyFormData);
+    // Directly reset the state without needing a form action
+    analysisAction(initialState);
+    videoAction(initialVideoState);
   };
 
   const AnalysisResult = () => {
@@ -399,7 +401,7 @@ export function DefectAnalyzer() {
       </div>
       
       <main className="flex-1 space-y-6 overflow-y-auto p-4 pb-32">
-        <form action={analysisAction}>
+        <form action={analysisAction} ref={formRef}>
            <div className="space-y-4">
               <div
                 className="relative group w-full aspect-video rounded-xl overflow-hidden border-2 border-dashed border-border bg-input/5 flex flex-col items-center justify-center cursor-pointer hover:border-accent scan-glow"
@@ -433,7 +435,7 @@ export function DefectAnalyzer() {
                     capture="environment"
                     onChange={handleFileChange}
                  />
-                <AnalysisOverlay />
+                <AnalysisOverlay isPending={pending}/>
               </div>
 
                <div className="grid w-full items-center gap-1.5">
@@ -473,5 +475,3 @@ export function DefectAnalyzer() {
     </>
   );
 }
-
-

@@ -107,7 +107,7 @@ const TransactionRow = ({ tx }: { tx: Transaction & {id: string} }) => {
                     {isPayout ? <Wrench className="text-primary" /> : <Users className="text-primary" />}
                 </div>
                 <div className="flex-1">
-                    <p className="font-bold text-white capitalize">{tx.type.replace('_', ' ')}</p>
+                    <p className="font-bold text-white capitalize">{tx.type?.replace('_', ' ')}</p>
                     <p className="text-xs text-muted-foreground">Job ID: {tx.sourceJobId?.substring(0, 6)}...</p>
                 </div>
                 <div className="text-right">
@@ -128,7 +128,7 @@ const TransactionRow = ({ tx }: { tx: Transaction & {id: string} }) => {
     );
 }
 
-const EarningsChart = ({ transactions }: { transactions: Transaction[] }) => {
+const EarningsChart = ({ transactions }: { transactions: (Transaction & {id: string})[] }) => {
   const chartData = useMemo(() => {
     const last7Days = Array.from({ length: 7 }).map((_, i) => subDays(new Date(), i));
     
@@ -138,7 +138,7 @@ const EarningsChart = ({ transactions }: { transactions: Transaction[] }) => {
         return acc;
     }, {} as Record<string, { payouts: number, referrals: number }>);
 
-    transactions.forEach(tx => {
+    transactions?.forEach(tx => {
         if (!tx.timestamp) return;
         const txDate = tx.timestamp.toDate();
         const dateString = format(txDate, 'yyyy-MM-dd');
@@ -220,9 +220,10 @@ export function EarningsHub() {
         return transactions.reduce((sum, tx) => sum + tx.amount, 0);
     }, [transactions]);
     
-    if (isUserLoading) {
+    if (isUserLoading || isTransactionsLoading) {
         return (
              <div className="p-4 space-y-6">
+                <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-24 w-full" />
                 <Skeleton className="h-24 w-full" />
@@ -243,17 +244,11 @@ export function EarningsHub() {
                 <h3 className="text-xl font-bold font-headline">Recent Transactions</h3>
                 <Link href="#" className="text-sm font-bold text-primary">See All</Link>
             </div>
-             {isTransactionsLoading && (
-                 <div className="space-y-3">
-                    <Skeleton className="h-20 w-full" />
-                    <Skeleton className="h-20 w-full" />
-                 </div>
-             )}
             {transactions && transactions.length > 0 ? (
                  <div className="space-y-3">
                     {transactions.map((tx) => <TransactionRow key={tx.id} tx={tx} />)}
                 </div>
-            ) : !isTransactionsLoading && (
+            ) : (
                 <p className="text-muted-foreground text-center py-8">No earnings yet. Complete jobs or refer friends to start earning!</p>
             )}
         </div>
