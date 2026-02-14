@@ -14,16 +14,16 @@ export const useGeolocation = () => {
     latitude: null,
     longitude: null,
     error: null,
-    isLoading: false, // Start with false, as we might not fetch if manual location exists
+    isLoading: true, // Start loading immediately to reflect the initial check.
   });
 
   const fetchLocation = useCallback(() => {
     if (typeof window === 'undefined' || !navigator.geolocation) {
-      setLocation(prev => ({ ...prev, error: 'Geolocation is not supported by your browser.', isLoading: false }));
+      setLocation({ latitude: null, longitude: null, error: 'Geolocation is not supported by your browser.', isLoading: false });
       return;
     }
 
-    setLocation({ latitude: null, longitude: null, error: null, isLoading: true });
+    setLocation(prev => ({ ...prev, isLoading: true, error: null }));
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -33,19 +33,34 @@ export const useGeolocation = () => {
           error: null,
           isLoading: false,
         });
-        // Clear manual location on successful live detection
         localStorage.removeItem('manualLocation');
       },
       (error) => {
-        setLocation(prev => ({ ...prev, latitude: null, longitude: null, error: error.message, isLoading: false }));
-      }
+        let errorMessage = 'An unknown error occurred.';
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access was denied. Please enable it in your browser settings.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'The request to get user location timed out.';
+            break;
+        }
+        setLocation({ latitude: null, longitude: null, error: errorMessage, isLoading: false });
+      },
+      { timeout: 10000 } // Add a timeout
     );
   }, []);
 
-  // On initial mount, check for manual location or fetch live location
   useEffect(() => {
     const storedLocation = localStorage.getItem('manualLocation');
-    if (!storedLocation) {
+    if (storedLocation) {
+        // If manual location exists, we are not loading and have no error.
+        // We don't have lat/lon, but the display will use the manual string.
+        setLocation({ latitude: null, longitude: null, error: null, isLoading: false });
+    } else {
         fetchLocation();
     }
   }, [fetchLocation]);

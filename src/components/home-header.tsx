@@ -34,25 +34,21 @@ export function HomeHeader() {
     if (storedLocation) {
       setDisplayLocation(storedLocation);
       setManualLocationInput(storedLocation);
-      return;
+      return; // Early exit if manual location is set
     }
 
-    if (!isLoading) {
-        if (latitude && longitude) {
-            setDisplayLocation("Near You");
-            setIsLocationModalOpen(false); // Close modal on successful detection
-        } else if (error) {
-            setDisplayLocation("Set Location");
-            // Automatically open modal only if it's not already open and no location is set
-            if (!localStorage.getItem('manualLocation')) {
-                setIsLocationModalOpen(true);
-            }
-        } else {
-            // This is the initial state before any location is determined
-            setDisplayLocation("Detecting Location...");
-        }
+    if (isLoading) {
+      setDisplayLocation("Detecting...");
+    } else if (latitude && longitude) {
+      setDisplayLocation("Near You");
+      if(isLocationModalOpen) setIsLocationModalOpen(false); // Close modal on success
+    } else if (error) {
+      setDisplayLocation("Set Location");
+      // If there's an error and no manual location, open the modal.
+      // This is the key part for the user's request.
+      setIsLocationModalOpen(true);
     }
-  }, [isLoading, latitude, longitude, error]);
+  }, [isLoading, latitude, longitude, error, isLocationModalOpen]);
 
   const handleLocationSave = async () => {
     if (manualLocationInput.trim()) {
@@ -84,7 +80,7 @@ export function HomeHeader() {
   };
   
   const handleLiveLocationClick = () => {
-    toast({ title: 'Detecting live location...' });
+    toast({ title: 'Detecting your live location...' });
     fetchLocation();
   };
 
@@ -98,7 +94,7 @@ export function HomeHeader() {
               Your Location <ChevronDown className="h-3 w-3" />
             </div>
             <p className="font-bold text-foreground">
-              {isLoading ? (
+              {isLoading && !localStorage.getItem('manualLocation') ? ( // Show loading only if no manual location
                 <span className="flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Detecting...</span>
               ) : (
                 displayLocation
@@ -132,7 +128,7 @@ export function HomeHeader() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Live Location Failed</AlertTitle>
                     <AlertDescription>
-                        {error} Please enable location access for this site in your browser settings or enter your location manually.
+                        {error}
                     </AlertDescription>
                 </Alert>
             )}
