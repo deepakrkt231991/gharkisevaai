@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dialog"
 import { Logo } from "./logo";
 import Image from "next/image";
+import { Skeleton } from "./ui/skeleton";
 
 // New component to handle client-side time rendering to prevent hydration errors
 const TimeAgo = ({ timestamp }: { timestamp: any }) => {
@@ -62,7 +63,7 @@ const TimeAgo = ({ timestamp }: { timestamp: any }) => {
   return <>{time}</>;
 };
 
-function StatCard({ title, value, icon, description }: { title: string; value: string | number; icon: React.ReactNode, description?: string }) {
+function StatCard({ title, value, icon, description, isLoading }: { title: string; value: string | number; icon: React.ReactNode, description?: string, isLoading?: boolean }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -70,7 +71,7 @@ function StatCard({ title, value, icon, description }: { title: string; value: s
         {icon}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        {isLoading ? <Skeleton className="h-8 w-24" /> : <div className="text-2xl font-bold">{value}</div>}
         {description && <p className="text-xs text-muted-foreground">{description}</p>}
       </CardContent>
     </Card>
@@ -174,13 +175,13 @@ function WorkerVerificationRow({ worker }: { worker: Worker & {id: string} }) {
          <Card className="flex flex-col md:flex-row items-center justify-between p-4">
             <div className="flex items-center gap-4 mb-4 md:mb-0">
                 <Avatar className="h-12 w-12">
-                    <AvatarImage src={`https://picsum.photos/seed/${worker.workerId}/150/150`} alt={worker.name || ''} />
-                    <AvatarFallback>{worker.name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={`https://picsum.photos/seed/${worker?.workerId}/150/150`} alt={worker?.name || ''} />
+                    <AvatarFallback>{worker?.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                    <p className="font-semibold">{worker.name}</p>
-                    <p className="text-sm text-muted-foreground">ID: {worker.workerId}</p>
-                    <p className="text-sm font-bold text-primary capitalize">{worker.skills?.join(', ')}</p>
+                    <p className="font-semibold">{worker?.name}</p>
+                    <p className="text-sm text-muted-foreground">ID: {worker?.workerId}</p>
+                    <p className="text-sm font-bold text-primary capitalize">{worker?.skills?.join(', ')}</p>
                 </div>
             </div>
             <div className="flex gap-2 mt-4 md:mt-0">
@@ -208,7 +209,7 @@ function PropertyVerificationCard({ property }: { property: Property & {id: stri
         startTransition(async () => {
             const result = await approvePropertyAndGenerateCertificate(property.id);
             if(result.success) {
-                toast({ title: "Success", description: `Property ${property.title} approved and certificate generated.`, className: "bg-green-600 text-white" });
+                toast({ title: "Success", description: `Property ${property?.title} approved and certificate generated.`, className: "bg-green-600 text-white" });
             } else {
                 toast({ title: "Error", description: result.message, variant: "destructive" });
             }
@@ -220,7 +221,7 @@ function PropertyVerificationCard({ property }: { property: Property & {id: stri
             if (confirm(`Are you sure you want to reject this property listing?`)) {
                 const result = await rejectProperty(property.id);
                  if(result.success) {
-                    toast({ title: "Success", description: `Property ${property.title} has been rejected.` });
+                    toast({ title: "Success", description: `Property ${property?.title} has been rejected.` });
                 } else {
                     toast({ title: "Error", description: result.message, variant: "destructive" });
                 }
@@ -231,12 +232,12 @@ function PropertyVerificationCard({ property }: { property: Property & {id: stri
     return (
          <Card className="flex flex-col md:flex-row items-start justify-between p-4 gap-4">
             <div className="flex items-start gap-4">
-                <Image src={property.imageUrl || 'https://placehold.co/150x100'} alt={property.title || 'Property Image'} width={150} height={100} className="rounded-md object-cover hidden md:block" />
+                <Image src={property?.imageUrl || 'https://placehold.co/150x100'} alt={property?.title || 'Property Image'} width={150} height={100} className="rounded-md object-cover hidden md:block" />
                 <div>
-                    <p className="font-semibold text-white">{property.title}</p>
-                    <p className="text-sm text-muted-foreground">{property.location}</p>
-                    <p className="text-sm text-muted-foreground">Owner: {property.ownerId.substring(0, 8)}...</p>
-                    <Badge className="mt-2">{property.listingType}</Badge>
+                    <p className="font-semibold text-white">{property?.title}</p>
+                    <p className="text-sm text-muted-foreground">{property?.location}</p>
+                    <p className="text-sm text-muted-foreground">Owner: {property?.ownerId?.substring(0, 8)}...</p>
+                    <Badge className="mt-2">{property?.listingType}</Badge>
                 </div>
             </div>
             <div className="flex flex-col gap-2 w-full md:w-auto">
@@ -290,13 +291,13 @@ function PayoutRow({ transaction }: { transaction: Transaction & { id: string } 
         <TableRow>
             <TableCell>
                 <div className="font-medium">{worker?.name || 'N/A'}</div>
-                <div className="text-xs text-muted-foreground font-mono">{transaction.userId}</div>
+                <div className="text-xs text-muted-foreground font-mono">{transaction?.userId}</div>
             </TableCell>
             <TableCell>
                 <div className="font-medium">{worker?.bankDetails?.upiId || 'Not Provided'}</div>
                 <div className="text-xs text-muted-foreground">UPI ID</div>
             </TableCell>
-            <TableCell className="font-semibold text-lg text-white">₹{transaction.amount.toFixed(2)}</TableCell>
+            <TableCell className="font-semibold text-lg text-white">₹{transaction?.amount.toFixed(2)}</TableCell>
             <TableCell>
                 <Button onClick={handleMarkAsPaid} disabled={isPending} size="sm">
                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Send className="mr-2 h-4 w-4" />}
@@ -424,7 +425,7 @@ function MarketingHub() {
     );
 }
 
-function RevenueWithdrawalCard({ netProfit }: { netProfit: number }) {
+function RevenueWithdrawalCard({ netProfit, isLoading }: { netProfit: number, isLoading: boolean }) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
@@ -453,8 +454,8 @@ function RevenueWithdrawalCard({ netProfit }: { netProfit: number }) {
     <Card className="bg-gray-900/50 border-accent text-white rounded-xl border">
       <CardContent className="p-6 text-center space-y-3">
         <p className="text-sm font-medium text-white/70">TOTAL NET PROFIT (WITHDRAWABLE)</p>
-        <p className="text-4xl font-extrabold text-accent">₹{netProfit.toFixed(2)}</p>
-        <Button onClick={handleWithdraw} disabled={isPending || netProfit < 500} className="w-full max-w-xs mx-auto bg-accent text-accent-foreground hover:bg-accent/90 h-12 text-base font-bold">
+        {isLoading ? <Skeleton className="h-10 w-48 mx-auto" /> : <p className="text-4xl font-extrabold text-accent">₹{netProfit.toFixed(2)}</p>}
+        <Button onClick={handleWithdraw} disabled={isPending || netProfit < 500 || isLoading} className="w-full max-w-xs mx-auto bg-accent text-accent-foreground hover:bg-accent/90 h-12 text-base font-bold">
           {isPending ? <Loader2 className="mr-2 animate-spin" /> : null}
           Withdraw to Bank
         </Button>
@@ -682,6 +683,8 @@ export function AdminDashboard() {
     };
   }, [transactions]);
 
+  const isLoading = transactionsLoading || sosLoading || pendingLoading || propertiesLoading || disputesLoading;
+
   return (
     <div className="space-y-6">
       <div>
@@ -725,34 +728,39 @@ export function AdminDashboard() {
                   value={`₹${workerFee.toFixed(2)}`}
                   description="From 7% service fee"
                   icon={<Users className="h-4 w-4 text-muted-foreground" />}
+                  isLoading={isLoading}
               />
               <StatCard
                   title="Marketplace Income"
                   value={`₹${marketplaceIncome.toFixed(2)}`}
                   description="From used item sales"
                   icon={<ShoppingBag className="h-4 w-4 text-muted-foreground" />}
+                  isLoading={isLoading}
               />
               <StatCard
                   title="Tool Rental Income"
                   value={`₹${toolIncome.toFixed(2)}`}
                   description="From tool rentals"
                   icon={<Hammer className="h-4 w-4 text-muted-foreground" />}
+                  isLoading={isLoading}
               />
                <StatCard
                   title="Home Rent Income"
                   value="₹0.00"
                   description="Feature coming soon"
                   icon={<Home className="h-4 w-4 text-muted-foreground" />}
+                  isLoading={isLoading}
               />
             </div>
             
-             <RevenueWithdrawalCard netProfit={netProfit} />
+             <RevenueWithdrawalCard netProfit={netProfit} isLoading={isLoading} />
              
              <Card>
                 <CardHeader>
                     <CardTitle>Financial Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                   {isLoading ? <Skeleton className="h-24 w-full" /> : <>
                     <div className="flex justify-between items-center text-sm">
                         <p className="text-muted-foreground">Total Platform Fees Earned</p>
                         <p className="font-medium text-green-500">+ ₹{(workerFee + marketplaceIncome + toolIncome).toFixed(2)}</p>
@@ -770,6 +778,7 @@ export function AdminDashboard() {
                         <p>Net Profit</p>
                         <p className="text-lg">₹{netProfit.toFixed(2)}</p>
                     </div>
+                   </>}
                 </CardContent>
              </Card>
       
@@ -888,9 +897,9 @@ export function AdminDashboard() {
                   )}
                   {sosAlerts?.map((alert) => (
                       <TableRow key={alert.id}>
-                        <TableCell className="font-medium font-mono text-xs">{alert.userId}</TableCell>
-                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert.location?.latitude?.toFixed(4)}, ${alert.location?.longitude?.toFixed(4)}`} </TableCell>
-                        <TableCell><TimeAgo timestamp={alert.timestamp} /></TableCell>
+                        <TableCell className="font-medium font-mono text-xs">{alert?.userId}</TableCell>
+                        <TableCell className="flex items-center gap-2"><MapPin size={14}/> {`${alert?.location?.latitude?.toFixed(4)}, ${alert?.location?.longitude?.toFixed(4)}`} </TableCell>
+                        <TableCell><TimeAgo timestamp={alert?.timestamp} /></TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm">View Details</Button>
                         </TableCell>
@@ -928,10 +937,10 @@ export function AdminDashboard() {
                       {disputesLoading && <TableRow><TableCell colSpan={5} className="text-center"><Loader2 className="animate-spin"/></TableCell></TableRow>}
                       {disputedDeals?.map(deal => (
                           <TableRow key={deal.id}>
-                              <TableCell className="font-mono text-xs">{deal.id}</TableCell>
-                              <TableCell>{deal.productName}</TableCell>
-                              <TableCell className="font-mono text-xs">{deal.buyerId}</TableCell>
-                              <TableCell className="font-mono text-xs">{deal.sellerId}</TableCell>
+                              <TableCell className="font-mono text-xs">{deal?.id}</TableCell>
+                              <TableCell>{deal?.productName}</TableCell>
+                              <TableCell className="font-mono text-xs">{deal?.buyerId}</TableCell>
+                              <TableCell className="font-mono text-xs">{deal?.sellerId}</TableCell>
                               <TableCell>
                                   <Button asChild variant="outline" size="sm">
                                      <Link href={`/chat/deal-${deal.id}`}>View Chat</Link>
