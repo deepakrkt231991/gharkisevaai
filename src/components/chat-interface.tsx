@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { useDoc, useCollection, useMemoFirebase, useUser, useFirestore } from '@/firebase';
 import { doc, collection, query, orderBy, serverTimestamp, addDoc, updateDoc } from 'firebase/firestore';
 import type { Job, User as UserEntity, Tool, Rental, Property, Product, Deal } from '@/lib/entities';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
@@ -409,22 +409,24 @@ export function ChatInterface({ chatId }: { chatId: string }) {
 
     // Fetch context document (Job, Tool, Property, Product, Deal, Rental)
     const contextDocRef = useMemoFirebase(() => {
-        if (!firestore || contextLoading || contextType === 'unknown') return null;
+        if (!firestore || contextLoading || contextType === 'unknown' || !user) return null;
         const id = chatId.split('-').slice(1).join('-');
         let collectionName = contextType + 's';
         if (contextType === 'property') collectionName = 'properties';
 
         return doc(firestore, collectionName, id);
-    }, [firestore, chatId, contextType, contextLoading]);
+    }, [firestore, chatId, contextType, contextLoading, user]);
 
     const { data: fetchedContextDoc, isLoading: isContextDocLoading } = useDoc<ContextDoc>(contextDocRef);
     
     useEffect(() => {
-        setContextDoc(fetchedContextDoc);
+        if (fetchedContextDoc) {
+            setContextDoc(fetchedContextDoc);
+        }
     },[fetchedContextDoc])
     
     // Determine the "other user" from the context document
-    const otherUserId = useMemoFirebase(() => {
+    const otherUserId = useMemo(() => {
         if (!contextDoc || !user) return null;
         switch(contextType) {
             case 'job': return (contextDoc as Job).workerId;
@@ -436,8 +438,6 @@ export function ChatInterface({ chatId }: { chatId: string }) {
             case 'property':
             case 'product':
                 const ownerId = (contextDoc as any).ownerId;
-                // Pre-deal chat, so we need a buyer. This is a simplification.
-                // In a real app, you might create a chat document with both participants.
                 return user.uid === ownerId ? null : ownerId; 
             default: return null;
         }
@@ -455,10 +455,6 @@ export function ChatInterface({ chatId }: { chatId: string }) {
         }
     }, [fetchedOtherUser]);
 
-    const initialMessages = [
-        { id: 1, sender: otherUserId || 'other', text: "Hello! I'm interested in this. Is it available?", time: '10:14 AM' },
-        { id: 2, sender: user?.uid || 'user', text: "Yes, it is! When would you like to pick it up?", time: '10:15 AM' },
-    ];
     
     const isLoading = isUserLoading || isContextDocLoading || (otherUserId && isOtherUserLoading) || contextLoading;
 
@@ -541,15 +537,11 @@ export function ChatInterface({ chatId }: { chatId: string }) {
                 <PaymentSafetyNotice />
 
                 <div className="text-center text-xs text-muted-foreground font-medium">TODAY</div>
-                {initialMessages.map((msg) => (
-                    <div key={msg.id} className={`flex flex-col ${msg.sender === user?.uid ? 'items-end' : 'items-start'}`}>
-                        {msg.sender !== user?.uid && <p className="text-sm text-muted-foreground mb-1">{otherUser?.displayName}</p>}
-                        <div className={`max-w-xs lg:max-w-md p-3 rounded-2xl ${msg.sender === user?.uid ? 'bg-primary text-white rounded-br-none' : 'bg-card rounded-bl-none'}`}>
-                           <p>{msg.text}</p>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground mt-1 px-1">{msg.time}</p>
-                    </div>
-                ))}
+                {/* Chat messages would be rendered here from a collection */}
+                 <div className="text-center py-10 text-muted-foreground">
+                    <p>Start the conversation!</p>
+                </div>
+
             </main>
 
             <footer className="sticky bottom-0 z-10 p-4 bg-background/80 backdrop-blur-md border-t border-border space-y-3">

@@ -111,7 +111,7 @@ const TransactionRow = ({ tx }: { tx: Transaction & {id: string} }) => {
                     <p className="text-xs text-muted-foreground">Job ID: {tx.sourceJobId?.substring(0, 6)}...</p>
                 </div>
                 <div className="text-right">
-                    <p className="font-bold text-white text-lg">+ ₹{tx.amount.toFixed(2)}</p>
+                    <p className="font-bold text-white text-lg">+ ₹{(tx.amount || 0).toFixed(2)}</p>
                     {isPayout && (
                         isWithdrawalReady ? (
                              <Button size="sm" className="h-7 mt-1 text-xs" onClick={handleWithdraw} disabled={isWithdrawing}>
@@ -128,8 +128,9 @@ const TransactionRow = ({ tx }: { tx: Transaction & {id: string} }) => {
     );
 }
 
-const EarningsChart = ({ transactions }: { transactions: (Transaction & {id: string})[] }) => {
+const EarningsChart = ({ transactions }: { transactions: (Transaction & {id: string})[] | null }) => {
   const chartData = useMemo(() => {
+    if (!transactions) return [];
     const last7Days = Array.from({ length: 7 }).map((_, i) => subDays(new Date(), i));
     
     const dailyTotals = last7Days.reduce((acc, date) => {
@@ -145,9 +146,9 @@ const EarningsChart = ({ transactions }: { transactions: (Transaction & {id: str
         
         if (dailyTotals.hasOwnProperty(dateString)) {
             if (tx.type === 'payout') {
-                dailyTotals[dateString].payouts += tx.amount;
+                dailyTotals[dateString].payouts += tx.amount || 0;
             } else if (tx.type === 'referral_commission') {
-                dailyTotals[dateString].referrals += tx.amount;
+                dailyTotals[dateString].referrals += tx.amount || 0;
             }
         }
     });
@@ -217,13 +218,13 @@ export function EarningsHub() {
 
     const totalEarnings = useMemo(() => {
         if (!transactions) return 0;
-        return transactions.reduce((sum, tx) => sum + tx.amount, 0);
+        return transactions.reduce((sum, tx) => sum + (tx.amount || 0), 0);
     }, [transactions]);
     
     if (isUserLoading || isTransactionsLoading) {
         return (
              <div className="p-4 space-y-6">
-                <Skeleton className="h-12 w-full" />
+                <HubHeader />
                 <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-24 w-full" />
                 <Skeleton className="h-24 w-full" />
@@ -237,7 +238,7 @@ export function EarningsHub() {
       <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-24">
         <TotalIncomeCard totalEarnings={totalEarnings} />
         
-        <EarningsChart transactions={transactions || []} />
+        <EarningsChart transactions={transactions} />
         
          <div className="space-y-4">
              <div className="flex justify-between items-center">

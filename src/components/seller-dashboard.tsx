@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
@@ -111,7 +112,7 @@ export function SellerDashboard() {
     if (isUserLoading || isPropertiesLoading) {
         return (
              <div className="p-4 space-y-6">
-                <Skeleton className="h-12 w-full" />
+                <HubHeader />
                 <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-24 w-full" />
              </div>
@@ -136,12 +137,12 @@ export function SellerDashboard() {
                      <Card key={prop.id} className="glass-card">
                         <CardContent className="p-4 flex justify-between items-center">
                             <div>
-                                <h3 className="font-semibold text-white">{prop.title}</h3>
-                                <p className="text-xs text-muted-foreground">{prop.location}</p>
+                                <h3 className="font-semibold text-white">{prop?.title}</h3>
+                                <p className="text-xs text-muted-foreground">{prop?.location}</p>
                             </div>
                             <div className="flex items-center gap-2 text-yellow-400 text-xs font-bold">
                                 <Loader2 className="animate-spin h-4 w-4" />
-                                {prop.verificationStatus.replace('_', ' ').toUpperCase()}
+                                {prop?.verificationStatus?.replace('_', ' ').toUpperCase()}
                             </div>
                         </CardContent>
                      </Card>

@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag, Send, Image as ImageIcon, Edit } from "lucide-react";
-import { useCollection, useDoc, useMemoFirebase } from "@/firebase";
+import { useCollection, useDoc, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, where, orderBy, doc, updateDoc } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
 import type { SOSAlert, Worker, Transaction, Deal, Property, Banner } from "@/lib/entities";
@@ -81,8 +81,8 @@ function StatCard({ title, value, icon, description, isLoading }: { title: strin
 function EditWorkerDialog({ worker }: { worker: Worker & {id: string} }) {
     const { toast } = useToast();
     const firestore = useFirestore();
-    const [name, setName] = useState(worker.name || '');
-    const [skills, setSkills] = useState(worker.skills?.join(', ') || '');
+    const [name, setName] = useState(worker?.name || '');
+    const [skills, setSkills] = useState(worker?.skills?.join(', ') || '');
     const [isSaving, setIsSaving] = useState(false);
 
     const handleSave = async () => {
@@ -109,7 +109,7 @@ function EditWorkerDialog({ worker }: { worker: Worker & {id: string} }) {
     return (
         <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-            <DialogTitle>Edit Worker: {worker.name}</DialogTitle>
+            <DialogTitle>Edit Worker: {worker?.name}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -297,7 +297,7 @@ function PayoutRow({ transaction }: { transaction: Transaction & { id: string } 
                 <div className="font-medium">{worker?.bankDetails?.upiId || 'Not Provided'}</div>
                 <div className="text-xs text-muted-foreground">UPI ID</div>
             </TableCell>
-            <TableCell className="font-semibold text-lg text-white">₹{transaction?.amount.toFixed(2)}</TableCell>
+            <TableCell className="font-semibold text-lg text-white">₹{(transaction?.amount || 0).toFixed(2)}</TableCell>
             <TableCell>
                 <Button onClick={handleMarkAsPaid} disabled={isPending} size="sm">
                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Send className="mr-2 h-4 w-4" />}
@@ -310,10 +310,11 @@ function PayoutRow({ transaction }: { transaction: Transaction & { id: string } 
 
 function PayoutsTab() {
     const firestore = useFirestore();
+    const { user } = useUser();
     const pendingPayoutsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
+        if (!firestore || !user) return null;
         return query(collection(firestore, 'transactions'), where('type', '==', 'payout'), where('status', '==', 'pending'));
-    }, [firestore]);
+    }, [firestore, user]);
 
     const { data: pendingPayouts, isLoading } = useCollection<Transaction>(pendingPayoutsQuery);
     
@@ -506,10 +507,11 @@ function WeeklyGrowthReport() {
 
 function BannerManager() {
     const firestore = useFirestore();
+    const { user } = useUser();
     const bannersQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
+        if (!firestore || !user) return null;
         return query(collection(firestore, 'banners'));
-    }, [firestore]);
+    }, [firestore, user]);
     const { data: banners, isLoading } = useCollection<Banner>(bannersQuery);
     const formRef = useRef<HTMLFormElement>(null);
 
@@ -588,32 +590,33 @@ function BannerManager() {
 }
 
 export function AdminDashboard() {
+  const { user } = useUser();
   const firestore = useFirestore();
 
   const sosAlertsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return query(collection(firestore, 'sos_alerts'), where('status', '==', 'active'));
-  }, [firestore]);
+  }, [firestore, user]);
   
   const pendingVerificationsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return query(collection(firestore, 'workers'), where('isVerified', '==', false));
-  }, [firestore]);
+  }, [firestore, user]);
 
   const pendingPropertiesQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return query(collection(firestore, 'properties'), where('verificationStatus', 'in', ['pending', 'review_needed']));
-  }, [firestore]);
+  }, [firestore, user]);
 
   const transactionsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return query(collection(firestore, 'transactions'), orderBy('timestamp', 'desc'));
-  }, [firestore]);
+  }, [firestore, user]);
 
   const disputedDealsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return query(collection(firestore, 'deals'), where('status', '==', 'disputed'));
-  }, [firestore]);
+  }, [firestore, user]);
 
   const { data: sosAlerts, isLoading: sosLoading } = useCollection<SOSAlert>(sosAlertsQuery);
   const { data: pendingVerifications, isLoading: pendingLoading } = useCollection<Worker>(pendingVerificationsQuery);
@@ -807,8 +810,8 @@ export function AdminDashboard() {
                                     <TableRow key={tx.id}>
                                         <TableCell className="font-mono text-xs">{tx.userId}</TableCell>
                                         <TableCell><Badge variant={tx.type === 'referral_commission' ? 'default' : 'secondary'}>{tx.type?.replace('_', ' ')}</Badge></TableCell>
-                                        <TableCell className={cn("font-semibold", tx.amount < 0 ? "text-destructive" : "text-green-500")}>
-                                            {tx.amount < 0 ? `- ₹${Math.abs(tx.amount).toFixed(2)}` : `+ ₹${tx.amount.toFixed(2)}`}
+                                        <TableCell className={cn("font-semibold", (tx.amount || 0) < 0 ? "text-destructive" : "text-green-500")}>
+                                            {(tx.amount || 0) < 0 ? `- ₹${Math.abs(tx.amount || 0).toFixed(2)}` : `+ ₹${(tx.amount || 0).toFixed(2)}`}
                                         </TableCell>
                                         <TableCell className="font-mono text-xs capitalize">{tx.sourceType || 'Job'} / {tx.sourceJobId?.substring(0,6)}...</TableCell>
                                         <TableCell><TimeAgo timestamp={tx.timestamp} /></TableCell>

@@ -1,5 +1,6 @@
+
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Bell, ChevronDown, MapPin, Loader2, AlertCircle, LocateFixed } from 'lucide-react';
 import { AppWebSwitch } from './app-web-switch';
@@ -45,7 +46,6 @@ export function HomeHeader() {
     } else if (error) {
       setDisplayLocation("Set Location");
       // If there's an error and no manual location, open the modal.
-      // This is the key part for the user's request.
       setIsLocationModalOpen(true);
     }
   }, [isLoading, latitude, longitude, error, isLocationModalOpen]);
@@ -79,10 +79,10 @@ export function HomeHeader() {
     }
   };
   
-  const handleLiveLocationClick = () => {
+  const handleLiveLocationClick = useCallback(() => {
     toast({ title: 'Detecting your live location...' });
     fetchLocation();
-  };
+  }, [fetchLocation, toast]);
 
   return (
     <>
@@ -128,7 +128,7 @@ export function HomeHeader() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Live Location Failed</AlertTitle>
                     <AlertDescription>
-                        {error}
+                        {error} Please go to your browser's site settings for this page and set Location to 'Allow', then try again.
                     </AlertDescription>
                 </Alert>
             )}

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useMemo } from 'react';
@@ -44,11 +45,11 @@ const TransactionRow = ({ tx }: { tx: Transaction & {id: string} }) => {
                     {isPayout ? <Wrench className="text-primary" /> : <Users className="text-primary" />}
                 </div>
                 <div className="flex-1">
-                    <p className="font-bold text-white capitalize">{tx.type.replace('_', ' ')}</p>
+                    <p className="font-bold text-white capitalize">{tx.type?.replace('_', ' ')}</p>
                     <p className="text-xs text-muted-foreground">Job ID: {tx.sourceJobId?.substring(0, 6)}...</p>
                 </div>
                 <div className="text-right">
-                    <p className="font-bold text-green-400 text-lg">+ ₹{tx.amount.toFixed(2)}</p>
+                    <p className="font-bold text-green-400 text-lg">+ ₹{(tx.amount || 0).toFixed(2)}</p>
                 </div>
             </CardContent>
         </Card>
@@ -79,7 +80,7 @@ export function WorkerDashboard() {
 
     const { totalEarnings, smartScore } = useMemo(() => {
         if (!transactions || !workerProfile) return { totalEarnings: 0, smartScore: 0 };
-        const earnings = transactions.reduce((sum, tx) => (tx.type === 'payout' || tx.type === 'referral_commission' ? sum + tx.amount : sum), 0);
+        const earnings = transactions.reduce((sum, tx) => (tx.type === 'payout' || tx.type === 'referral_commission' ? sum + (tx.amount || 0) : sum), 0);
         
         // Smart Score Logic
         const ratingScore = (workerProfile?.rating || 0) * 20; // Max 100
@@ -94,6 +95,7 @@ export function WorkerDashboard() {
     if (isUserLoading || isWorkerLoading) {
         return (
              <div className="p-4 space-y-6">
+                <HubHeader />
                 <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-24 w-full" />
              </div>
