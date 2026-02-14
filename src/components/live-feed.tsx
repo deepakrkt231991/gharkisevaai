@@ -14,12 +14,11 @@ import { PropertyCard } from './property-card';
 import { ProductCard } from './product-card';
 import { ProfessionalCard } from './professional-card';
 import { Skeleton } from './ui/skeleton';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from './ui/button';
 import React from 'react';
 
-const DISTANCE_KM = 10;
+const DISTANCE_KM = 20;
 
 const LiveFeedSection = ({ title, link, items, renderItem, isLoading }: { title: string; link: string; items: any[]; renderItem: (item: any) => React.ReactNode; isLoading: boolean; }) => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
@@ -71,7 +70,8 @@ const LiveFeedSection = ({ title, link, items, renderItem, isLoading }: { title:
             </div>
             {isLoading ? (
                 <div className="flex gap-4 overflow-hidden -mx-4 px-4">
-                    {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-56 w-72 rounded-xl" />)}
+                    <div className="flex-shrink-0 w-80 pr-4"><Skeleton className="h-80 w-full" /></div>
+                    <div className="flex-shrink-0 w-80 pr-4"><Skeleton className="h-80 w-full" /></div>
                 </div>
             ) : items.length > 0 ? (
                 <div className="overflow-hidden -mx-4" ref={emblaRef}>
@@ -124,73 +124,17 @@ export function LiveFeed() {
     };
     
     // --- Merging and Filtering Data ---
-    const { displayItems: salePropertiesToShow, isNearby: salePropertiesAreNearby } = useMemo(() => {
-        const demoData = PlaceHolderImages.filter(p => p.type === 'property' && p.listingType === 'sale').map(p => ({
-             ...p,
-             id: p.id,
-             propertyId: p.id,
-             ownerId: `demo-user-${p.id}`,
-             listingType: 'sale' as const,
-             geo: { latitude: 0, longitude: 0 },
-             createdAt: null,
-        }));
-        const realIds = new Set(allSaleProperties?.map(p => p.id));
-        const uniqueDemos = demoData.filter(p => !realIds.has(p.id));
-        const combined = [...(allSaleProperties || []), ...uniqueDemos];
-        return getFilteredAndSortedItems(combined as any);
-    }, [allSaleProperties, userLat, userLon, isGeoLoading]);
-
-    const { displayItems: rentPropertiesToShow, isNearby: rentPropertiesAreNearby } = useMemo(() => {
-        const demoData = PlaceHolderImages.filter(p => p.type === 'property' && p.listingType === 'rent').map(p => ({
-             ...p,
-             id: p.id,
-             propertyId: p.id,
-             ownerId: `demo-user-${p.id}`,
-             listingType: 'rent' as const,
-             geo: { latitude: 0, longitude: 0 },
-             createdAt: null,
-        }));
-        const realIds = new Set(allRentProperties?.map(p => p.id));
-        const uniqueDemos = demoData.filter(p => !realIds.has(p.id));
-        const combined = [...(allRentProperties || []), ...uniqueDemos];
-        return getFilteredAndSortedItems(combined as any);
-    }, [allRentProperties, userLat, userLon, isGeoLoading]);
-
-
-    const { displayItems: productsToShow, isNearby: productsAreNearby } = useMemo(() => {
-        const demoData = PlaceHolderImages.filter(p => p.type === 'product').map(p => ({
-             ...p,
-             id: p.id,
-             productId: p.id,
-             ownerId: 'demo-user-' + p.id,
-             imageUrls: p.imageUrl ? [p.imageUrl] : [],
-             createdAt: null,
-        }));
-        const realIds = new Set(allProducts?.map(p => p.id));
-        const uniqueDemos = demoData.filter(p => !realIds.has(p.id));
-        const combined = [...(allProducts || []), ...uniqueDemos];
-        return getFilteredAndSortedItems(combined as any);
-    }, [allProducts, userLat, userLon, isGeoLoading]);
-
-    const { displayItems: workersToShow, isNearby: workersAreNearby } = useMemo(() => {
-        const demoData = PlaceHolderImages.filter(p => p.type === 'worker').map(p => ({
-            ...p,
-            id: p.id,
-            location: { latitude: 0, longitude: 0 }, // Add placeholder location
-            createdAt: null,
-        }));
-        const realIds = new Set(allWorkers?.map(w => w.id));
-        const uniqueDemos = demoData.filter(p => !realIds.has(p.id));
-        const combined = [...(allWorkers || []), ...uniqueDemos];
-        return getFilteredAndSortedItems(combined as any);
-    }, [allWorkers, userLat, userLon, isGeoLoading]);
+    const { displayItems: salePropertiesToShow, isNearby: salePropertiesAreNearby } = useMemo(() => getFilteredAndSortedItems(allSaleProperties), [allSaleProperties, userLat, userLon, isGeoLoading]);
+    const { displayItems: rentPropertiesToShow, isNearby: rentPropertiesAreNearby } = useMemo(() => getFilteredAndSortedItems(allRentProperties), [allRentProperties, userLat, userLon, isGeoLoading]);
+    const { displayItems: productsToShow, isNearby: productsAreNearby } = useMemo(() => getFilteredAndSortedItems(allProducts), [allProducts, userLat, userLon, isGeoLoading]);
+    const { displayItems: workersToShow, isNearby: workersAreNearby } = useMemo(() => getFilteredAndSortedItems(allWorkers), [allWorkers, userLat, userLon, isGeoLoading]);
     
     return (
         <div className="space-y-8">
             <LiveFeedSection 
                 title={salePropertiesAreNearby ? "Homes for Sale Near You" : "Latest Homes for Sale"} 
                 link="/explore?tab=buy" 
-                isLoading={isSaleLoading} 
+                isLoading={isSaleLoading || isGeoLoading} 
                 items={salePropertiesToShow}
                 renderItem={(prop) => (
                     <div key={prop.id} className="flex-shrink-0 w-80 pr-4">
@@ -202,7 +146,7 @@ export function LiveFeed() {
             <LiveFeedSection 
                 title={rentPropertiesAreNearby ? "Homes for Rent Near You" : "Latest Homes for Rent"} 
                 link="/explore?tab=rent" 
-                isLoading={isRentLoading} 
+                isLoading={isRentLoading || isGeoLoading} 
                 items={rentPropertiesToShow}
                 renderItem={(prop) => (
                     <div key={prop.id} className="flex-shrink-0 w-80 pr-4">
@@ -214,7 +158,7 @@ export function LiveFeed() {
             <LiveFeedSection 
                 title={productsAreNearby ? "Products Near You" : "Latest Products"} 
                 link="/marketplace" 
-                isLoading={isProductsLoading} 
+                isLoading={isProductsLoading || isGeoLoading} 
                 items={productsToShow}
                 renderItem={(prod) => (
                      <div key={prod.id} className="flex-shrink-0 w-56 pr-4">
@@ -226,7 +170,7 @@ export function LiveFeed() {
             <LiveFeedSection 
                 title={workersAreNearby ? "Workers Near You" : "Top Workers"} 
                 link="/find-a-worker" 
-                isLoading={isWorkersLoading} 
+                isLoading={isWorkersLoading || isGeoLoading} 
                 items={workersToShow}
                 renderItem={(worker) => (
                     <div key={worker.id} className="flex-shrink-0 w-80 pr-4">

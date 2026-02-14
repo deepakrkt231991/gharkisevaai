@@ -128,7 +128,7 @@ function VideoSubmitButton() {
 function AnalysisOverlay({ isPending }: { isPending: boolean }) {
     if(!isPending) return null;
     return (
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden">
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden z-20">
             <div className="scan-line"></div>
             <Loader2 className="h-8 w-8 animate-spin text-accent/80" />
             <p className="font-bold tracking-widest text-accent">AI IS ANALYZING...</p>
@@ -143,12 +143,12 @@ const WorkerCard = ({ worker }: { worker: any }) => (
         <CardContent className="p-3">
             <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12 border-2 border-primary">
-                    <AvatarImage src={`https://i.pravatar.cc/150?u=${worker.workerId}`} />
-                    <AvatarFallback>{worker.name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={`https://i.pravatar.cc/150?u=${worker?.workerId}`} />
+                    <AvatarFallback>{worker?.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                    <h4 className="font-bold text-white">{worker.name}</h4>
-                    <p className="text-xs text-muted-foreground capitalize">{worker.skills?.join(', ')}</p>
+                    <h4 className="font-bold text-white">{worker?.name}</h4>
+                    <p className="text-xs text-muted-foreground capitalize">{worker?.skills?.join(', ')}</p>
                     <div className="flex items-center gap-1.5 text-yellow-400 text-xs">
                         <Star className="h-3 w-3 fill-current" />
                         <span className="font-bold text-white">4.8</span>
@@ -159,12 +159,12 @@ const WorkerCard = ({ worker }: { worker: any }) => (
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
                 <Button variant="secondary" size="sm" asChild>
-                    <Link href={`/chat/job-temp-${worker.workerId}`}>
+                    <Link href={`/chat/job-temp-${worker?.workerId}`}>
                         <MessageSquare className="mr-2 h-4 w-4"/>Free Chat
                     </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
-                    <a href={`tel:${worker.phone || ''}`}>
+                    <a href={`tel:${worker?.phone || ''}`}>
                         <Phone className="mr-2 h-4 w-4"/>Free Call
                     </a>
                 </Button>
@@ -183,8 +183,8 @@ export function DefectAnalyzer() {
   const [isLoadingWorkers, setIsLoadingWorkers] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const { pending: isAnalysisPending } = useFormStatus();
 
-  const { pending } = useFormStatus();
   
   useEffect(() => {
     if (analysisState.success && analysisState.data?.recommendedWorkerType) {
@@ -239,8 +239,9 @@ export function DefectAnalyzer() {
       fileInputRef.current.value = '';
     }
     // Directly reset the state without needing a form action
-    analysisAction(initialState);
-    videoAction(initialVideoState);
+    const emptyFormData = new FormData();
+    analysisAction(emptyFormData);
+    videoAction(emptyFormData);
   };
 
   const AnalysisResult = () => {
@@ -269,12 +270,12 @@ export function DefectAnalyzer() {
           <Card className="glass-card border-l-4 border-l-primary/80">
             <CardContent className="p-4">
                 <p className="text-xs text-primary font-bold uppercase tracking-wider">Issue Identified</p>
-                <h3 className="text-2xl font-bold font-headline text-white mt-1">{result.defect}</h3>
-                <p className="text-sm text-muted-foreground mt-2">{result.analysisDetails}</p>
+                <h3 className="text-2xl font-bold font-headline text-white mt-1">{result?.defect}</h3>
+                <p className="text-sm text-muted-foreground mt-2">{result?.analysisDetails}</p>
                  <div className="w-28 text-center mt-3">
                     <p className="text-[10px] font-bold text-green-400/80 tracking-wider">AI CONFIDENCE</p>
-                    <Progress value={result.confidence} className="h-1.5 mt-1 [&>div]:bg-green-400" />
-                    <p className="text-xs font-bold text-green-400 mt-0.5">{result.confidence}%</p>
+                    <Progress value={result?.confidence || 0} className="h-1.5 mt-1 [&>div]:bg-green-400" />
+                    <p className="text-xs font-bold text-green-400 mt-0.5">{result?.confidence}%</p>
                 </div>
             </CardContent>
           </Card>
@@ -294,7 +295,7 @@ export function DefectAnalyzer() {
                   ) : (
                     <form action={videoAction}>
                       <input type="hidden" name="mediaDataUri" value={media.dataUrl} />
-                      <input type="hidden" name="defect" value={result.defect} />
+                      <input type="hidden" name="defect" value={result?.defect || ''} />
                       <VideoSubmitButton />
                     </form>
                   )}
@@ -313,10 +314,10 @@ export function DefectAnalyzer() {
               <Card className="glass-card">
                   <CardContent className="p-4 text-center">
                       <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Est. Cost</p>
-                      <p className="text-3xl font-bold text-accent mt-2">{result.estimatedCost.total}</p>
+                      <p className="text-3xl font-bold text-accent mt-2">{result?.estimatedCost?.total}</p>
                        <div className="text-xs text-muted-foreground/70 mt-1 grid grid-cols-2 divide-x divide-border">
-                        <p className="pr-2">Material: <span className="font-bold text-white/80">{result.estimatedCost.material}</span></p>
-                        <p className="pl-2">Labor: <span className="font-bold text-white/80">{result.estimatedCost.labor}</span></p>
+                        <p className="pr-2">Material: <span className="font-bold text-white/80">{result?.estimatedCost?.material}</span></p>
+                        <p className="pl-2">Labor: <span className="font-bold text-white/80">{result?.estimatedCost?.labor}</span></p>
                     </div>
                   </CardContent>
               </Card>
@@ -324,19 +325,19 @@ export function DefectAnalyzer() {
                   <CardContent className="p-4">
                        <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-2">Parts & Materials</p>
                        <ul className="space-y-2">
-                           {result.requiredParts.map((part, index) => (
+                           {result?.requiredParts?.map((part, index) => (
                                <li key={`part-${index}`} className="flex items-center gap-2 text-sm text-white">
                                    <CheckCircle size={16} className="text-accent"/>
                                    <span className="truncate">{part}</span>
                                </li>
                            ))}
-                            {result.materialSuggestions.map((suggestion, index) => (
+                            {result?.materialSuggestions?.map((suggestion, index) => (
                                 <li key={`mat-${index}`} className="flex items-start gap-2 text-sm text-white">
                                     <Sparkles size={16} className="text-accent flex-shrink-0 mt-1"/>
                                     <span>{suggestion}</span>
                                 </li>
                             ))}
-                            {result.requiredParts.length === 0 && result.materialSuggestions.length === 0 && (
+                            {(result?.requiredParts?.length === 0 && result?.materialSuggestions?.length === 0) && (
                                 <p className="text-sm text-muted-foreground">No specific parts or materials recommended.</p>
                             )}
                        </ul>
@@ -344,7 +345,7 @@ export function DefectAnalyzer() {
               </Card>
           </div>
 
-          {result.diySteps && result.diySteps.length > 0 && (
+          {result?.diySteps && result.diySteps.length > 0 && (
             <div>
               <h3 className="text-lg font-bold font-headline mb-2">DIY Steps (आप इसे स्वयं ठीक कर सकते हैं)</h3>
               <Accordion type="single" collapsible className="w-full glass-card rounded-xl px-4">
@@ -370,7 +371,7 @@ export function DefectAnalyzer() {
               )}
               {!isLoadingWorkers && workers.length > 0 && (
                   <div className="space-y-3">
-                      {workers.map(worker => <WorkerCard key={worker.workerId} worker={worker} />)}
+                      {workers.map(worker => <WorkerCard key={worker?.workerId} worker={worker} />)}
                   </div>
               )}
               {!isLoadingWorkers && workers.length === 0 && (
@@ -435,7 +436,7 @@ export function DefectAnalyzer() {
                     capture="environment"
                     onChange={handleFileChange}
                  />
-                <AnalysisOverlay isPending={pending}/>
+                <AnalysisOverlay isPending={isAnalysisPending}/>
               </div>
 
                <div className="grid w-full items-center gap-1.5">

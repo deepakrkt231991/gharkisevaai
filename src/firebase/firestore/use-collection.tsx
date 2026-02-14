@@ -97,16 +97,18 @@ export function useCollection<T = any>(
           path,
         })
         
+        // For public collections, we can return empty data to prevent a crash.
+        // For protected collections, we must throw the error.
         const publicCollections = ['properties', 'products', 'workers', 'tools', 'banners', 'app_settings'];
         
         if (publicCollections.includes(path)) {
             console.warn(`Access to '${path}' blocked by Firestore rules. Returning empty data as a fallback. Please verify your security rules are correctly deployed to allow public read access. Auth state:`, contextualError.request.auth);
             setData([]);
-            setError(null);
+            setError(null); // Clear the error as we are handling it gracefully.
             setIsLoading(false);
             return; 
         }
-
+        
         setError(contextualError)
         setData(null)
         setIsLoading(false)

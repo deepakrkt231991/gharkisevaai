@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -50,7 +51,7 @@ export const useGeolocation = () => {
         }
         setLocation({ latitude: null, longitude: null, error: errorMessage, isLoading: false });
       },
-      { timeout: 10000 } // Add a timeout
+      { timeout: 10000, enableHighAccuracy: true } // Add a timeout and request high accuracy
     );
   }, []);
 

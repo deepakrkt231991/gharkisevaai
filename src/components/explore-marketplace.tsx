@@ -2,19 +2,18 @@
 'use client';
 import { useCollection, useMemoFirebase } from '@/firebase';
 import { useFirestore } from '@/firebase/provider';
-import { collection, query, where } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 import type { Property } from '@/lib/entities';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
-import { ArrowRight, ShoppingBag, Tag, KeyRound, Bot, Building } from 'lucide-react';
+import { ArrowRight, Bot, Building } from 'lucide-react';
 import { PropertyCard } from './property-card';
 import { Skeleton } from './ui/skeleton';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import AdsenseBanner from './adsense-banner';
 
 // Helper function to calculate distance (Haversine formula)
@@ -56,7 +55,7 @@ const PropertyList = ({properties, isLoading}: {properties: (Property & { id: st
         </div>
         
         <div className="space-y-6">
-            {isLoading && properties.length === 0 && (
+            {isLoading && (!properties || properties.length === 0) && (
                 <>
                     {[...Array(2)].map((_, i) => (
                          <div className="space-y-3" key={i}>
@@ -83,7 +82,7 @@ const PropertyList = ({properties, isLoading}: {properties: (Property & { id: st
                 return content;
             })}
 
-             {!isLoading && properties.length === 0 && (
+             {!isLoading && (!properties || properties.length === 0) && (
                 <div className="text-center py-8">
                     <p className="text-muted-foreground">No properties found for this category.</p>
                      <p className="text-xs text-muted-foreground/50 mt-2">Check back later or list your own property!</p>
@@ -123,18 +122,18 @@ export function ExploreMarketplace() {
 
     const salePropertiesQuery = useMemoFirebase(() => {
         if (!firestore) return null;
-        return query(collection(firestore, 'properties'), where('listingType', '==', 'sale'));
+        return query(collection(firestore, 'properties'), where('listingType', '==', 'sale'), orderBy('createdAt', 'desc'), limit(20));
     }, [firestore]);
 
     const rentPropertiesQuery = useMemoFirebase(() => {
         if (!firestore) return null;
-        return query(collection(firestore, 'properties'), where('listingType', '==', 'rent'));
+        return query(collection(firestore, 'properties'), where('listingType', '==', 'rent'), orderBy('createdAt', 'desc'), limit(20));
     }, [firestore]);
 
     const { data: saleProperties, isLoading: isSaleLoading } = useCollection<Property>(salePropertiesQuery);
     const { data: rentProperties, isLoading: isRentLoading } = useCollection<Property>(rentPropertiesQuery);
 
-    const sortPropertiesByDistance = (properties: Property[] | null) => {
+    const sortPropertiesByDistance = (properties: (Property & {id: string})[] | null) => {
          if (!properties) return [];
         if (userLat === null || userLon === null) return properties;
 
@@ -153,56 +152,8 @@ export function ExploreMarketplace() {
         });
     }
 
-    const combinedSaleProperties = useMemo(() => {
-        const demoProperties: (Property & { id: string })[] = PlaceHolderImages
-            .filter(p => p.type === 'property' && p.listingType === 'sale')
-            .map(p => ({
-                id: p.id,
-                propertyId: p.id,
-                ownerId: `demo-user-${p.id}`,
-                title: p.title || 'Demo Sale Property',
-                location: p.location || 'Unknown Location',
-                price: p.price || 0,
-                priceUnit: p.priceUnit || 'Cr',
-                sqft: p.sqft || 0,
-                parking: p.parking || 0,
-                listingType: 'sale',
-                imageUrl: p.imageUrl,
-                isAiVerified: p.isAiVerified || false,
-                vastuScore: p.vastuScore,
-            } as Property & { id: string }));
-
-        const realPropertyIds = new Set(saleProperties?.map(p => p.id));
-        const uniqueDemoProperties = demoProperties.filter(p => !realPropertyIds.has(p.id));
-
-        return sortPropertiesByDistance([...uniqueDemoProperties, ...(saleProperties || [])]);
-    }, [saleProperties, userLat, userLon]);
-
-    const combinedRentProperties = useMemo(() => {
-        const demoProperties: (Property & { id: string })[] = PlaceHolderImages
-            .filter(p => p.type === 'property' && p.listingType === 'rent')
-            .map(p => ({
-                id: p.id,
-                propertyId: p.id,
-                ownerId: `demo-user-${p.id}`,
-                title: p.title || 'Demo Rent Property',
-                location: p.location || 'Unknown Location',
-                price: p.price || 0,
-                priceUnit: p.priceUnit || 'L',
-                sqft: p.sqft || 0,
-                parking: p.parking || 0,
-                listingType: 'rent',
-                imageUrl: p.imageUrl,
-                isAiVerified: p.isAiVerified || false,
-                vastuScore: p.vastuScore,
-            } as Property & { id: string }));
-
-        const realPropertyIds = new Set(rentProperties?.map(p => p.id));
-        const uniqueDemoProperties = demoProperties.filter(p => !realPropertyIds.has(p.id));
-
-        return sortPropertiesByDistance([...uniqueDemoProperties, ...(rentProperties || [])]);
-    }, [rentProperties, userLat, userLon]);
-
+    const sortedSaleProperties = useMemo(() => sortPropertiesByDistance(saleProperties), [saleProperties, userLat, userLon]);
+    const sortedRentProperties = useMemo(() => sortPropertiesByDistance(rentProperties), [rentProperties, userLat, userLon]);
 
     return (
         <div className="space-y-6">
@@ -223,14 +174,14 @@ export function ExploreMarketplace() {
                 
                 <TabsContent value="buy" className="pt-6 space-y-6">
                     <AiPriceEstimatorCard />
-                    <PropertyList properties={combinedSaleProperties} isLoading={isSaleLoading} />
+                    <PropertyList properties={sortedSaleProperties} isLoading={isSaleLoading} />
                 </TabsContent>
                 <TabsContent value="sell" className="pt-6 space-y-6">
                     <ListPropertyCtaCard />
-                    <PropertyList properties={combinedSaleProperties} isLoading={isSaleLoading} />
+                    <PropertyList properties={sortedSaleProperties} isLoading={isSaleLoading} />
                 </TabsContent>
                 <TabsContent value="rent" className="pt-6 space-y-6">
-                    <PropertyList properties={combinedRentProperties} isLoading={isRentLoading} />
+                    <PropertyList properties={sortedRentProperties} isLoading={isRentLoading} />
                     <ListPropertyCtaCard forRent />
                 </TabsContent>
             </Tabs>

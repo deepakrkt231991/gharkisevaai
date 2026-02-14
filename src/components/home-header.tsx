@@ -80,6 +80,7 @@ export function HomeHeader() {
   };
   
   const handleLiveLocationClick = useCallback(() => {
+    localStorage.removeItem('manualLocation');
     toast({ title: 'Detecting your live location...' });
     fetchLocation();
   }, [fetchLocation, toast]);
@@ -119,7 +120,7 @@ export function HomeHeader() {
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl text-white">Change Location</DialogTitle>
             <DialogDescription>
-               Enter your area or city to find services near you.
+               Enter your area or city to find services near you. For the best experience, allow access to your live location.
             </DialogDescription>
           </DialogHeader>
 
@@ -128,7 +129,7 @@ export function HomeHeader() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Live Location Failed</AlertTitle>
                     <AlertDescription>
-                        {error} Please go to your browser's site settings for this page and set Location to 'Allow', then try again.
+                        {error} Please go to your browser's site settings for this page and set Location to 'Allow', then try again by clicking the button below.
                     </AlertDescription>
                 </Alert>
             )}
