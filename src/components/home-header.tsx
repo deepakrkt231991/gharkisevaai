@@ -25,10 +25,11 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 export function HomeHeader() {
   const router = useRouter();
-  const { latitude, longitude, error, isLoading, fetchLocation } = useGeolocation();
+  const { latitude, longitude, error, isLoading: isGeoLoading, fetchLocation } = useGeolocation();
   const [displayLocation, setDisplayLocation] = useState<string>('Detecting Location...');
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [manualLocationInput, setManualLocationInput] = useState('');
+  const [isSavingManual, setIsSavingManual] = useState(false);
   const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -38,48 +39,48 @@ export function HomeHeader() {
     if (storedLocation) {
       setDisplayLocation(storedLocation);
       setManualLocationInput(storedLocation);
-      return; // Early exit if manual location is set
+      setIsLocationModalOpen(false);
+      return; 
     }
 
-    if (isLoading) {
+    if (isGeoLoading) {
       setDisplayLocation("Detecting...");
     } else if (latitude && longitude) {
       setDisplayLocation("Near You");
-      if(isLocationModalOpen) setIsLocationModalOpen(false); // Close modal on success
+      if(isLocationModalOpen) setIsLocationModalOpen(false);
     } else if (error) {
       setDisplayLocation("Set Location");
-      // If there's an error and no manual location, open the modal.
       setIsLocationModalOpen(true);
     }
-  }, [isLoading, latitude, longitude, error, isLocationModalOpen]);
+  }, [isGeoLoading, latitude, longitude, error, isLocationModalOpen]);
 
   const handleLocationSave = async () => {
-    if (manualLocationInput.trim()) {
-      const newLocation = manualLocationInput.trim();
-      localStorage.setItem('manualLocation', newLocation);
+    if (!manualLocationInput.trim()) return;
+    
+    setIsSavingManual(true);
+    const newLocation = manualLocationInput.trim();
+    localStorage.setItem('manualLocation', newLocation);
 
-      if (user && firestore) {
-        try {
-          const userDocRef = doc(firestore, 'users', user.uid);
-          await updateDoc(userDocRef, {
-            address: newLocation,
-          });
-           toast({
-            title: "Location Saved!",
-            description: `Your location has been set to ${newLocation}.`,
-          });
-        } catch (e) {
-          console.error("Failed to save location to profile:", e);
-           toast({
-            title: "Save Failed",
-            description: "Could not save location to your profile.",
-            variant: "destructive"
-          });
-        }
+    if (user && firestore) {
+      try {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        await updateDoc(userDocRef, {
+          address: newLocation,
+        });
+         toast({
+          title: "Location Saved!",
+          description: `Your location has been set to ${newLocation}.`,
+        });
+      } catch (e) {
+        console.error("Failed to save location to profile:", e);
+         toast({
+          title: "Save Failed",
+          description: "Could not save location to your profile.",
+          variant: "destructive"
+        });
       }
-      setIsLocationModalOpen(false);
-      router.push('/');
     }
+    window.location.href = '/';
   };
   
   const handleLiveLocationClick = useCallback(() => {
@@ -98,7 +99,7 @@ export function HomeHeader() {
               Your Location <ChevronDown className="h-3 w-3" />
             </div>
             <p className="font-bold text-foreground">
-              {isLoading && !localStorage.getItem('manualLocation') ? ( // Show loading only if no manual location
+              {isGeoLoading && !localStorage.getItem('manualLocation') ? ( 
                 <span className="flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Detecting...</span>
               ) : (
                 displayLocation
@@ -121,9 +122,9 @@ export function HomeHeader() {
       <Dialog open={isLocationModalOpen} onOpenChange={setIsLocationModalOpen}>
         <DialogContent className="glass-card sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="font-headline text-2xl text-white">Change Location</DialogTitle>
+            <DialogTitle className="font-headline text-2xl text-white">Set Your Location</DialogTitle>
             <DialogDescription>
-               Enter your area or city to find services near you. For the best experience, allow access to your live location.
+               Enable live location for the best experience or enter your area manually.
             </DialogDescription>
           </DialogHeader>
 
@@ -132,15 +133,15 @@ export function HomeHeader() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Live Location Failed</AlertTitle>
                     <AlertDescription>
-                        {error} Please go to your browser's site settings for this page and set Location to 'Allow', then try again by clicking the button below.
+                        {error} To fix this, go to your browser's site settings for this page, find the 'Location' permission, and set it to 'Allow'. Then try again.
                     </AlertDescription>
                 </Alert>
             )}
 
             <div className="py-4 space-y-4">
-                <Button onClick={handleLiveLocationClick} variant="outline" className="w-full h-12 text-base">
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <LocateFixed className="mr-2 h-4 w-4" />}
-                    Use Live Location (Try Again)
+                <Button onClick={handleLiveLocationClick} variant="outline" className="w-full h-12 text-base" disabled={isGeoLoading}>
+                    {isGeoLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <LocateFixed className="mr-2 h-4 w-4" />}
+                    Use Live Location
                 </Button>
                 <div className="relative">
                     <div className="absolute inset-0 flex items-center">
@@ -165,7 +166,10 @@ export function HomeHeader() {
                 </div>
             </div>
           <DialogFooter className="sm:justify-start flex-col sm:flex-col sm:space-x-0 gap-2">
-            <Button onClick={handleLocationSave} className="w-full">Save Location</Button>
+            <Button onClick={handleLocationSave} className="w-full" disabled={isSavingManual || !manualLocationInput.trim()}>
+              {isSavingManual && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save & Continue
+            </Button>
             <Button onClick={() => setIsLocationModalOpen(false)} variant="ghost" className="w-full">Skip for now</Button>
           </DialogFooter>
         </DialogContent>
