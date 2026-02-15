@@ -48,12 +48,12 @@ export function HomeHeader() {
       setDisplayLocation("Set Location");
       setIsLocationModalOpen(true);
     }
-  }, [isGeoLoading, latitude, longitude, error]); // Removed isLocationModalOpen from deps
+  }, [isGeoLoading, latitude, longitude, error, isLocationModalOpen]);
 
   const handleLocationSave = () => {
     if (!manualLocationInput.trim()) return;
     localStorage.setItem('userLocation', manualLocationInput.trim());
-    window.location.href = '/'; // Force a full page reload to re-evaluate everything
+    window.location.href = '/home'; // Force a full page reload to re-evaluate everything
   };
   
   const handleLiveLocationClick = useCallback(() => {

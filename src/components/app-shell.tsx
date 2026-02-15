@@ -10,6 +10,7 @@ import { PwaLoader } from '@/components/pwa-loader';
 import { PwaUpdateNotifier } from '@/components/pwa-update-notifier';
 import { FloatingAiAssistant } from '@/components/floating-ai-assistant';
 import { Toaster } from "@/components/ui/toaster";
+import { InstallPwaBanner } from './install-pwa-banner';
 
 const ADMIN_EMAIL = "deepakkadam231991@gmail.com"; 
 
@@ -51,6 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <PwaUpdateNotifier />
         {children}
         <FloatingAiAssistant />
+        <InstallPwaBanner />
         <Toaster />
     </>
   );

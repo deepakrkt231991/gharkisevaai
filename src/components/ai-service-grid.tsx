@@ -18,11 +18,23 @@ import {
   Compass,
   Sofa,
   ChevronRight,
-  Package
+  Package,
+  Building,
+  Tag,
+  Warehouse
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 const serviceCategories = [
+   {
+    title: 'Property & Marketplace',
+    services: [
+      { name: 'Buy', icon: Building, href: '/explore?tab=buy', description: 'AI verified properties' },
+      { name: 'Sell', icon: Tag, href: '/explore?tab=sell', description: 'List your property for sale' },
+      { name: 'Rent', icon: BedDouble, href: '/explore?tab=rent', description: 'Find homes for rent' },
+      { name: 'Marketplace', icon: Warehouse, href: '/marketplace', description: 'Buy/Sell used items' },
+    ],
+  },
   {
     title: 'Appliance Repair',
     services: [
@@ -41,16 +53,6 @@ const serviceCategories = [
       { name: 'Deep Cleaning', icon: Sparkles, href: '/find-a-worker?category=cleaning' },
       { name: 'Plumbing', icon: Wrench, href: '/find-a-worker?category=plumbing' },
       { name: 'Electrician', icon: Zap, href: '/find-a-worker?category=electrician' },
-    ],
-  },
-  {
-    title: 'Property & Real Estate',
-    services: [
-      { name: 'Sell Home', icon: Home, href: '/explore?tab=sell', description: 'AI valuation & verification' },
-      { name: 'Rent Home', icon: BedDouble, href: '/explore?tab=rent', description: 'Verified tenants, smart contracts' },
-      { name: 'Sell Product', icon: Package, href: '/marketplace', description: 'Sell old items with AI valuation' },
-      { name: 'Vastu Check', icon: Compass, href: '/ai-help', description: 'Improve your home\'s energy' },
-      { name: 'Interior Design', icon: Sofa, href: '/ai-help', description: 'Get AI-powered design ideas' },
     ],
   },
 ];
@@ -82,7 +84,7 @@ export function AiServiceGrid() {
       {serviceCategories.map((category) => (
         <div key={category.title}>
           <h3 className="mb-4 text-xl font-bold font-headline text-white">{category.title}</h3>
-          {category.title !== 'Property & Real Estate' ? (
+          {category.title !== 'Property & Marketplace' ? (
              <div className="grid grid-cols-4 gap-4">
                 {category.services.map((service) => (
                     <ServiceItem key={service.name} {...service} />
