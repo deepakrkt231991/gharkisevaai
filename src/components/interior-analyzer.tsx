@@ -221,7 +221,7 @@ export function InteriorAnalyzer() {
                     <div className="text-center p-4">
                         <ScanSearch className="w-12 h-12 text-muted-foreground mx-auto" />
                         <h2 className="mt-4 text-xl font-bold font-headline">Analyze Your Space</h2>
-                        <p className="text-muted-foreground">Align room inside the frame for best results.</p>
+                        <p className="text-muted-foreground px-4">Upload a photo of your room to get Vastu and aesthetic suggestions from our AI.</p>
                     </div>
                 </div>
             )}
