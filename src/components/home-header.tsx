@@ -53,7 +53,7 @@ export function HomeHeader() {
   const handleLocationSave = () => {
     if (!manualLocationInput.trim()) return;
     localStorage.setItem('userLocation', manualLocationInput.trim());
-    window.location.href = '/home'; // Force a full page reload to re-evaluate everything
+    window.location.href = '/'; // Force a full page reload to re-evaluate everything
   };
   
   const handleLiveLocationClick = useCallback(() => {

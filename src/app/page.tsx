@@ -1,18 +1,34 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
 
-export default function RootPage() {
-  const router = useRouter();
-  useEffect(() => {
-    router.replace('/home');
-  }, [router]);
+import { HomeHeader } from '@/components/home-header';
+import { BottomNavBar } from '@/components/bottom-nav-bar';
+import { WelcomeVideoModal } from '@/components/welcome-video-modal';
+import { HomeCarouselBanner } from '@/components/home-carousel-banner';
+import { LiveFeed } from '@/components/live-feed';
+import { AiServiceGrid } from '@/components/ai-service-grid';
+import { SmartHub } from '@/components/smart-hub';
+import { TrendingNow } from '@/components/trending-now';
+import { UserStats } from '@/components/user-stats';
+import { WhyChooseUsHome } from '@/components/why-choose-us-home';
 
+
+export default function Page() {
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-background">
-      <Loader2 className="h-12 w-12 animate-spin text-primary"/>
-      <p className="mt-4 text-muted-foreground">Initializing App...</p>
+    <div className="dark bg-background text-foreground">
+      <WelcomeVideoModal />
+      <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
+        <HomeHeader />
+        <main className="flex-1 space-y-8 overflow-y-auto p-4 pb-48">
+          <UserStats />
+          <HomeCarouselBanner />
+          <AiServiceGrid />
+          <SmartHub />
+          <WhyChooseUsHome />
+          <TrendingNow />
+          <LiveFeed />
+        </main>
+        <BottomNavBar />
+      </div>
     </div>
   );
 }
