@@ -234,10 +234,10 @@ export function InteriorAnalyzer() {
                         <div className="absolute inset-0 rounded-full border-2 border-accent/50 animate-ping"></div>
                     </div>
                     <p className="font-bold tracking-widest text-accent">
-                        {isRenderPending ? 'GENERATING 3D RENDER...' : 'ANALYZING SPACE...'}
+                        {isRenderPending ? 'GENERATING 3D RENDER...' : 'AI IS THINKING...'}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                        {isRenderPending ? 'AI is re-imagining your room...' : 'AI is identifying hotspots...'}
+                        {isRenderPending ? 'AI is re-imagining your room...' : 'Please wait while we process the image.'}
                     </p>
                 </div>
             )}
