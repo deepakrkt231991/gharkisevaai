@@ -17,7 +17,7 @@ function AiHubHeader() {
                 </Avatar>
                 <div>
                     <p className="text-xs text-primary font-bold">GRIHSEVA AI</p>
-                    <h1 className="font-headline text-xl font-bold tracking-tight text-white">AI Design Studio</h1>
+                    <h1 className="font-headline text-xl font-bold tracking-tight text-white">AI Assistant Hub</h1>
                 </div>
             </div>
              <Button variant="ghost" size="icon" className="relative">
