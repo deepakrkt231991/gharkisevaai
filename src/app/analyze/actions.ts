@@ -124,7 +124,7 @@ export async function generateVideo(
     }
 
     try {
-        const videoPrompt = `Create a 5-second cinematic walkthrough video. Start with the provided image, which shows a defect: '${validatedFields.data.defect}'. Smoothly transition the scene to show the defect perfectly repaired and the entire area looking clean, new, and aspirational.`;
+        const videoPrompt = `Create a 5-second "Before & After" transformation video. Start with the provided image showing a defect: '${validatedFields.data.defect}'. Magically repair the wall, and then redesign it with a smooth, modern, dual-tone finish using a calming green and an elegant white. The final look should be clean, aspirational, and professionally designed.`;
         
         const result = await createTransformationVideo({
             imageDataUri: validatedFields.data.mediaDataUri,

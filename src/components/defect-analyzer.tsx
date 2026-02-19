@@ -117,8 +117,8 @@ function VideoSubmitButton() {
             </>
         ) : (
             <>
-            <Film className="mr-2 h-5 w-5" />
-            See My New Home (AI Video)
+            <Sparkles className="mr-2 h-5 w-5" />
+            Generate Redesign Video
             </>
         )}
         </Button>
@@ -286,9 +286,9 @@ export function DefectAnalyzer() {
           {media?.type === 'image' && (
              <Card className="glass-card bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
                 <CardContent className="p-4 space-y-3">
-                  <h3 className="font-bold font-headline text-white">AI Visual Reinvention</h3>
+                  <h3 className="font-bold font-headline text-white">AI Redesign (Before/After)</h3>
                   <p className="text-sm text-muted-foreground">
-                    See how your space could look after the repair with a short cinematic video.
+                    Generate a short "Before & After" video to see your wall repaired and redesigned by AI.
                   </p>
                   
                   {videoState.success && videoState.data ? (
