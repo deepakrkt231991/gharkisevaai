@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useCallback, useEffect, useState } from 'react';
@@ -9,6 +8,7 @@ import { useGeolocation } from '@/hooks/use-geolocation';
 import { collection, query, orderBy, limit, where } from 'firebase/firestore';
 import type { Property, Product, Worker } from '@/lib/entities';
 import { calculateDistance } from '@/lib/geo-helpers';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 import { PropertyCard } from './property-card';
 import { ProductCard } from './product-card';
@@ -102,18 +102,90 @@ export function LiveFeed() {
     const { data: allProducts, isLoading: isProductsLoading } = useCollection<Product>(productsQuery);
     const { data: allWorkers, isLoading: isWorkersLoading } = useCollection<Worker>(workersQuery);
 
+    // --- Merging with Demo Data ---
+    const salePropertiesWithDemo = useMemo(() => {
+        const demoProps = PlaceHolderImages
+            .filter(p => p.type === 'property' && p.listingType === 'sale')
+            .map(p => ({
+                id: p.id,
+                propertyId: p.id,
+                ownerId: 'demo-user-' + p.id,
+                title: p.title || 'Demo Property',
+                location: p.location || 'Demo Location',
+                price: p.price,
+                priceUnit: p.priceUnit,
+                sqft: p.sqft || 1000,
+                parking: p.parking || 1,
+                imageUrl: p.imageUrl,
+                listingType: 'sale',
+                verificationStatus: 'verified',
+                isAiVerified: p.isAiVerified
+            } as Property & { id: string }));
+        
+        const realPropIds = new Set(allSaleProperties?.map(p => p.id));
+        const uniqueDemoProps = demoProps.filter(p => !realPropIds.has(p.id));
+        
+        return [...(allSaleProperties || []), ...uniqueDemoProps];
+    }, [allSaleProperties]);
+
+    const rentPropertiesWithDemo = useMemo(() => {
+        const demoProps = PlaceHolderImages
+            .filter(p => p.type === 'property' && p.listingType === 'rent')
+            .map(p => ({
+                id: p.id,
+                propertyId: p.id,
+                ownerId: 'demo-user-' + p.id,
+                title: p.title || 'Demo Property',
+                location: p.location || 'Demo Location',
+                rentAmount: p.price ? p.price * 100000 : 25000,
+                sqft: p.sqft || 1000,
+                parking: p.parking || 1,
+                imageUrl: p.imageUrl,
+                listingType: 'rent',
+                verificationStatus: 'verified',
+                isAiVerified: p.isAiVerified
+            } as Property & { id: string }));
+        
+        const realPropIds = new Set(allRentProperties?.map(p => p.id));
+        const uniqueDemoProps = demoProps.filter(p => !realPropIds.has(p.id));
+
+        return [...(allRentProperties || []), ...uniqueDemoProps];
+    }, [allRentProperties]);
+    
+    const productsWithDemo = useMemo(() => {
+        const demoProducts = PlaceHolderImages
+            .filter(p => p.type === 'product')
+            .map(p => ({
+                id: p.id,
+                productId: p.id,
+                ownerId: 'demo-user-' + p.id,
+                name: p.name || 'Demo Item',
+                category: p.category,
+                price: p.price || 0,
+                description: 'This is a demo item.',
+                location: p.location || 'Unknown Location',
+                imageUrls: p.imageUrl ? [p.imageUrl] : [],
+                isReserved: !!p.isReserved,
+            } as Product & { id: string }));
+
+        const realProductIds = new Set(allProducts?.map(p => p.id));
+        const uniqueDemoProducts = demoProducts.filter(p => !realProductIds.has(p.id));
+
+        return [...(allProducts || []), ...uniqueDemoProducts];
+    }, [allProducts]);
+
     // --- Filtering and Fallback Logic ---
-    const getFilteredAndSortedItems = <T extends { geo?: { latitude: number; longitude: number; } } | { location?: any }>(items: (T & {id: string})[] | null) => {
+    const getFilteredAndSortedItems = <T extends { geo?: { latitude?: number; longitude?: number; } }>(items: (T & {id: string})[] | null) => {
         if (!items || isGeoLoading) return { displayItems: items || [], isNearby: false };
         if (!userLat || !userLon) return { displayItems: items, isNearby: false };
 
         const nearby = items.filter(item => {
-            const loc = (item as any).geo || (item as any).location;
-            if (!loc || typeof loc.latitude !== 'number' || typeof loc.longitude !== 'number') {
-                return false; // Cannot determine distance for this item
+            const loc = item.geo;
+            if (loc && typeof loc.latitude === 'number' && typeof loc.longitude === 'number') {
+                const dist = calculateDistance(userLat, userLon, loc.latitude, loc.longitude);
+                return dist <= DISTANCE_KM;
             }
-            const dist = calculateDistance(userLat, userLon, loc.latitude, loc.longitude);
-            return dist <= DISTANCE_KM;
+            return false;
         });
 
         if (nearby.length > 0) {
@@ -124,9 +196,9 @@ export function LiveFeed() {
     };
     
     // --- Merging and Filtering Data ---
-    const { displayItems: salePropertiesToShow, isNearby: salePropertiesAreNearby } = useMemo(() => getFilteredAndSortedItems(allSaleProperties), [allSaleProperties, userLat, userLon, isGeoLoading]);
-    const { displayItems: rentPropertiesToShow, isNearby: rentPropertiesAreNearby } = useMemo(() => getFilteredAndSortedItems(allRentProperties), [allRentProperties, userLat, userLon, isGeoLoading]);
-    const { displayItems: productsToShow, isNearby: productsAreNearby } = useMemo(() => getFilteredAndSortedItems(allProducts), [allProducts, userLat, userLon, isGeoLoading]);
+    const { displayItems: salePropertiesToShow, isNearby: salePropertiesAreNearby } = useMemo(() => getFilteredAndSortedItems(salePropertiesWithDemo), [salePropertiesWithDemo, userLat, userLon, isGeoLoading]);
+    const { displayItems: rentPropertiesToShow, isNearby: rentPropertiesAreNearby } = useMemo(() => getFilteredAndSortedItems(rentPropertiesWithDemo), [rentPropertiesWithDemo, userLat, userLon, isGeoLoading]);
+    const { displayItems: productsToShow, isNearby: productsAreNearby } = useMemo(() => getFilteredAndSortedItems(productsWithDemo as any), [productsWithDemo, userLat, userLon, isGeoLoading]);
     const { displayItems: workersToShow, isNearby: workersAreNearby } = useMemo(() => getFilteredAndSortedItems(allWorkers), [allWorkers, userLat, userLon, isGeoLoading]);
     
     return (
