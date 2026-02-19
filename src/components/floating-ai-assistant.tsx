@@ -8,6 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const pageTips: Record<string, { title: string; tip: string }> = {
+  '/ai-help': {
+    title: 'AI Assistant Hub',
+    tip: 'This is your creative center. Use our AI tools to analyze defects, design rooms, or create promotional videos.',
+  },
   '/list-item': {
     title: 'Listing Tip',
     tip: 'Clear photos in good lighting can increase your sale price by up to 15%. Make sure to show any defects.',
