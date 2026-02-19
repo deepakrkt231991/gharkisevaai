@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ArrowUpRight, Camera, ShieldCheck, Copy, Share2, Sofa, Video } from 'lucide-react';
+import { ArrowUpRight, Camera, ShieldCheck, Copy, Share2, Sofa, Video, Compass } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -30,24 +30,21 @@ const IntelligenceSuite = () => (
             <Link href="#" className="text-sm font-bold text-primary">VIEW ALL</Link>
         </div>
 
-        <Card className="glass-card p-4 space-y-3 relative overflow-hidden">
-            <div className="flex items-center gap-3">
-                <div className="bg-primary/20 p-2 rounded-lg"><Sofa className="text-primary"/></div>
-                <h4 className="font-bold text-lg font-headline text-white">AI Interior Designer</h4>
-            </div>
-            <p className="text-sm text-muted-foreground">Instant Vastu-compliant layouts from a single photo.</p>
-            <Button asChild className="w-fit">
-                <Link href="/interior-analysis">
-                    <Camera className="mr-2" />
-                    Upload Room
-                </Link>
-            </Button>
-            <div className="absolute -right-8 -bottom-4 w-32 h-32 opacity-10">
-                <Image src="https://picsum.photos/seed/sofa-icon/200" alt="sofa" fill className="object-contain" />
-            </div>
-        </Card>
-
         <div className="grid grid-cols-2 gap-4">
+            <Card className="glass-card p-4 space-y-4">
+                 <div className="bg-primary/20 p-2 rounded-lg w-fit"><Sofa className="text-primary"/></div>
+                 <h4 className="font-bold text-white">AI Room Designer</h4>
+                 <p className="text-xs text-muted-foreground">Instant redesign from one photo.</p>
+                 <Button variant="outline" className="w-full bg-transparent" asChild><Link href="/interior-analysis">Upload Room</Link></Button>
+            </Card>
+             <Card className="glass-card p-4 space-y-4">
+                <div className="bg-primary/20 p-2 rounded-lg w-fit"><Compass className="text-primary"/></div>
+                <h4 className="font-bold text-white">AI Home Vastu</h4>
+                <p className="text-xs text-muted-foreground">Check Vastu for your home layout.</p>
+                <Button variant="outline" className="w-full bg-transparent" asChild>
+                    <Link href="/interior-analysis">Check Now</Link>
+                </Button>
+            </Card>
             <Card className="glass-card p-4 space-y-4">
                  <div className="bg-primary/20 p-2 rounded-lg w-fit"><ShieldCheck className="text-primary"/></div>
                  <h4 className="font-bold text-white">Property Verifier</h4>
