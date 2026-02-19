@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that analyzes an image or video of a home defect or item.
@@ -22,19 +23,11 @@ const AnalyzeDefectInputSchema = z.object({
 export type AnalyzeDefectInput = z.infer<typeof AnalyzeDefectInputSchema>;
 
 const AnalyzeDefectOutputSchema = z.object({
-  defect: z.string().describe('The identified defect (e.g., "Leaky faucet washer") or the item being listed (e.g., "Used 24-inch Television"), explained in simple, human-like language.'),
-  analysisDetails: z.string().describe("A micro-level analysis of the issue, detailing things like crack depth, dampness levels, or paint quality."),
-  confidence: z.number().describe("A confidence score (from 0 to 100) for the accuracy of the defect identification."),
-  estimatedCost: z.object({
-      total: z.string().describe("The total estimated cost range, e.g., '₹20,000 - ₹25,000'."),
-      material: z.string().describe("The estimated cost for materials, e.g., '₹15,000'."),
-      labor: z.string().describe("The estimated cost for labor, e.g., '₹5,000'.")
-  }).describe("A detailed breakdown of the estimated costs."),
-  diySteps: z.array(z.string()).describe('A list of simple, step-by-step DIY instructions for a user to potentially fix the issue themselves. Each step should be a clear action. This should be an empty array if the repair is complex, dangerous, or if it is an item for sale.'),
-  requiredTools: z.array(z.string()).describe('A list of tools the worker might need to bring for the repair.'),
-  requiredParts: z.array(z.string()).describe('A list of specific parts that might be needed for the repair (e.g., "1/2 inch faucet washer", "TV Capacitor Model 25v 1000uF"). This can also be used to list key components of an item for sale.'),
+  damage: z.array(z.string()).describe("List of identified damages, like 'Peeling plaster (left side)', 'Moisture damage (bottom)'"),
+  steps: z.array(z.string()).describe("Numbered repair steps with materials and Mumbai-based prices, e.g., '1. JK WallPutty ₹800'"),
+  total_cost: z.string().describe("Total estimated cost for the repair, e.g., '₹3500'"),
+  painter: z.string().describe("Contact information for a recommended local painter, e.g., 'Raju Painter - 9876543210'"),
   recommendedWorkerType: z.string().describe("The single, most relevant type of worker for this job (e.g., 'plumber', 'electrician', 'painter')."),
-  materialSuggestions: z.array(z.string()).describe("Recommendations for specific materials based on the problem, e.g., 'Use waterproof paint for damp areas.'"),
 });
 export type AnalyzeDefectOutput = z.infer<typeof AnalyzeDefectOutputSchema>;
 
@@ -46,30 +39,19 @@ const prompt = ai.definePrompt({
   name: 'analyzeDefectPrompt',
   input: {schema: AnalyzeDefectInputSchema},
   output: {schema: AnalyzeDefectOutputSchema},
-  prompt: `You are an expert Home Repair AI Consultant, creating a viral Instagram Reels-style analysis of a home defect. Your tone is fast, modern, and direct. Use emojis where appropriate.
+  prompt: `🚨 STRICT INSTRUCTIONS 🚨
+You are an expert Home Repair AI Consultant for Mumbai, India. Analyze the uploaded wall photo.
 
-You will be provided with media (an image or video) of a home defect. Your task is to analyze it and provide a report in the specified JSON format.
+1.  **DAMAGE ANALYSIS:** Identify all issues like peeling plaster and moisture damage. Describe their location briefly.
+2.  **REPAIR STEPS:** Provide a 3-step numbered guide with specific materials and estimated prices for Mumbai. You must include:
+    - Step 1: Scraping and preparation.
+    - Step 2: Application of JK Wall Putty.
+    - Step 3: Application of AsianPaints Primer and a final green paint.
+3.  **COSTING:** Calculate a total cost based on the steps.
+4.  **BOOKING:** Provide contact details for a fictional local Mumbai painter named 'Raju Painter'.
+5.  **WORKER TYPE:** Identify the primary worker type needed, e.g., 'painter'.
 
-1.  **DAMAGE ANALYSIS 🔬:**
-    *   Analyze the image and identify all issues like peeling plaster, loose paint, moisture stains, cracks, etc.
-    *   For the 'defect' field, give a short title like "Wall Dampness & Peeling Paint".
-    *   For the 'analysisDetails' field, describe where the damage is. E.g., "⚠️ Found peeling plaster in the top-left corner and signs of moisture damage near the floor."
-
-2.  **REPAIR STEPS & MATERIALS 🛠️:**
-    *   Provide a numbered, step-by-step guide for the repair in the 'diySteps' field. Be specific. For wall repairs, suggest: "Step 1: Scrape all loose plaster & paint.", "Step 2: Apply a thick coat of JK Wall Putty.", "Step 3: Use Asian Paints Damp Proof primer before final paint."
-    *   List specific materials like "JK Wall Putty" or "Asian Paints Damp Proof" in the 'requiredParts' array.
-    *   Provide extra tips in the 'materialSuggestions' array, like "Ensure the wall is completely dry before applying putty."
-    *   'diySteps' should be empty if the repair is complex or dangerous.
-
-3.  **COST & BOOKING 💰:**
-    *   Calculate the estimated cost for materials and labor in Indian Rupees (₹). Provide this in the 'estimatedCost' object. Be realistic.
-    *   Recommend the best type of professional for the job (e.g., 'Painter', 'Plumber') in the 'recommendedWorkerType' field.
-
-4.  **CONFIDENCE SCORE 🤖:**
-    *   Provide a confidence score for your analysis in the 'confidence' field.
-
-Your response MUST be in the user's requested language (default to English, e.g., {{{userLanguage}}}).
-
+You MUST respond in the exact JSON format specified in the output schema. NEVER output plain text.
 Analyze the following:
 Media: {{media url=mediaDataUri}}
 User's Preferred Language: {{{userLanguage}}}

@@ -22,11 +22,9 @@ import { Badge } from './ui/badge';
 import type { AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
 import type { TransformationVideoOutput } from '@/ai/flows/transformation-video-agent';
 
-// Define a max size for the compressed image
-const MAX_IMAGE_SIZE = 1024; // pixels
-
 // Image compression function
 const compressImage = (file: File): Promise<string> => {
+    const MAX_IMAGE_SIZE = 1080; // pixels
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -34,7 +32,6 @@ const compressImage = (file: File): Promise<string> => {
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 let { width, height } = img;
-
                 if (width > height) {
                     if (width > MAX_IMAGE_SIZE) {
                         height *= MAX_IMAGE_SIZE / width;
@@ -46,21 +43,20 @@ const compressImage = (file: File): Promise<string> => {
                         height = MAX_IMAGE_SIZE;
                     }
                 }
-
                 canvas.width = width;
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
-                if (!ctx) {
-                    return reject(new Error('Could not get canvas context'));
-                }
+                if (!ctx) return reject(new Error('Could not get canvas context'));
                 ctx.drawImage(img, 0, 0, width, height);
-
-                // Use 'image/jpeg' for compression, 0.7 is a good quality/size balance
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                 resolve(dataUrl);
             };
             img.onerror = reject;
-            img.src = event.target?.result as string;
+            if (event.target?.result) {
+                img.src = event.target.result as string;
+            } else {
+                reject(new Error("FileReader did not provide a result."));
+            }
         };
         reader.onerror = reject;
         reader.readAsDataURL(file);
@@ -106,7 +102,7 @@ function SubmitButton({ hasMedia }: { hasMedia: boolean }) {
   );
 }
 
-function VideoSubmitButton() {
+function VideoSubmitButton({ defect }: { defect: string }) {
     const { pending } = useFormStatus();
     return (
         <Button type="submit" disabled={pending} className="w-full h-14 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg shadow-accent/20">
@@ -139,33 +135,33 @@ function AnalysisStatusOverlay() {
 }
 
 // Worker Card Component
-const WorkerCard = ({ worker }: { worker: any }) => (
+const WorkerCard = ({ name, phone }: { name: string, phone?: string }) => (
     <Card className="glass-card">
         <CardContent className="p-3">
             <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12 border-2 border-primary">
-                    <AvatarImage src={`https://i.pravatar.cc/150?u=${'\'\'\''}${worker?.workerId}${'\'\'\''}`} />
-                    <AvatarFallback>{worker?.name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={`https://i.pravatar.cc/150?u=${name}`} />
+                    <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                    <h4 className="font-bold text-white">{worker?.name}</h4>
-                    <p className="text-xs text-muted-foreground capitalize">{worker?.skills?.join(', ')}</p>
+                    <h4 className="font-bold text-white">{name}</h4>
+                    <p className="text-xs text-muted-foreground capitalize">Painter</p>
                     <div className="flex items-center gap-1.5 text-yellow-400 text-xs">
                         <Star className="h-3 w-3 fill-current" />
-                        <span className="font-bold text-white">4.8</span>
-                        <span className="text-muted-foreground text-[10px]">(120 reviews)</span>
+                        <span className="font-bold text-white">4.9</span>
+                        <span className="text-muted-foreground text-[10px]">(Local Pro)</span>
                     </div>
                 </div>
                  <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-900/30">Verified</Badge>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
                 <Button variant="secondary" size="sm" asChild>
-                    <Link href={`/chat/job-temp-${'\'\'\''}${worker?.workerId}${'\'\'\''}`}>
+                    <Link href={`/chat/job-temp-${name}`}>
                         <MessageSquare className="mr-2 h-4 w-4"/>Free Chat
                     </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
-                    <a href={`tel:${'\'\'\''}${worker?.phone || ''}${'\'\'\''}`}>
+                    <a href={`tel:${phone || ''}`}>
                         <Phone className="mr-2 h-4 w-4"/>Free Call
                     </a>
                 </Button>
@@ -180,47 +176,21 @@ export function DefectAnalyzer() {
   
   const [media, setMedia] = useState<Media | null>(null);
   const [description, setDescription] = useState('');
-  const [workers, setWorkers] = useState<any[]>([]);
-  const [isLoadingWorkers, setIsLoadingWorkers] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
-  useEffect(() => {
-    if (analysisState.success && analysisState.data?.recommendedWorkerType) {
-        setIsLoadingWorkers(true);
-        findNearbyWorkers({ skill: analysisState.data.recommendedWorkerType })
-            .then(result => {
-                if (result.success) {
-                    setWorkers(result.workers);
-                }
-            })
-            .finally(() => setIsLoadingWorkers(false));
-    }
-  }, [analysisState.success, analysisState.data]);
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
-
-      if (mediaType === 'image') {
-          try {
-              const compressedDataUrl = await compressImage(file);
-              setMedia({ dataUrl: compressedDataUrl, type: 'image' });
-          } catch (error) {
-              console.error("Image compression failed:", error);
-              // Fallback to uncompressed if compression fails
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                  setMedia({ dataUrl: reader.result as string, type: 'image' });
-              };
-              reader.readAsDataURL(file);
-          }
-      } else {
-          // For video, we don't compress on client-side for now
+      try {
+          const compressedDataUrl = await compressImage(file);
+          setMedia({ dataUrl: compressedDataUrl, type: 'image' });
+      } catch (error) {
+          console.error("Image compression failed:", error);
           const reader = new FileReader();
           reader.onloadend = () => {
-              setMedia({ dataUrl: reader.result as string, type: 'video' });
+              setMedia({ dataUrl: reader.result as string, type: 'image' });
           };
           reader.readAsDataURL(file);
       }
@@ -230,8 +200,6 @@ export function DefectAnalyzer() {
   const handleReset = () => {
     setMedia(null);
     setDescription('');
-    setWorkers([]);
-    setIsLoadingWorkers(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -267,17 +235,10 @@ export function DefectAnalyzer() {
           <Card className="glass-card border-l-4 border-l-primary/80">
             <CardContent className="p-4 space-y-3">
                 <div>
-                    <p className="text-xs text-primary font-bold uppercase tracking-wider">Issue Identified</p>
-                    <h3 className="text-2xl font-bold font-headline text-white mt-1">{result?.defect}</h3>
-                </div>
-                 <div>
-                    <h4 className="text-xs text-muted-foreground font-bold uppercase tracking-wider">AI's Detailed Analysis</h4>
-                    <p className="text-sm text-white/90 mt-1">{result?.analysisDetails}</p>
-                </div>
-                <div className="w-28 text-center pt-2">
-                    <p className="text-[10px] font-bold text-green-400/80 tracking-wider">AI CONFIDENCE</p>
-                    <Progress value={result?.confidence || 0} className="h-1.5 mt-1 [&>div]:bg-green-400" />
-                    <p className="text-xs font-bold text-green-400 mt-0.5">{result?.confidence}%</p>
+                    <p className="text-xs text-primary font-bold uppercase tracking-wider">Issues Identified</p>
+                     <ul className="list-disc list-inside mt-1 text-white/90">
+                        {result.damage?.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
                 </div>
             </CardContent>
           </Card>
@@ -297,8 +258,8 @@ export function DefectAnalyzer() {
                   ) : (
                     <form action={videoAction}>
                       <input type="hidden" name="mediaDataUri" value={media.dataUrl} />
-                      <input type="hidden" name="defect" value={result?.defect || ''} />
-                      <VideoSubmitButton />
+                      <input type="hidden" name="defect" value={result?.damage?.join(', ') || ''} />
+                      <VideoSubmitButton defect={result?.damage?.join(', ') || ''} />
                     </form>
                   )}
                   {videoState.message && !videoState.success && (
@@ -315,71 +276,33 @@ export function DefectAnalyzer() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="glass-card">
                   <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Est. Cost</p>
-                      <p className="text-3xl font-bold text-accent mt-2">{result?.estimatedCost?.total}</p>
-                       <div className="text-xs text-muted-foreground/70 mt-1 grid grid-cols-2 divide-x divide-border">
-                        <p className="pr-2">Material: <span className="font-bold text-white/80">{result?.estimatedCost?.material}</span></p>
-                        <p className="pl-2">Labor: <span className="font-bold text-white/80">{result?.estimatedCost?.labor}</span></p>
-                    </div>
+                      <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Total Est. Cost</p>
+                      <p className="text-3xl font-bold text-accent mt-2">{result?.total_cost}</p>
                   </CardContent>
               </Card>
-              <Card className="glass-card">
+               <Card className="glass-card">
                   <CardContent className="p-4">
-                       <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-2">Parts & Materials</p>
-                       <ul className="space-y-2">
-                           {result?.requiredParts?.map((part, index) => (
-                               <li key={`part-${'\'\'\''}${index}${'\'\'\''}`} className="flex items-center gap-2 text-sm text-white">
-                                   <CheckCircle size={16} className="text-accent"/>
-                                   <span className="truncate">{part}</span>
-                               </li>
-                           ))}
-                            {result?.materialSuggestions?.map((suggestion, index) => (
-                                <li key={`mat-${'\'\'\''}${index}${'\'\'\''}`} className="flex items-start gap-2 text-sm text-white">
-                                    <Sparkles size={16} className="text-accent flex-shrink-0 mt-1"/>
-                                    <span>{suggestion}</span>
-                                </li>
-                            ))}
-                            {(result?.requiredParts?.length === 0 && result?.materialSuggestions?.length === 0) && (
-                                <p className="text-sm text-muted-foreground">No specific parts or materials recommended.</p>
-                            )}
-                       </ul>
+                       <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-2">Recommended Painter</p>
+                       <p className="font-bold text-white">{result?.painter}</p>
                   </CardContent>
               </Card>
           </div>
 
-          {result?.diySteps && result.diySteps.length > 0 && (
+          {result?.steps && result.steps.length > 0 && (
             <div>
-              <h3 className="text-lg font-bold font-headline mb-2">DIY Steps (आप इसे स्वयं ठीक कर सकते हैं)</h3>
+              <h3 className="text-lg font-bold font-headline mb-2">DIY Repair Steps (आप इसे स्वयं ठीक कर सकते हैं)</h3>
               <Accordion type="single" collapsible className="w-full glass-card rounded-xl px-4">
-                {result.diySteps.map((step, index) => (
-                  <AccordionItem key={index} value={`item-${'\'\'\''}${index}${'\'\'\''}`} className={index === result.diySteps.length -1 ? 'border-b-0' : ''}>
-                    <AccordionTrigger className="text-white hover:no-underline text-left">{index+1}. {step.split(':')[0]}</AccordionTrigger>
+                {result.steps.map((step, index) => (
+                  <AccordionItem key={index} value={`item-${index}`} className={index === result.steps.length -1 ? 'border-b-0' : ''}>
+                    <AccordionTrigger className="text-white hover:no-underline text-left">{step}</AccordionTrigger>
                     <AccordionContent className="text-muted-foreground">
-                      {step.split(': ')[1] || 'No further details.'}
+                      Follow this step carefully. Ensure you have the right tools and safety gear.
                     </AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
             </div>
           )}
-
-           <div>
-              <h3 className="text-lg font-bold font-headline mb-2">Connect with a Pro (Free)</h3>
-              {isLoadingWorkers && (
-                  <div className="flex items-center justify-center gap-2 text-muted-foreground py-4">
-                      <Loader2 className="animate-spin h-5 w-5"/>
-                      <span>Finding best workers near you...</span>
-                  </div>
-              )}
-              {!isLoadingWorkers && workers.length > 0 && (
-                  <div className="space-y-3">
-                      {workers.map(worker => <WorkerCard key={worker?.workerId} worker={worker} />)}
-                  </div>
-              )}
-              {!isLoadingWorkers && workers.length === 0 && (
-                   <p className="text-muted-foreground text-sm">No recommended workers found for this issue.</p>
-              )}
-           </div>
 
         </div>
       );
