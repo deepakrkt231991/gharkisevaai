@@ -21,6 +21,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from './ui/badge';
 import type { AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
 import type { TransformationVideoOutput } from '@/ai/flows/transformation-video-agent';
+import { LocationTracker } from './location-tracker';
 
 // Image compression function
 const compressImage = (file: File): Promise<string> => {
@@ -140,7 +141,7 @@ const WorkerCard = ({ name, phone }: { name: string, phone?: string }) => (
         <CardContent className="p-3">
             <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12 border-2 border-primary">
-                    <AvatarImage src={`https://i.pravatar.cc/150?u=${name}`} />
+                    <AvatarImage src={`https://i.pravatar.cc/150?u=${'\'\'\''}${name}${'\'\'\''}`} />
                     <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
@@ -156,12 +157,12 @@ const WorkerCard = ({ name, phone }: { name: string, phone?: string }) => (
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
                 <Button variant="secondary" size="sm" asChild>
-                    <Link href={`/chat/job-temp-${name}`}>
+                    <Link href={`/chat/job-temp-${'\'\'\''}${name}${'\'\'\''}`}>
                         <MessageSquare className="mr-2 h-4 w-4"/>Free Chat
                     </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
-                    <a href={`tel:${phone || ''}`}>
+                    <a href={`tel:${'\'\'\''}${phone || ''}${'\'\'\''}`}>
                         <Phone className="mr-2 h-4 w-4"/>Free Call
                     </a>
                 </Button>
@@ -176,6 +177,7 @@ export function DefectAnalyzer() {
   
   const [media, setMedia] = useState<Media | null>(null);
   const [description, setDescription] = useState('');
+  const [userLocation, setUserLocation] = useState<{ city: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
@@ -243,7 +245,7 @@ export function DefectAnalyzer() {
             </CardContent>
           </Card>
 
-          {media?.type === 'image' && (
+          {media?.type === 'image' && result.ai_design && (
              <Card className="glass-card bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
                 <CardContent className="p-4 space-y-3">
                   <h3 className="font-bold font-headline text-white">AI Redesign (Before/After)</h3>
@@ -293,7 +295,7 @@ export function DefectAnalyzer() {
               <h3 className="text-lg font-bold font-headline mb-2">DIY Repair Steps (आप इसे स्वयं ठीक कर सकते हैं)</h3>
               <Accordion type="single" collapsible className="w-full glass-card rounded-xl px-4">
                 {result.steps.map((step, index) => (
-                  <AccordionItem key={index} value={`item-${index}`} className={index === result.steps.length -1 ? 'border-b-0' : ''}>
+                  <AccordionItem key={index} value={`item-${'\'\'\''}${index}${'\'\'\''}`} className={index === result.steps.length -1 ? 'border-b-0' : ''}>
                     <AccordionTrigger className="text-white hover:no-underline text-left">{step}</AccordionTrigger>
                     <AccordionContent className="text-muted-foreground">
                       Follow this step carefully. Ensure you have the right tools and safety gear.
@@ -327,7 +329,9 @@ export function DefectAnalyzer() {
       </div>
       
       <main className="flex-1 space-y-6 overflow-y-auto p-4 pb-32">
+        <LocationTracker onLocationChange={(loc) => setUserLocation(loc ? { city: loc.address.split(',')[0] } : null)} />
         <form action={analysisAction} ref={formRef}>
+           <input type="hidden" name="userLocation" value={userLocation?.city || ''} />
            <div className="space-y-4">
               <div
                 className="relative group w-full aspect-video rounded-xl overflow-hidden border-2 border-dashed border-border bg-input/5 flex flex-col items-center justify-center cursor-pointer hover:border-accent scan-glow"

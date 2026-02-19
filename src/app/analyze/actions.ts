@@ -11,6 +11,7 @@ const schema = z.object({
     message: 'Invalid data URI',
   }),
   description: z.string().optional(),
+  userLocation: z.string().optional(),
 });
 
 type State = {
@@ -36,6 +37,7 @@ export async function analyzeDefect(
   const validatedFields = schema.safeParse({
     mediaDataUri: formData.get('mediaDataUri'),
     description: formData.get('description'),
+    userLocation: formData.get('userLocation'),
   });
 
   if (!validatedFields.success) {
@@ -52,6 +54,7 @@ export async function analyzeDefect(
       description: validatedFields.data.description,
       // In a real app, you'd get this from user preferences
       userLanguage: 'Hindi', 
+      userLocation: validatedFields.data.userLocation,
     });
     return {
       success: true,
@@ -124,7 +127,7 @@ export async function generateVideo(
     }
 
     try {
-        const videoPrompt = `Create a 5-second "Before & After" transformation video. Start with the provided image showing a defect: '${validatedFields.data.defect}'. Magically repair the wall, and then redesign it with a smooth, modern, dual-tone finish using a calming green and an elegant white. The final look should be clean, aspirational, and professionally designed.`;
+        const videoPrompt = `Create a 5-second "Before & After" transformation video. Start with the provided image showing a defect: '${'\'\'\''}${validatedFields.data.defect}${'\'\'\''}'. Magically repair the wall, and then redesign it with a smooth, modern, dual-tone finish using a calming green and an elegant white. The final look should be clean, aspirational, and professionally designed.`;
         
         const result = await createTransformationVideo({
             imageDataUri: validatedFields.data.mediaDataUri,

@@ -15,10 +15,11 @@ const AnalyzeDefectInputSchema = z.object({
   mediaDataUri: z
     .string()
     .describe(
-      "A photo or video of a home defect or an item for sale, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "A photo or video of a home defect or an item for sale, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'"
     ),
   description: z.string().optional().describe('An optional user-provided description of the problem or item.'),
   userLanguage: z.string().optional().describe('The preferred language for the response (e.g., "Hindi", "Spanish"). Defaults to English.'),
+  userLocation: z.string().optional().describe("The user's city to provide localized results (e.g., 'Mumbai')."),
 });
 export type AnalyzeDefectInput = z.infer<typeof AnalyzeDefectInputSchema>;
 
@@ -41,19 +42,22 @@ const prompt = ai.definePrompt({
   input: {schema: AnalyzeDefectInputSchema},
   output: {schema: AnalyzeDefectOutputSchema},
   prompt: `🚨 STRICT INSTRUCTIONS 🚨
-You are an expert Home Repair AI Consultant for Mumbai, India. Analyze the uploaded wall photo.
+You are an expert Home Repair AI Consultant for India. Analyze the uploaded wall photo.
 
 1.  **DAMAGE ANALYSIS:** Identify issues like peeling plaster. Respond with markers like "Peeling plaster🔴".
-2.  **REPAIR STEPS:** Provide a 3-step numbered guide with specific materials and estimated prices for Mumbai. You MUST include "JK WallPutty", "AsianPaints Primer", and a "Green paint" step with prices.
+2.  **REPAIR STEPS:** Provide a 3-step numbered guide with specific materials and estimated prices. If the user's location is Mumbai, you MUST use Mumbai-based prices and include "JK WallPutty", "AsianPaints Primer", and a "Green paint" step with prices. Otherwise, use general prices.
 3.  **COSTING:** Calculate a total cost based on the steps.
 4.  **AI DESIGN IMAGE:** Set the 'ai_design' field to "smooth_green_wall.jpg".
-5.  **BOOKING:** Provide contact details for a fictional Mumbai painter named 'Raju Painter'.
+5.  **BOOKING:** If the user's location is Mumbai, provide contact details for a fictional Mumbai painter named 'Raju Painter'. Otherwise, state that local professionals are available.
 6.  **WORKER TYPE:** Identify the primary worker type needed. For wall issues, it is always 'painter'.
 
 You MUST respond in the exact JSON format specified in the output schema. NEVER output plain text.
 
 Analyze the following:
 Media: {{media url=mediaDataUri}}
+{{#if userLocation}}
+User Location: {{{userLocation}}}
+{{/if}}
 {{#if description}}
 User Description: {{{description}}}
 {{/if}}
