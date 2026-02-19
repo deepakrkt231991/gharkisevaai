@@ -209,7 +209,7 @@ export function InteriorAnalyzer() {
                 onChange={handleFileChange}
              />
         </form>
-        <div className="relative w-full aspect-[9/10] bg-muted">
+        <div className="relative w-full aspect-video rounded-xl overflow-hidden">
             {renderState.success && renderState.renderData?.renderDataUri ? (
                 <Image src={renderState.renderData.renderDataUri} alt="3D Render of improved room" fill className="object-cover" />
             ) : image ? (
@@ -222,7 +222,7 @@ export function InteriorAnalyzer() {
                     <div className="absolute inset-6 border-2 border-dashed border-white/20 rounded-lg opacity-50 pointer-events-none"></div>
                     <div className="text-center p-4">
                         <ScanSearch className="w-12 h-12 text-muted-foreground mx-auto" />
-                        <p className="mt-4 text-lg font-semibold font-headline">Capture Your Space</p>
+                        <p className="mt-4 text-lg font-semibold font-headline">Capture the Defect</p>
                         <p className="text-sm text-muted-foreground">Take a clear, well-lit photo for the most accurate AI analysis.</p>
                     </div>
                 </div>
