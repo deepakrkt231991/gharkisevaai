@@ -23,11 +23,12 @@ const AnalyzeDefectInputSchema = z.object({
 export type AnalyzeDefectInput = z.infer<typeof AnalyzeDefectInputSchema>;
 
 const AnalyzeDefectOutputSchema = z.object({
-  damage: z.array(z.string()).describe("List of identified damages, like 'Peeling plaster (left side)', 'Moisture damage (bottom)'"),
+  damage: z.array(z.string()).describe("List of identified damages, like 'Peeling plaster🔴'"),
   steps: z.array(z.string()).describe("Numbered repair steps with materials and Mumbai-based prices, e.g., '1. JK WallPutty ₹800'"),
   total_cost: z.string().describe("Total estimated cost for the repair, e.g., '₹3500'"),
   painter: z.string().describe("Contact information for a recommended local painter, e.g., 'Raju Painter - 9876543210'"),
-  recommendedWorkerType: z.string().describe("The single, most relevant type of worker for this job (e.g., 'plumber', 'electrician', 'painter')."),
+  ai_design: z.string().describe("Filename of a demo image showing the after state, e.g., 'smooth_green_wall.jpg'").optional(),
+  recommendedWorkerType: z.string().describe("The single, most relevant type of worker for this job (e.g., 'painter')."),
 });
 export type AnalyzeDefectOutput = z.infer<typeof AnalyzeDefectOutputSchema>;
 
@@ -42,19 +43,17 @@ const prompt = ai.definePrompt({
   prompt: `🚨 STRICT INSTRUCTIONS 🚨
 You are an expert Home Repair AI Consultant for Mumbai, India. Analyze the uploaded wall photo.
 
-1.  **DAMAGE ANALYSIS:** Identify all issues like peeling plaster and moisture damage. Describe their location briefly.
-2.  **REPAIR STEPS:** Provide a 3-step numbered guide with specific materials and estimated prices for Mumbai. You must include:
-    - Step 1: Scraping and preparation.
-    - Step 2: Application of JK Wall Putty.
-    - Step 3: Application of AsianPaints Primer and a final green paint.
+1.  **DAMAGE ANALYSIS:** Identify issues like peeling plaster. Respond with markers like "Peeling plaster🔴".
+2.  **REPAIR STEPS:** Provide a 3-step numbered guide with specific materials and estimated prices for Mumbai. You MUST include "JK WallPutty", "AsianPaints Primer", and a "Green paint" step with prices.
 3.  **COSTING:** Calculate a total cost based on the steps.
-4.  **BOOKING:** Provide contact details for a fictional local Mumbai painter named 'Raju Painter'.
-5.  **WORKER TYPE:** Identify the primary worker type needed, e.g., 'painter'.
+4.  **AI DESIGN IMAGE:** Set the 'ai_design' field to "smooth_green_wall.jpg".
+5.  **BOOKING:** Provide contact details for a fictional Mumbai painter named 'Raju Painter'.
+6.  **WORKER TYPE:** Identify the primary worker type needed. For wall issues, it is always 'painter'.
 
 You MUST respond in the exact JSON format specified in the output schema. NEVER output plain text.
+
 Analyze the following:
 Media: {{media url=mediaDataUri}}
-User's Preferred Language: {{{userLanguage}}}
 {{#if description}}
 User Description: {{{description}}}
 {{/if}}
