@@ -213,16 +213,16 @@ export function InteriorAnalyzer() {
             ) : image ? (
                 <Image src={image} alt="Room for analysis" fill className="object-cover" />
             ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8 text-center">
-                    <div className="p-4 bg-primary/10 rounded-full">
-                        <ScanSearch className="w-16 h-16 text-primary" />
+                 <div
+                    className="absolute inset-0 group w-full h-full flex flex-col items-center justify-center cursor-pointer"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <div className="absolute inset-6 border-2 border-dashed border-white/20 rounded-lg opacity-50 pointer-events-none group-hover:border-primary transition-colors"></div>
+                    <div className="text-center p-4">
+                        <ScanSearch className="w-12 h-12 text-muted-foreground mx-auto" />
+                        <h2 className="mt-4 text-xl font-bold font-headline">Analyze Your Space</h2>
+                        <p className="text-muted-foreground">Align room inside the frame for best results.</p>
                     </div>
-                    <h2 className="text-xl font-bold font-headline">Analyze Your Space</h2>
-                    <p className="text-muted-foreground">Upload a photo of your room to get Vastu and aesthetic suggestions from our AI.</p>
-                     <Button onClick={() => fileInputRef.current?.click()} size="lg">
-                        <UploadCloud className="mr-2" />
-                        Upload Photo
-                    </Button>
                 </div>
             )}
              {(isAnalysisPending || isRenderPending) && (
