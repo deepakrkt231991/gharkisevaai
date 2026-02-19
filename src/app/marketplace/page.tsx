@@ -1,7 +1,6 @@
-
 'use client';
 
-import { Home, Bell, ShoppingBag, Search, SlidersHorizontal, Plus, Heart, MessageSquare, User, MapPin, Tag, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Home, Bell, ShoppingBag, Search, SlidersHorizontal, Plus, Heart, MessageSquare, User, MapPin, Tag, ArrowLeft, ArrowRight, IndianRupee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo, useCallback, useEffect } from 'react';
@@ -17,8 +16,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import useEmblaCarousel from 'embla-carousel-react';
 import AdsenseBanner from '@/components/adsense-banner';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter, DrawerClose } from '@/components/ui/drawer';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 
-const MarketplaceHeader = () => (
+
+const MarketplaceHeader = ({ onSearchTermChange }: { onSearchTermChange: (term: string) => void }) => (
      <header className="sticky top-0 z-40 flex flex-col gap-4 bg-background/80 p-4 backdrop-blur-md border-b border-border">
         <div className="flex items-center justify-between">
              <Link href="/" className="flex items-center gap-2">
@@ -45,11 +48,13 @@ const MarketplaceHeader = () => (
                 type="search"
                 placeholder="Search for home items..."
                 className="w-full rounded-md bg-input pl-10 pr-12 h-12 text-white border-border"
-                onChange={(e) => (window as any).setMarketplaceSearchTerm(e.target.value)}
+                onChange={(e) => onSearchTermChange(e.target.value)}
             />
-             <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9">
-                <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
-            </Button>
+             <DrawerTrigger asChild>
+                <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9">
+                    <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
+                </Button>
+             </DrawerTrigger>
         </div>
     </header>
 );
@@ -122,6 +127,8 @@ export default function MarketplacePage() {
     
     const [activeFilter, setActiveFilter] = useState('All Items');
     const [searchTerm, setSearchTerm] = useState('');
+    const [locationFilter, setLocationFilter] = useState('');
+    const [priceRange, setPriceRange] = useState([0, 100000]);
     
     const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
     const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
@@ -147,11 +154,6 @@ export default function MarketplacePage() {
         emblaApi.on('reInit', onSelect);
         emblaApi.on('select', onSelect);
     }, [emblaApi, onSelect]);
-
-
-    if (typeof window !== 'undefined') {
-        (window as any).setMarketplaceSearchTerm = setSearchTerm;
-    }
 
     const filteredProducts = useMemo(() => {
         const demoProducts: (Product & { id: string })[] = PlaceHolderImages
@@ -189,88 +191,140 @@ export default function MarketplacePage() {
             );
         }
 
+        // Apply new filters
+        tempProducts = tempProducts.filter(p => {
+            const locationMatch = !locationFilter || (p.location && p.location.toLowerCase().includes(locationFilter.toLowerCase()));
+            const priceMatch = p.price >= priceRange[0] && p.price <= priceRange[1];
+            return locationMatch && priceMatch;
+        });
+
         return tempProducts;
-    }, [products, activeFilter, searchTerm]);
+    }, [products, activeFilter, searchTerm, locationFilter, priceRange]);
 
 
     return (
-        <div className="dark bg-background text-foreground">
-            <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
-                <MarketplaceHeader />
-                <main className="flex-1 space-y-6 overflow-y-auto p-4 pb-32">
-                    <Tabs defaultValue="buy" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 bg-card h-14 rounded-xl p-1">
-                             <TabsTrigger value="buy" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                                <ShoppingBag /> Buy Items
-                            </TabsTrigger>
-                            <TabsTrigger value="sell" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-                                <Tag /> Sell Items
-                            </TabsTrigger>
-                        </TabsList>
+        <Drawer>
+            <div className="dark bg-background text-foreground">
+                <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col">
+                    <MarketplaceHeader onSearchTermChange={setSearchTerm} />
+                    <main className="flex-1 space-y-6 overflow-y-auto p-4 pb-32">
+                        <Tabs defaultValue="buy" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2 bg-card h-14 rounded-xl p-1">
+                                 <TabsTrigger value="buy" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
+                                    <ShoppingBag /> Buy Items
+                                </TabsTrigger>
+                                <TabsTrigger value="sell" className="h-full rounded-lg text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
+                                    <Tag /> Sell Items
+                                </TabsTrigger>
+                            </TabsList>
 
-                        <TabsContent value="buy" className="pt-6 space-y-6">
-                            <div className="relative">
-                                <div className="overflow-hidden" ref={emblaRef}>
-                                    <div className="flex gap-2 pb-2 -mx-4 px-4">
-                                        <Button onClick={() => setActiveFilter('All Items')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'All Items' ? 'default' : 'secondary'}>ALL ITEMS</Button>
-                                        <Button onClick={() => setActiveFilter('Furniture')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'Furniture' ? 'default' : 'secondary'}>FURNITURE</Button>
-                                        <Button onClick={() => setActiveFilter('Electronics')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'Electronics' ? 'default' : 'secondary'}>ELECTRONICS</Button>
-                                        <Button onClick={() => setActiveFilter('Appliances')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'Appliances' ? 'default' : 'secondary'}>APPLIANCES</Button>
-                                    </div>
-                                </div>
-                                <Button
-                                    onClick={scrollPrev}
-                                    disabled={prevBtnDisabled}
-                                    variant="outline"
-                                    size="icon"
-                                    className="absolute -left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background z-10"
-                                >
-                                    <ArrowLeft size={16} />
-                                </Button>
-                                <Button
-                                    onClick={scrollNext}
-                                    disabled={nextBtnDisabled}
-                                    variant="outline"
-                                    size="icon"
-                                    className="absolute -right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background z-10"
-                                >
-                                    <ArrowRight size={16} />
-                                </Button>
-                            </div>
-                            {isLoading ? (
-                                <div className="grid grid-cols-2 gap-4">
-                                    {[...Array(4)].map((_, i) => (
-                                        <div key={i} className="space-y-2">
-                                            <Skeleton className="h-56 w-full rounded-xl" />
-                                            <Skeleton className="h-4 w-3/4" />
-                                            <Skeleton className="h-4 w-1/2" />
+                            <TabsContent value="buy" className="pt-6 space-y-6">
+                                <div className="relative">
+                                    <div className="overflow-hidden" ref={emblaRef}>
+                                        <div className="flex gap-2 pb-2 -mx-4 px-4">
+                                            <Button onClick={() => setActiveFilter('All Items')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'All Items' ? 'default' : 'secondary'}>ALL ITEMS</Button>
+                                            <Button onClick={() => setActiveFilter('Furniture')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'Furniture' ? 'default' : 'secondary'}>FURNITURE</Button>
+                                            <Button onClick={() => setActiveFilter('Electronics')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'Electronics' ? 'default' : 'secondary'}>ELECTRONICS</Button>
+                                            <Button onClick={() => setActiveFilter('Appliances')} className="rounded-full h-10 whitespace-nowrap flex-shrink-0" variant={activeFilter === 'Appliances' ? 'default' : 'secondary'}>APPLIANCES</Button>
                                         </div>
-                                    ))}
+                                    </div>
+                                    <Button
+                                        onClick={scrollPrev}
+                                        disabled={prevBtnDisabled}
+                                        variant="outline"
+                                        size="icon"
+                                        className="absolute -left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background z-10"
+                                    >
+                                        <ArrowLeft size={16} />
+                                    </Button>
+                                    <Button
+                                        onClick={scrollNext}
+                                        disabled={nextBtnDisabled}
+                                        variant="outline"
+                                        size="icon"
+                                        className="absolute -right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background z-10"
+                                    >
+                                        <ArrowRight size={16} />
+                                    </Button>
                                 </div>
-                            ) : (
-                                <div className="grid grid-cols-2 gap-4">
-                                    {filteredProducts.length > 0 ? filteredProducts.flatMap((product, index) => {
-                                        const content = [<ProductCard key={product.id} product={product as Product & { id: string }} />];
-                                        if ((index + 1) % 4 === 0) {
-                                            content.push(
-                                                <div key={`ad-${index}`} className="col-span-2 my-2 rounded-xl overflow-hidden glass-card p-2">
-                                                    <AdsenseBanner adSlot="2001427785" />
-                                                </div>
-                                            );
-                                        }
-                                        return content;
-                                    }) : <p className="col-span-2 text-center text-muted-foreground py-10">No products found in this category.</p>}
-                                </div>
-                            )}
-                        </TabsContent>
+                                {isLoading ? (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {[...Array(4)].map((_, i) => (
+                                            <div key={i} className="space-y-2">
+                                                <Skeleton className="h-56 w-full rounded-xl" />
+                                                <Skeleton className="h-4 w-3/4" />
+                                                <Skeleton className="h-4 w-1/2" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {filteredProducts.length > 0 ? filteredProducts.flatMap((product, index) => {
+                                            const content = [<ProductCard key={product.id} product={product as Product & { id: string }} />];
+                                            if ((index + 1) % 4 === 0) {
+                                                content.push(
+                                                    <div key={`ad-${index}`} className="col-span-2 my-2 rounded-xl overflow-hidden glass-card p-2">
+                                                        <AdsenseBanner adSlot="2001427785" />
+                                                    </div>
+                                                );
+                                            }
+                                            return content;
+                                        }) : <p className="col-span-2 text-center text-muted-foreground py-10">No products found for the selected filters.</p>}
+                                    </div>
+                                )}
+                            </TabsContent>
 
-                         <TabsContent value="sell" className="pt-6 space-y-6">
-                            <ListItemCtaCard />
-                        </TabsContent>
-                    </Tabs>
-                </main>
-                <MarketplaceBottomNav />
+                             <TabsContent value="sell" className="pt-6 space-y-6">
+                                <ListItemCtaCard />
+                            </TabsContent>
+                        </Tabs>
+                    </main>
+                    <MarketplaceBottomNav />
+                </div>
             </div>
-        </div>
+            
+            <DrawerContent>
+                <div className="mx-auto w-full max-w-sm">
+                    <DrawerHeader>
+                        <DrawerTitle>Filters</DrawerTitle>
+                    </DrawerHeader>
+                    <div className="p-4 space-y-6">
+                        <div className="space-y-3">
+                            <Label htmlFor="location" className="flex items-center gap-2"><MapPin/> Location</Label>
+                            <Input 
+                                id="location" 
+                                placeholder="e.g., Mumbai, Delhi"
+                                value={locationFilter}
+                                onChange={(e) => setLocationFilter(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <Label htmlFor="price" className="flex items-center gap-2"><IndianRupee/> Price Range</Label>
+                            <div className="flex justify-between text-sm text-muted-foreground">
+                                <span>₹{priceRange[0].toLocaleString('en-IN')}</span>
+                                <span>₹{priceRange[1].toLocaleString('en-IN')}{priceRange[1] === 100000 ? '+' : ''}</span>
+                            </div>
+                            <Slider
+                                id="price"
+                                min={0}
+                                max={100000}
+                                step={1000}
+                                value={priceRange}
+                                onValueChange={(value: number[]) => setPriceRange(value)}
+                                className="w-full"
+                            />
+                        </div>
+                    </div>
+                    <DrawerFooter>
+                        <DrawerClose asChild>
+                            <Button>Apply Filters</Button>
+                        </DrawerClose>
+                         <DrawerClose asChild>
+                            <Button variant="outline">Close</Button>
+                        </DrawerClose>
+                    </DrawerFooter>
+                </div>
+            </DrawerContent>
+        </Drawer>
     );
 }
