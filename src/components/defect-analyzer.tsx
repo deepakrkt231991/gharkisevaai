@@ -125,8 +125,9 @@ function VideoSubmitButton() {
     )
 }
 
-function AnalysisOverlay({ isPending }: { isPending: boolean }) {
-    if(!isPending) return null;
+function AnalysisStatusOverlay() {
+    const { pending } = useFormStatus();
+    if(!pending) return null;
     return (
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 text-white overflow-hidden z-20">
             <div className="scan-line"></div>
@@ -183,8 +184,6 @@ export function DefectAnalyzer() {
   const [isLoadingWorkers, setIsLoadingWorkers] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const { pending: isAnalysisPending } = useFormStatus();
-
   
   useEffect(() => {
     if (analysisState.success && analysisState.data?.recommendedWorkerType) {
@@ -426,7 +425,7 @@ export function DefectAnalyzer() {
                     <div className="text-center p-4">
                         <ScanSearch className="w-12 h-12 text-muted-foreground mx-auto" />
                         <p className="mt-4 text-lg font-semibold font-headline">Capture the Defect</p>
-                        <p className="text-sm text-muted-foreground">Align item inside the frame for best results.</p>
+                        <p className="text-sm text-muted-foreground">Take a clear, well-lit photo for the most accurate AI analysis.</p>
                     </div>
                   </>
                 )}
@@ -439,7 +438,7 @@ export function DefectAnalyzer() {
                     capture="environment"
                     onChange={handleFileChange}
                  />
-                <AnalysisOverlay isPending={isAnalysisPending}/>
+                <AnalysisStatusOverlay/>
               </div>
 
                <div className="grid w-full items-center gap-1.5">

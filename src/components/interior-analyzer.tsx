@@ -2,8 +2,8 @@
 
 "use client";
 
-import { useState, useRef, ChangeEvent, startTransition } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useState, useRef, ChangeEvent, useTransition } from 'react';
+import { useFormState } from 'react-dom';
 import Image from 'next/image';
 import { ArrowLeft, Share, Heart, Sparkles, Compass, Paintbrush, Lightbulb, CheckCircle, Loader2, UploadCloud, ScanSearch, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,17 +33,15 @@ export function InteriorAnalyzer() {
   const [analysisState, analysisAction] = useFormState(analyzeInterior, initialAnalysisState);
   const [renderState, renderAction] = useFormState(generate3dRender, initialRenderState);
   
+  const [isAnalysisPending, startAnalysisTransition] = useTransition();
+  const [isRenderPending, startRenderTransition] = useTransition();
+
   const [image, setImage] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState('Modern');
   const moodboardStyles = ['Modern', 'Classic', 'Minimalist', 'Industrial', 'Bohemian'];
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const analysisFormRef = useRef<HTMLFormElement>(null);
-  const renderFormRef = useRef<HTMLFormElement>(null);
-
-  const { pending: isAnalysisPending } = useFormStatus();
-  const { pending: isRenderPending } = useFormStatus();
-
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -57,7 +55,9 @@ export function InteriorAnalyzer() {
         if (analysisFormRef.current) {
           const formData = new FormData(analysisFormRef.current);
           formData.set('roomPhotoUri', dataUrl);
-          analysisAction(formData);
+           startAnalysisTransition(() => {
+            analysisAction(formData);
+          });
         }
       };
       reader.readAsDataURL(file);
@@ -66,11 +66,9 @@ export function InteriorAnalyzer() {
 
   const handleResetStates = () => {
       setImage(null);
-      if (analysisFormRef.current) {
-          analysisFormRef.current.reset();
-      }
-      analysisAction(new FormData());
-      renderAction(new FormData());
+      const emptyFormData = new FormData();
+      startAnalysisTransition(() => analysisAction(emptyFormData));
+      startRenderTransition(() => renderAction(emptyFormData));
   }
 
   const handleStartOver = () => {
@@ -81,10 +79,9 @@ export function InteriorAnalyzer() {
   };
 
   function RenderSubmitButton() {
-      const { pending } = useFormStatus();
       return (
-        <Button type="submit" size="lg" className="w-full h-14 bg-primary text-lg" disabled={pending}>
-            {pending ? (
+        <Button type="submit" size="lg" className="w-full h-14 bg-primary text-lg" disabled={isRenderPending}>
+            {isRenderPending ? (
                 <>
                     <Loader2 className="mr-2 animate-spin"/>
                     Generating...
@@ -124,6 +121,12 @@ export function InteriorAnalyzer() {
             </CardContent>
         </Card>
     );
+
+    const handleRenderSubmit = (formData: FormData) => {
+        startRenderTransition(() => {
+            renderAction(formData);
+        });
+    }
 
     return (
         <div className="bg-background rounded-t-3xl p-4 -mt-8 relative z-10 space-y-6 pb-24">
@@ -170,7 +173,7 @@ export function InteriorAnalyzer() {
             </div>
 
 
-            <form action={renderAction} ref={renderFormRef}>
+            <form action={handleRenderSubmit}>
                 <input type="hidden" name="roomPhotoUri" value={image!} />
                 <input type="hidden" name="suggestions" value={JSON.stringify(analysisState.data?.suggestions)} />
                 <input type="hidden" name="style" value={selectedStyle} />
@@ -196,16 +199,15 @@ export function InteriorAnalyzer() {
       </header>
 
       <main className="flex-1">
-        <form ref={analysisFormRef} action={analysisAction} className="hidden">
-            <input
+        <form ref={analysisFormRef} className="hidden">
+             <input
                 ref={fileInputRef}
                 type="file"
-                name="imageFile"
+                name="roomPhotoUri"
                 className="hidden"
                 accept="image/png, image/jpeg, image/webp"
                 onChange={handleFileChange}
              />
-             <input type="hidden" name="roomPhotoUri" />
         </form>
         <div className="relative w-full aspect-[9/10] bg-muted">
             {renderState.success && renderState.renderData?.renderDataUri ? (
@@ -226,7 +228,7 @@ export function InteriorAnalyzer() {
                 </div>
             )}
              {(isAnalysisPending || isRenderPending) && (
-                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-white">
+                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-white z-20">
                     <div className="relative">
                         <Loader2 className="h-10 w-10 animate-spin text-accent" />
                         <div className="absolute inset-0 rounded-full border-2 border-accent/50 animate-ping"></div>
