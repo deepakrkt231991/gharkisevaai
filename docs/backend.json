@@ -154,9 +154,10 @@
             "type": "object",
             "properties": {
               "latitude": { "type": "number" },
-              "longitude": { "type": "number" }
+              "longitude": { "type": "number" },
+              "city": { "type": "string" }
             },
-            "description": "Geographical location of the worker."
+            "description": "Geographical location of the worker, including city for search purposes."
           },
           "isVerified": {
             "type": "boolean",
@@ -590,5 +591,7 @@
   }
   
       
+
+    
 
     

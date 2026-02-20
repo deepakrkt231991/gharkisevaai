@@ -43,6 +43,7 @@ export interface Worker {
     location?: {
         latitude?: number;
         longitude?: number;
+        city?: string;
     }; // Geographical location of the worker.
     isVerified: boolean; // Whether the worker is verified by an admin.
     bankDetails?: {
