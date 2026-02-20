@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@capacitor/camera": "^8.0.1",
-    "@capacitor/core": "^8.1.0",
-    "@capacitor/geolocation": "^6.1.1",
     "@genkit-ai/ai": "latest",
     "@genkit-ai/core": "latest",
     "@genkit-ai/dotprompt": "latest",
