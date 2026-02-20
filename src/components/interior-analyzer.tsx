@@ -3,18 +3,19 @@
 import { useState, useRef, ChangeEvent } from 'react';
 import Image from 'next/image';
 import { 
-  Sparkles, AlertCircle, Loader2, ScanSearch, 
-  ArrowLeft, History, Paintbrush, Wallet, CheckCircle2 
+  Sparkles, RotateCw, AlertCircle, Loader2, ScanSearch, 
+  ArrowLeft, History, Paintbrush, Wallet, CheckCircle2, 
+  ShoppingBag, Hammer, MapPin, Star 
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LocationTracker } from './location-tracker';
+import { Badge } from '@/components/ui/badge';
 
-export default function InteriorAnalyzer() {
+export function DefectAnalyzer() {
   const [media, setMedia] = useState<{ dataUrl: string } | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [result, setResult] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -26,100 +27,111 @@ export default function InteriorAnalyzer() {
     }
   };
 
-  const handleAnalyze = () => {
+  const startAnalysis = () => {
     setIsAnalyzing(true);
     setTimeout(() => {
-      setAnalysisResult({
-        defect: "दीवार में नमी (Seepage) और पपड़ी पाई गई है।",
-        total: "₹6,350",
-        bill: [
-          { name: "वॉटरप्रूफ पुट्टी", cost: "₹1,200" },
-          { name: "एंटी-फंगल प्राइमर", cost: "₹850" },
-          { name: "प्रीमियम पेंट", cost: "₹2,500" },
-          { name: "लेबर चार्ज", cost: "₹1,800" }
+      setResult({
+        issue: "Dampness & Efflorescence (नमी और सोरा)",
+        details: "दीवार के प्लास्टर में नमी की वजह से पेंट खराब हो रहा है।",
+        marketProducts: [
+          { name: "Dr. Fixit LW+", price: "₹180", img: "https://m.media-amazon.com/images/I/61S7R1D-x9L._SL1000_.jpg" },
+          { name: "Asian Paints Putty", price: "₹950", img: "https://m.media-amazon.com/images/I/51p6K6N1ZHL._SL1000_.jpg" }
         ],
-        designTips: "Off-white कलर चुनें जो लग्जरी लुक देगा।",
-        afterImage: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800"
+        totalEstimate: "₹4,200 - ₹5,500",
+        aiDesign: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80",
+        expert: { name: "Raju Mistri", rating: "4.8", distance: "1.2 km" }
       });
       setIsAnalyzing(false);
     }, 3000);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <div className="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-slate-950 z-50">
-        <Button variant="ghost" size="icon" onClick={() => window.history.back()}><ArrowLeft className="text-white" /></Button>
-        <h1 className="font-bold text-blue-500 tracking-widest text-sm uppercase">AI INTERIOR SCAN</h1>
-        <History className="opacity-40" />
+    <div className="min-h-screen bg-[#0F172A] text-white pb-10">
+      <div className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/10 p-4 flex items-center justify-between">
+        <Button variant="ghost" className="text-white" onClick={() => window.history.back()}><ArrowLeft /></Button>
+        <div className="text-center">
+          <h1 className="text-xl font-black tracking-tighter text-blue-400">DEFECT SCANNER</h1>
+          <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">AI Powered</p>
+        </div>
+        <Button variant="ghost" className="text-white"><History /></Button>
       </div>
 
-      <main className="max-w-md mx-auto p-4 space-y-6">
-        {/* Browser based Location Tracker */}
-        <LocationTracker onLocationChange={() => {}} />
-
-        {!analysisResult ? (
-          <Card className="bg-white/5 border-white/10 overflow-hidden rounded-[40px]">
+      <main className="max-w-xl mx-auto p-4 space-y-6">
+        {!result ? (
+          <div className="space-y-6">
             <div 
-              className="aspect-[4/5] relative flex items-center justify-center cursor-pointer group"
+              className="relative aspect-[3/4] rounded-[40px] overflow-hidden border-2 border-white/10 bg-slate-800 flex items-center justify-center cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
               {media ? (
-                <Image src={media.dataUrl} alt="Preview" fill className="object-cover" />
+                <>
+                  <Image src={media.dataUrl} alt="Target" fill className="object-cover" />
+                  {isAnalyzing && (
+                    <div className="absolute inset-0 z-10 bg-blue-500/10 backdrop-blur-[2px] flex items-center justify-center">
+                       <Loader2 className="h-12 w-12 animate-spin text-blue-400" />
+                    </div>
+                  )}
+                </>
               ) : (
-                <div className="text-center">
-                  <ScanSearch size={60} className="mx-auto mb-4 text-blue-500" />
-                  <p className="text-xl font-bold">खराबी की फोटो लें</p>
-                  <p className="text-sm text-gray-500">AI तुरंत जांच करेगा</p>
-                </div>
-              )}
-              {isAnalyzing && (
-                <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center">
-                  <Loader2 className="animate-spin text-blue-500 mb-2 h-10 w-10" />
-                  <p className="text-blue-500 font-black animate-pulse">Scanning...</p>
+                <div className="text-center space-y-4">
+                  <ScanSearch className="w-12 h-12 text-blue-400 mx-auto" />
+                  <p className="text-lg font-bold text-slate-300">फोटो अपलोड करें</p>
                 </div>
               )}
             </div>
-            <CardContent className="p-6">
-               <Button onClick={handleAnalyze} disabled={!media || isAnalyzing} className="w-full bg-blue-600 hover:bg-blue-700 h-16 rounded-2xl text-xl font-black">
-                 जांच शुरू करें ✨
-               </Button>
-            </CardContent>
-          </Card>
+
+            <Button 
+              onClick={startAnalysis} 
+              disabled={!media || isAnalyzing}
+              className="w-full h-16 rounded-3xl text-xl font-black bg-blue-600 shadow-lg"
+            >
+              {isAnalyzing ? "Scanning..." : "START AI SCAN ✨"}
+            </Button>
+          </div>
         ) : (
-          <div className="space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-10">
-             <div className="bg-red-500/10 border border-red-500/50 p-6 rounded-3xl">
-                <p className="text-red-400 font-bold flex items-center gap-2"><AlertCircle /> {analysisResult.defect}</p>
-             </div>
-             
-             <Card className="bg-white/5 border-white/10 rounded-[30px] p-6 shadow-2xl">
-                <h3 className="font-bold mb-4 flex items-center gap-2 text-blue-400"><Wallet size={18} /> खर्च का विवरण (Bill)</h3>
-                <div className="space-y-3">
-                  {analysisResult.bill.map((item: any, i: number) => (
-                    <div key={i} className="flex justify-between text-sm border-b border-white/5 pb-2">
-                      <span className="text-gray-400">{item.name}</span>
-                      <span className="font-bold">{item.cost}</span>
-                    </div>
-                  ))}
-                  <div className="pt-4 flex justify-between font-black text-2xl text-blue-500">
-                    <span>Total Bill</span>
-                    <span>{analysisResult.total}</span>
-                  </div>
-                </div>
-             </Card>
+          <div className="space-y-6 animate-in zoom-in-95 duration-500">
+            <Card className="bg-slate-900 border-red-500/50 border-2 rounded-[32px] overflow-hidden">
+              <div className="bg-red-500 text-white px-6 py-2 flex items-center gap-2 font-bold uppercase text-xs">
+                <AlertCircle size={14} /> Problem Detected
+              </div>
+              <CardContent className="p-6">
+                <h2 className="text-xl font-bold text-white mb-2">{result.issue}</h2>
+                <p className="text-slate-400 text-sm">{result.details}</p>
+              </CardContent>
+            </Card>
 
-             <Card className="bg-white/5 border-white/10 rounded-[30px] overflow-hidden">
-                <div className="p-6">
-                  <h3 className="font-bold flex items-center gap-2 mb-4 text-green-400"><Paintbrush size={18} /> AI Modern Look</h3>
-                  <div className="relative aspect-video rounded-2xl overflow-hidden mb-4">
-                    <Image src={analysisResult.afterImage} alt="After" fill className="object-cover" />
+            <div className="space-y-4">
+              <h3 className="flex items-center gap-2 font-bold text-slate-300 ml-2 text-sm">
+                <ShoppingBag size={16} className="text-blue-400" /> Recommended Products:
+              </h3>
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {result.marketProducts.map((p: any, i: number) => (
+                  <div key={i} className="min-w-[140px] bg-white rounded-2xl p-3 flex flex-col items-center">
+                    <img src={p.img} alt={p.name} className="h-16 object-contain mb-2" />
+                    <p className="text-[10px] text-black font-bold text-center line-clamp-1">{p.name}</p>
+                    <p className="text-blue-600 font-black text-sm">₹{p.price}</p>
                   </div>
-                  <p className="text-sm text-gray-400 italic">"{analysisResult.designTips}"</p>
-                </div>
-             </Card>
+                ))}
+              </div>
+            </div>
 
-             <Button className="w-full bg-green-600 hover:bg-green-700 h-16 rounded-2xl text-2xl font-black shadow-lg">
-               <CheckCircle2 className="mr-2" /> राजू पेंटर को बुक करें
-             </Button>
+            <Card className="bg-slate-900 border-white/10 rounded-[32px] overflow-hidden">
+               <div className="p-4 bg-white/5 flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Total Estimate:</span>
+                  <span className="text-xl font-black text-green-400">{result.totalEstimate}</span>
+               </div>
+               <div className="p-4">
+                  <Image src={result.aiDesign} alt="Design" width={400} height={200} className="rounded-xl object-cover" />
+               </div>
+            </Card>
+
+            <Button className="w-full h-16 rounded-3xl text-xl font-black bg-green-600">
+              BOOK RAJU MISTRI
+            </Button>
+            
+            <Button variant="ghost" className="w-full text-slate-500" onClick={() => setResult(null)}>
+              SCAN AGAIN
+            </Button>
           </div>
         )}
       </main>
