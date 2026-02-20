@@ -4,7 +4,7 @@
 import { useState, useRef, ChangeEvent, useTransition } from 'react';
 import { useFormState } from 'react-dom';
 import Image from 'next/image';
-import { ArrowLeft, Share, Heart, Sparkles, Compass, Paintbrush, Lightbulb, CheckCircle, Loader2, UploadCloud, ScanSearch, RotateCw, Sofa } from 'lucide-react';
+import { ArrowLeft, Share, Heart, Sparkles, Compass, Paintbrush, Lightbulb, CheckCircle, Loader2, UploadCloud, ScanSearch, RotateCw, Sofa, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,7 +14,9 @@ import type { InteriorDesignOutput } from '@/ai/flows/interior-design-agent';
 import type { InteriorRenderOutput } from '@/ai/flows/interior-render-agent';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { LocationTracker } from './location-tracker';
+import { useToast } from '@/hooks/use-toast';
+import { Geolocation } from '@capacitor/geolocation';
+
 
 const initialAnalysisState: {
   success: boolean;
@@ -40,9 +42,33 @@ export function InteriorAnalyzer() {
   const [selectedStyle, setSelectedStyle] = useState('Modern');
   const moodboardStyles = ['Modern', 'Classic', 'Minimalist', 'Industrial', 'Bohemian'];
   const [userLocation, setUserLocation] = useState<{ city: string } | null>(null);
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'granted' | 'denied'>('idle');
+  const { toast } = useToast();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const analysisFormRef = useRef<HTMLFormElement>(null);
+
+  const getLocation = async () => {
+    setLocationStatus('loading');
+    try {
+        const permission = await Geolocation.requestPermissions();
+        if (permission.state === 'granted') {
+            const coords = await Geolocation.getCurrentPosition();
+            console.log('Mumbai Location:', coords);
+            // In a real app, you would reverse geocode coords.latitude, coords.longitude
+            setUserLocation({ city: 'Mumbai' });
+            setLocationStatus('granted');
+            toast({ title: "Location Enabled", description: "Mumbai detected as your location." });
+        } else {
+             setLocationStatus('denied');
+             toast({ title: "Location Denied", description: "Please enable location permissions in your browser settings.", variant: 'destructive' });
+        }
+    } catch (error: any) {
+        console.log('Location failed:', error);
+        setLocationStatus('denied');
+        toast({ title: "Location Failed", description: error.message, variant: 'destructive' });
+    }
+  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -224,8 +250,8 @@ export function InteriorAnalyzer() {
                     <div className="absolute inset-6 border-2 border-dashed border-white/20 rounded-lg opacity-50 pointer-events-none"></div>
                     <div className="text-center p-4">
                         <Sofa className="w-12 h-12 text-muted-foreground mx-auto" />
-                        <p className="mt-4 text-lg font-semibold font-headline">📸 Capture Your Room</p>
-                        <p className="text-sm text-muted-foreground">Take a photo of your room for AI design ideas and a 3D render.</p>
+                        <p className="mt-4 text-lg font-semibold font-headline">📸 Capture the Defect</p>
+                        <p className="text-sm text-muted-foreground">Take a clear, well-lit photo for the most accurate AI analysis.</p>
                     </div>
                 </div>
             )}
@@ -246,9 +272,11 @@ export function InteriorAnalyzer() {
         </div>
 
         <div className="p-4">
-          {!analysisState.success && 
-              <LocationTracker onLocationChange={(loc) => setUserLocation(loc ? { city: loc.address.split(',')[0] } : null)} />
-          }
+            <Button onClick={getLocation} disabled={locationStatus === 'loading' || locationStatus === 'granted'}>
+                {locationStatus === 'loading' && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                {locationStatus === 'granted' ? <CheckCircle className="mr-2 h-4 w-4"/> : <MapPin className="mr-2 h-4 w-4"/>}
+                {locationStatus === 'granted' ? 'Location Active' : '📍 Live Location ON'}
+            </Button>
         </div>
         
         {analysisState.success && !renderState.success && <AnalysisResults />}
