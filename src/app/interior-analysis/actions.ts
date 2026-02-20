@@ -9,6 +9,7 @@ const schema = z.object({
   roomPhotoUri: z.string().refine(val => val.startsWith('data:'), {
     message: 'Invalid data URI',
   }),
+  userLocation: z.string().optional(),
 });
 
 type State = {
@@ -33,6 +34,7 @@ export async function analyzeInterior(
   
   const validatedFields = schema.safeParse({
     roomPhotoUri: formData.get('roomPhotoUri'),
+    userLocation: formData.get('userLocation'),
   });
 
   if (!validatedFields.success) {
@@ -46,6 +48,7 @@ export async function analyzeInterior(
   try {
     const result = await suggestInteriorImprovements({
       roomPhotoUri: validatedFields.data.roomPhotoUri,
+      userLocation: validatedFields.data.userLocation,
     });
     return {
       success: true,

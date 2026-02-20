@@ -14,6 +14,7 @@ import type { InteriorDesignOutput } from '@/ai/flows/interior-design-agent';
 import type { InteriorRenderOutput } from '@/ai/flows/interior-render-agent';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { LocationTracker } from './location-tracker';
 
 const initialAnalysisState: {
   success: boolean;
@@ -38,6 +39,7 @@ export function InteriorAnalyzer() {
   const [image, setImage] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState('Modern');
   const moodboardStyles = ['Modern', 'Classic', 'Minimalist', 'Industrial', 'Bohemian'];
+  const [userLocation, setUserLocation] = useState<{ city: string } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const analysisFormRef = useRef<HTMLFormElement>(null);
@@ -199,6 +201,7 @@ export function InteriorAnalyzer() {
 
       <main className="flex-1">
         <form ref={analysisFormRef} className="hidden">
+             <input type="hidden" name="userLocation" value={userLocation?.city || ''} />
              <input
                 ref={fileInputRef}
                 type="file"
@@ -241,6 +244,12 @@ export function InteriorAnalyzer() {
                 </div>
             )}
         </div>
+
+        <div className="p-4">
+          {!analysisState.success && 
+              <LocationTracker onLocationChange={(loc) => setUserLocation(loc ? { city: loc.address.split(',')[0] } : null)} />
+          }
+        </div>
         
         {analysisState.success && !renderState.success && <AnalysisResults />}
         
@@ -279,5 +288,3 @@ export function InteriorAnalyzer() {
     </>
   );
 }
-
-    

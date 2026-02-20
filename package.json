@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@capacitor/geolocation": "^6.0.0",
     "@genkit-ai/ai": "latest",
     "@genkit-ai/core": "latest",
     "@genkit-ai/dotprompt": "latest",

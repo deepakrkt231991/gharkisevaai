@@ -17,6 +17,7 @@ const InteriorDesignInputSchema = z.object({
     .describe(
       "A photo of the room, home exterior, or garden area, as a data URI that must include a MIME type and use Base64 encoding."
     ),
+  userLocation: z.string().optional().describe("The user's city for localized suggestions (e.g., 'Mumbai')."),
 });
 export type InteriorDesignInput = z.infer<typeof InteriorDesignInputSchema>;
 
@@ -48,10 +49,13 @@ Your tasks are:
     -   **For Interiors:** Focus on making the space look larger, more appealing, incorporating modern design trends, and following basic Vastu principles. Be specific with your suggestions. In the description, provide advice based on the estimated room size. For example, "For this 10x12 room, an L-shaped sofa in the south-west corner would optimize space and flow."
     -   **For Exteriors:** Suggest improvements for the building's facade, landscaping, gardening, flowering, and curb appeal.
     -   Suggestions should be practical and achievable.
-3.  **Identify Required Workers:** Based on your suggestions, list the types of skilled workers required to implement the changes (e.g., 'Painter', 'Carpenter', 'Electrician', 'Gardener').
+3.  **Identify Required Workers:** Based on your suggestions, list the types of skilled workers required to implement the changes (e.g., 'Painter', 'Carpenter', 'Electrician', 'Gardener'). If the user's location is provided, you can also suggest a fictional local contact, for example, for Mumbai, suggest "Seema's Design Studio - 9876543210".
 
 Analyze the following scene and provide suggestions in the specified output format:
 {{media url=roomPhotoUri}}
+{{#if userLocation}}
+User Location: {{{userLocation}}}
+{{/if}}
 `,
 });
 
