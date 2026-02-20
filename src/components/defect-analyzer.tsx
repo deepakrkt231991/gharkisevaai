@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { UploadCloud, Sparkles, RotateCw, AlertCircle, Loader2, Wrench, IndianRupee, Hammer, Mic, MicOff, Settings2, Package, ArrowLeft, History, CheckCircle, Download, UserCheck, ScanSearch, Star, MessageSquare, Phone, Film } from 'lucide-react';
 
-import { analyzeDefect, findNearbyWorkers, generateVideo } from '@/app/analyze/actions';
+import { analyzeDefect, findNearbyWorkers } from '@/app/analyze/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,8 +19,8 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from './ui/badge';
 import type { AnalyzeDefectOutput } from '@/ai/flows/defect-analysis';
-import type { TransformationVideoOutput } from '@/ai/flows/transformation-video-agent';
 import { LocationTracker } from './location-tracker';
+import { cn } from '@/lib/utils';
 
 // Image compression function
 const compressImage = (file: File): Promise<string> => {
@@ -75,13 +75,6 @@ const initialState: {
   data: AnalyzeDefectOutput | null;
 } = { success: false, message: '', data: null };
 
-const initialVideoState: {
-  success: boolean;
-  message: string;
-  data: TransformationVideoOutput | null;
-} = { success: false, message: '', data: null };
-
-
 function SubmitButton({ hasMedia }: { hasMedia: boolean }) {
   const { pending } = useFormStatus();
 
@@ -102,25 +95,6 @@ function SubmitButton({ hasMedia }: { hasMedia: boolean }) {
   );
 }
 
-function VideoSubmitButton({ defect }: { defect: string }) {
-    const { pending } = useFormStatus();
-    return (
-        <Button type="submit" disabled={pending} className="w-full h-14 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg shadow-accent/20">
-        {pending ? (
-            <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Generating Video (takes ~1 min)...
-            </>
-        ) : (
-            <>
-            <Sparkles className="mr-2 h-5 w-5" />
-            Generate Redesign Video
-            </>
-        )}
-        </Button>
-    )
-}
-
 function AnalysisStatusOverlay() {
     const { pending } = useFormStatus();
     if(!pending) return null;
@@ -134,45 +108,8 @@ function AnalysisStatusOverlay() {
     )
 }
 
-// Worker Card Component
-const WorkerCard = ({ name, phone }: { name: string, phone?: string }) => (
-    <Card className="glass-card">
-        <CardContent className="p-3">
-            <div className="flex items-start gap-3">
-                <Avatar className="h-12 w-12 border-2 border-primary">
-                    <AvatarImage src={`https://i.pravatar.cc/150?u=${'\'\'\''}${name}${'\'\'\''}`} />
-                    <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                    <h4 className="font-bold text-white">{name}</h4>
-                    <p className="text-xs text-muted-foreground capitalize">Painter</p>
-                    <div className="flex items-center gap-1.5 text-yellow-400 text-xs">
-                        <Star className="h-3 w-3 fill-current" />
-                        <span className="font-bold text-white">4.9</span>
-                        <span className="text-muted-foreground text-[10px]">(Local Pro)</span>
-                    </div>
-                </div>
-                 <Badge variant="outline" className="text-green-400 border-green-500/50 bg-green-900/30">Verified</Badge>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-                <Button variant="secondary" size="sm" asChild>
-                    <Link href={`/chat/job-temp-${'\'\'\''}${name}${'\'\'\''}`}>
-                        <MessageSquare className="mr-2 h-4 w-4"/>Free Chat
-                    </Link>
-                </Button>
-                <Button variant="outline" size="sm" asChild>
-                    <a href={`tel:${'\'\'\''}${phone || ''}${'\'\'\''}`}>
-                        <Phone className="mr-2 h-4 w-4"/>Free Call
-                    </a>
-                </Button>
-            </div>
-        </CardContent>
-    </Card>
-);
-
 export function DefectAnalyzer() {
   const [analysisState, analysisAction] = useFormState(analyzeDefect, initialState);
-  const [videoState, videoAction] = useFormState(generateVideo, initialVideoState);
   
   const [media, setMedia] = useState<Media | null>(null);
   const [description, setDescription] = useState('');
@@ -204,26 +141,17 @@ export function DefectAnalyzer() {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    // Directly reset the state without needing a form action
     const emptyFormData = new FormData();
     analysisAction(emptyFormData);
-    videoAction(emptyFormData);
   };
 
   const AnalysisResult = () => {
-    if (analysisState.message && !analysisState.success) {
-      return (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Analysis Failed</AlertTitle>
-          <AlertDescription>{analysisState.message}</AlertDescription>
-        </Alert>
-      );
+    if (!analysisState.success || !analysisState.data) {
+      return null;
     }
 
-    if (analysisState.success && analysisState.data) {
-      const result = analysisState.data;
-      return (
+    const result = analysisState.data;
+    return (
         <div className="space-y-6">
           <div className="flex items-start justify-between">
              <div className="flex items-center gap-3">
@@ -234,83 +162,47 @@ export function DefectAnalyzer() {
           </div>
           
           <Card className="glass-card border-l-4 border-l-primary/80">
-            <CardContent className="p-4 space-y-3">
-                <div>
-                    <p className="text-xs text-primary font-bold uppercase tracking-wider">Issues Identified</p>
-                     <ul className="list-disc list-inside mt-1 text-white/90">
-                        {result.damage?.map((d, i) => <li key={i}>{d}</li>)}
-                    </ul>
-                </div>
+            <CardHeader><CardTitle>Issues Identified</CardTitle></CardHeader>
+            <CardContent className="p-4 pt-0 space-y-3">
+                 <ul className="list-disc list-inside mt-1 text-white/90">
+                    {result.damage?.map((d, i) => <li key={i}>{d}</li>)}
+                </ul>
             </CardContent>
           </Card>
-
-          {media?.type === 'image' && result.ai_design && (
-             <Card className="glass-card bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
-                <CardContent className="p-4 space-y-3">
-                  <h3 className="font-bold font-headline text-white">AI Redesign (Before/After)</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Generate a short "Before & After" video to see your wall repaired and redesigned by AI.
-                  </p>
-                  
-                  {videoState.success && videoState.data ? (
-                    <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                      <video src={videoState.data.videoDataUri} controls autoPlay loop className="w-full h-full" />
-                    </div>
-                  ) : (
-                    <form action={videoAction}>
-                      <input type="hidden" name="mediaDataUri" value={media.dataUrl} />
-                      <input type="hidden" name="defect" value={result?.damage?.join(', ') || ''} />
-                      <VideoSubmitButton defect={result?.damage?.join(', ') || ''} />
-                    </form>
-                  )}
-                  {videoState.message && !videoState.success && (
-                    <Alert variant="destructive" className="mt-2">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Video Generation Failed</AlertTitle>
-                      <AlertDescription>{videoState.message}</AlertDescription>
-                    </Alert>
-                  )}
-                </CardContent>
-              </Card>
-          )}
-
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="glass-card">
-                  <CardContent className="p-4 text-center">
-                      <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Total Est. Cost</p>
-                      <p className="text-3xl font-bold text-accent mt-2">{result?.total_cost}</p>
+                  <CardHeader><CardTitle className="text-sm">Total Est. Cost</CardTitle></CardHeader>
+                  <CardContent className="p-4 pt-0">
+                      <p className="text-3xl font-bold text-accent">{result?.total_cost}</p>
                   </CardContent>
               </Card>
                <Card className="glass-card">
-                  <CardContent className="p-4">
-                       <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-2">Recommended Painter</p>
+                   <CardHeader><CardTitle className="text-sm">Recommended Painter</CardTitle></CardHeader>
+                  <CardContent className="p-4 pt-0">
                        <p className="font-bold text-white">{result?.painter}</p>
                   </CardContent>
               </Card>
           </div>
 
           {result?.steps && result.steps.length > 0 && (
-            <div>
-              <h3 className="text-lg font-bold font-headline mb-2">DIY Repair Steps (आप इसे स्वयं ठीक कर सकते हैं)</h3>
               <Accordion type="single" collapsible className="w-full glass-card rounded-xl px-4">
-                {result.steps.map((step, index) => (
-                  <AccordionItem key={index} value={`item-${'\'\'\''}${index}${'\'\'\''}`} className={index === result.steps.length -1 ? 'border-b-0' : ''}>
-                    <AccordionTrigger className="text-white hover:no-underline text-left">{step}</AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground">
-                      Follow this step carefully. Ensure you have the right tools and safety gear.
+                <AccordionItem value="steps" className="border-b-0">
+                    <AccordionTrigger className="text-white hover:no-underline text-left font-bold">DIY Repair Steps (आप इसे स्वयं ठीक कर सकते हैं)</AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground space-y-2">
+                      {result.steps.map((step, index) => (
+                         <p key={index}>{step}</p>
+                      ))}
                     </AccordionContent>
                   </AccordionItem>
-                ))}
               </Accordion>
-            </div>
           )}
 
         </div>
       );
-    }
-    
-    return null;
   };
+  
+  const showInitialView = !media && !analysisState.success;
 
   return (
     <>
@@ -327,11 +219,19 @@ export function DefectAnalyzer() {
         </Button>
       </div>
       
-      <main className="flex-1 space-y-6 overflow-y-auto p-4 pb-32">
-        <LocationTracker onLocationChange={(loc) => setUserLocation(loc ? { city: loc.address.split(',')[0] } : null)} />
-        <form action={analysisAction} ref={formRef}>
+      <main className={cn(
+          "flex-1 flex flex-col p-4 pb-32",
+          showInitialView ? "justify-center" : "overflow-y-auto"
+      )}>
+        
+        <form action={analysisAction} ref={formRef} className={cn("w-full space-y-6", showInitialView ? "max-w-md mx-auto" : "")}>
            <input type="hidden" name="userLocation" value={userLocation?.city || ''} />
-           <div className="space-y-4">
+           
+           {!analysisState.success && 
+                <LocationTracker onLocationChange={(loc) => setUserLocation(loc ? { city: loc.address.split(',')[0] } : null)} />
+           }
+
+            <div className="space-y-4">
               <div
                 className="relative group w-full aspect-video rounded-xl overflow-hidden border-2 border-dashed border-border bg-input/5 flex flex-col items-center justify-center cursor-pointer hover:border-accent scan-glow"
                 onClick={() => fileInputRef.current?.click()}
@@ -388,7 +288,15 @@ export function DefectAnalyzer() {
         </form>
 
         <div className="mt-8">
-          <AnalysisResult />
+          {analysisState.message && !analysisState.success && !media ? (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Analysis Failed</AlertTitle>
+              <AlertDescription>{analysisState.message}</AlertDescription>
+            </Alert>
+          ) : (
+             <AnalysisResult />
+          )}
         </div>
         
         {analysisState.success && (
