@@ -62,8 +62,17 @@ function AddWorkerForm() {
                         <Input id="worker-phone" name="phone" type="tel" required />
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="worker-skills">Skills (comma-separated)</Label>
-                        <Input id="worker-skills" name="skills" placeholder="plumber, electrician" required />
+                        <Label htmlFor="worker-skills">Skills (e.g. plumber, electrician)</Label>
+                        <Select name="skills" required>
+                            <SelectTrigger><SelectValue placeholder="Select Skill" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="plumber">Plumber</SelectItem>
+                                <SelectItem value="electrician">Electrician</SelectItem>
+                                <SelectItem value="carpenter">Carpenter</SelectItem>
+                                <SelectItem value="painter">Painter</SelectItem>
+                                <SelectItem value="ac_repair">AC Repair</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                          <div className="space-y-1">
@@ -106,7 +115,7 @@ function AddPropertyForm() {
         <Card>
             <CardHeader>
                 <CardTitle>Add New Property</CardTitle>
-                <CardDescription>Manually add a property listing.</CardDescription>
+                <CardDescription>Manually add a property listing for "Buy/Sell/Rent".</CardDescription>
             </CardHeader>
             <CardContent>
                  <form ref={formRef} action={formAction} className="space-y-4">
@@ -121,6 +130,10 @@ function AddPropertyForm() {
                      <div className="space-y-1">
                         <Label htmlFor="prop-location">Location</Label>
                         <Input id="prop-location" name="location" required placeholder="e.g., Koramangala, Bangalore" />
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="prop-imageUrl">Property Photo URL</Label>
+                        <Input id="prop-imageUrl" name="imageUrl" required type="url" placeholder="https://picsum.photos/seed/1/800/600" />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="prop-type">Listing Type</Label>
@@ -139,7 +152,13 @@ function AddPropertyForm() {
                         </div>
                          <div className="space-y-1">
                             <Label htmlFor="prop-priceUnit">Unit</Label>
-                            <Input id="prop-priceUnit" name="priceUnit" placeholder="Cr / L" />
+                             <Select name="priceUnit">
+                                <SelectTrigger><SelectValue placeholder="Select Unit" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Cr">Crore (Cr)</SelectItem>
+                                    <SelectItem value="L">Lakh (L)</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">

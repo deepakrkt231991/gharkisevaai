@@ -57,6 +57,7 @@ const AddPropertySchema = z.object({
   priceUnit: z.string().optional(),
   sqft: z.coerce.number().positive(),
   parking: z.coerce.number().int().min(0),
+  imageUrl: z.string().url({ message: "Please enter a valid image URL." }).optional().or(z.literal('')),
 });
 
 export async function addPropertyManually(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -69,6 +70,7 @@ export async function addPropertyManually(prevState: FormState, formData: FormDa
         priceUnit: formData.get('priceUnit'),
         sqft: formData.get('sqft'),
         parking: formData.get('parking'),
+        imageUrl: formData.get('imageUrl'),
     });
 
     if (!validated.success) {
