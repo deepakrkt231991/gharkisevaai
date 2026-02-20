@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useRef, ChangeEvent, useTransition } from 'react';
@@ -237,7 +236,7 @@ export function InteriorAnalyzer() {
                         {isRenderPending ? 'GENERATING 3D RENDER...' : 'AI IS THINKING...'}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                        {isRenderPending ? 'AI is re-imagining your room...' : 'Please wait while we process the image.'}
+                        {isRenderPending ? 'AI is re-imagining your space...' : 'Please wait while we process the image.'}
                     </p>
                 </div>
             )}

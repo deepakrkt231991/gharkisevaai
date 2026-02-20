@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
@@ -351,7 +350,7 @@ export function DefectAnalyzer() {
                     <div className="absolute inset-6 border-2 border-dashed border-white/20 rounded-lg opacity-50 pointer-events-none"></div>
                     <div className="text-center p-4">
                         <ScanSearch className="w-12 h-12 text-muted-foreground mx-auto" />
-                        <p className="mt-4 text-lg font-semibold font-headline">Capture the Defect</p>
+                        <p className="mt-4 text-lg font-semibold font-headline">📸 Capture the Defect</p>
                         <p className="text-sm text-muted-foreground">Take a clear, well-lit photo for the most accurate AI analysis.</p>
                     </div>
                   </>
