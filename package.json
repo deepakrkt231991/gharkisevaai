@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@capacitor/camera": "^8.0.1",
     "@genkit-ai/ai": "latest",
     "@genkit-ai/core": "latest",
     "@genkit-ai/dotprompt": "latest",
@@ -43,7 +42,7 @@
     "framer-motion": "latest",
     "genkit": "latest",
     "lucide-react": "latest",
-    "next": "^14.2.3",
+    "next": "14.2.35",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "latest",
