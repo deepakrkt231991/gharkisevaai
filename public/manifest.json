@@ -1,23 +1,21 @@
 {
   "name": "Ghar Ki Seva",
-  "short_name": "Ghar Ki Seva",
+  "short_name": "GrihSeva",
   "description": "7% Fee, 100% Trust. The smartest way to Repair, Rent & Sell with AI.",
   "icons": [
     {
       "src": "/logo.png?v=2",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "/logo.png?v=2",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ],
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#18181b",
+  "background_color": "#0F1A1B",
   "theme_color": "#006970"
 }

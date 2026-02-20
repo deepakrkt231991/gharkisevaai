@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag, Send, Image as ImageIcon, Edit } from "lucide-react";
+import { TrendingUp, AlertTriangle, Users, CheckCircle, Clock, IndianRupee, MapPin, Loader2, Share2, Sparkles, Download, Bot, Banknote, Hammer, Home, ShoppingBag, Send, Image as ImageIcon, Edit, PlusCircle } from "lucide-react";
 import { useCollection, useDoc, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, where, orderBy, doc, updateDoc } from "firebase/firestore";
 import { useFirestore } from "@/firebase/provider";
@@ -694,6 +694,12 @@ export function AdminDashboard() {
         <div className="flex items-center gap-3">
             <Logo className="h-10 w-10" />
             <h1 className="text-3xl font-bold font-headline">Admin Panel</h1>
+            <Button asChild variant="outline" className="ml-auto">
+              <Link href="/admin/manage">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Manage Data
+              </Link>
+            </Button>
         </div>
         <p className="text-muted-foreground">Welcome back! Here's your real-time business overview.</p>
       </div>
