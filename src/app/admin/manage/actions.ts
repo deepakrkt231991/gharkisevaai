@@ -13,6 +13,7 @@ const AddWorkerSchema = z.object({
     name: z.string().min(1),
     phone: z.string().min(1),
     skills: z.string().min(1),
+    location: z.string().optional(),
     rating: z.coerce.number().optional().default(4.5),
     successfulOrders: z.coerce.number().optional().default(50),
 });
@@ -22,6 +23,7 @@ export async function addWorkerManually(prevState: FormState, formData: FormData
         name: formData.get('name'),
         phone: formData.get('phone'),
         skills: formData.get('skills'),
+        location: formData.get('location'),
         rating: formData.get('rating'),
         successfulOrders: formData.get('successfulOrders'),
     });
@@ -33,11 +35,15 @@ export async function addWorkerManually(prevState: FormState, formData: FormData
     try {
         const { firestore } = initializeFirebase();
         const workersRef = collection(firestore, 'workers');
+        const { location, ...restOfData } = validated.data;
         await addDoc(workersRef, {
-            ...validated.data,
+            ...restOfData,
             skills: validated.data.skills.split(',').map(s => s.trim()),
             isVerified: true, // Manually added workers are pre-verified
             createdAt: serverTimestamp(),
+            location: {
+                city: location || null,
+            }
         });
         revalidatePath('/admin/manage');
         revalidatePath('/find-a-worker');
@@ -58,6 +64,7 @@ const AddPropertySchema = z.object({
   sqft: z.coerce.number().positive(),
   parking: z.coerce.number().int().min(0),
   imageUrl: z.string().url({ message: "Please enter a valid image URL." }).optional().or(z.literal('')),
+  videoUrl: z.string().url({ message: "Please enter a valid video URL." }).optional().or(z.literal('')),
 });
 
 export async function addPropertyManually(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -71,6 +78,7 @@ export async function addPropertyManually(prevState: FormState, formData: FormDa
         sqft: formData.get('sqft'),
         parking: formData.get('parking'),
         imageUrl: formData.get('imageUrl'),
+        videoUrl: formData.get('videoUrl') || '',
     });
 
     if (!validated.success) {

@@ -61,6 +61,10 @@ function AddWorkerForm() {
                         <Label htmlFor="worker-phone">Phone</Label>
                         <Input id="worker-phone" name="phone" type="tel" required />
                     </div>
+                     <div className="space-y-1">
+                        <Label htmlFor="worker-location">Location</Label>
+                        <Input id="worker-location" name="location" placeholder="e.g., Kalyan, Mumbai" />
+                    </div>
                     <div className="space-y-1">
                         <Label htmlFor="worker-skills">Skills (e.g. plumber, electrician)</Label>
                         <Select name="skills" required>
@@ -134,6 +138,10 @@ function AddPropertyForm() {
                     <div className="space-y-1">
                         <Label htmlFor="prop-imageUrl">Property Photo URL</Label>
                         <Input id="prop-imageUrl" name="imageUrl" required type="url" placeholder="https://picsum.photos/seed/1/800/600" />
+                    </div>
+                     <div className="space-y-1">
+                        <Label htmlFor="prop-videoUrl">Property Video URL (Optional)</Label>
+                        <Input id="prop-videoUrl" name="videoUrl" type="url" placeholder="https://youtube.com/..." />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="prop-type">Listing Type</Label>
