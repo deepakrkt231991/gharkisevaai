@@ -9,10 +9,10 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 
-export function DefectAnalyzer() {
+// ✅ हमने नाम 'InteriorAnalyzer' रखा है और 'default' एक्सपोर्ट किया है
+export default function InteriorAnalyzer() {
   const [media, setMedia] = useState<{ dataUrl: string } | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -50,7 +50,7 @@ export function DefectAnalyzer() {
       <div className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/10 p-4 flex items-center justify-between">
         <Button variant="ghost" className="text-white" onClick={() => window.history.back()}><ArrowLeft /></Button>
         <div className="text-center">
-          <h1 className="text-xl font-black tracking-tighter text-blue-400">DEFECT SCANNER</h1>
+          <h1 className="text-xl font-black tracking-tighter text-blue-400">INTERIOR SCANNER</h1>
           <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">AI Powered</p>
         </div>
         <Button variant="ghost" className="text-white"><History /></Button>
@@ -104,7 +104,7 @@ export function DefectAnalyzer() {
               <h3 className="flex items-center gap-2 font-bold text-slate-300 ml-2 text-sm">
                 <ShoppingBag size={16} className="text-blue-400" /> Recommended Products:
               </h3>
-              <div className="flex gap-4 overflow-x-auto pb-2">
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {result.marketProducts.map((p: any, i: number) => (
                   <div key={i} className="min-w-[140px] bg-white rounded-2xl p-3 flex flex-col items-center">
                     <img src={p.img} alt={p.name} className="h-16 object-contain mb-2" />
