@@ -1,24 +1,22 @@
 "use client";
 
-import { useState, useRef, ChangeEvent } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { 
-  Sparkles, RotateCw, AlertCircle, Loader2, ScanSearch, 
-  ArrowLeft, History, Paintbrush, Wallet, CheckCircle2, 
-  ShoppingBag, Hammer, MapPin, Star 
+  ArrowLeft, ScanSearch, Loader2, AlertCircle, 
+  History, Wallet, CheckCircle2, MapPin, Star, ShieldCheck 
 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-// ✅ हमने नाम 'InteriorAnalyzer' रखा है और 'default' एक्सपोर्ट किया है
+// ✅ 'default' export का उपयोग करें ताकि page.tsx में एरर न आए
 export default function InteriorAnalyzer() {
   const [media, setMedia] = useState<{ dataUrl: string } | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -29,109 +27,104 @@ export default function InteriorAnalyzer() {
 
   const startAnalysis = () => {
     setIsAnalyzing(true);
+    // AI Realistic Simulation
     setTimeout(() => {
       setResult({
-        issue: "Dampness & Efflorescence (नमी और सोरा)",
-        details: "दीवार के प्लास्टर में नमी की वजह से पेंट खराब हो रहा है।",
-        marketProducts: [
-          { name: "Dr. Fixit LW+", price: "₹180", img: "https://m.media-amazon.com/images/I/61S7R1D-x9L._SL1000_.jpg" },
-          { name: "Asian Paints Putty", price: "₹950", img: "https://m.media-amazon.com/images/I/51p6K6N1ZHL._SL1000_.jpg" }
-        ],
-        totalEstimate: "₹4,200 - ₹5,500",
-        aiDesign: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80",
-        expert: { name: "Raju Mistri", rating: "4.8", distance: "1.2 km" }
+        issue: "Wall Seepage & Surface Cracks",
+        severity: "Medium",
+        fix: "Waterproof Putty + Primer Coat",
+        estimate: "₹4,200",
+        nearWorker: { name: "Raju Mistri", rating: "4.9", distance: "0.8 km", jobs: 120 },
+        realisticAfter: "https://images.unsplash.com/photo-1615529182904-14819c35db37?w=800&q=80"
       });
       setIsAnalyzing(false);
     }, 3000);
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-white pb-10">
-      <div className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/10 p-4 flex items-center justify-between">
-        <Button variant="ghost" className="text-white" onClick={() => window.history.back()}><ArrowLeft /></Button>
+    <div className="min-h-screen bg-[#020617] text-slate-100">
+      {/* Premium Header */}
+      <div className="sticky top-0 z-50 bg-slate-900/50 backdrop-blur-xl border-b border-white/5 p-4 flex items-center justify-between">
+        <Button variant="ghost" size="icon" onClick={() => window.history.back()}><ArrowLeft /></Button>
         <div className="text-center">
-          <h1 className="text-xl font-black tracking-tighter text-blue-400">INTERIOR SCANNER</h1>
-          <p className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">AI Powered</p>
+          <h1 className="text-sm font-black tracking-[0.2em] text-blue-500 uppercase">GharKiSeva AI</h1>
         </div>
-        <Button variant="ghost" className="text-white"><History /></Button>
+        <History className="w-5 h-5 opacity-40" />
       </div>
 
-      <main className="max-w-xl mx-auto p-4 space-y-6">
+      <main className="max-w-md mx-auto p-5 space-y-6">
         {!result ? (
           <div className="space-y-6">
             <div 
-              className="relative aspect-[3/4] rounded-[40px] overflow-hidden border-2 border-white/10 bg-slate-800 flex items-center justify-center cursor-pointer"
+              className="relative aspect-[4/5] rounded-[40px] overflow-hidden border-2 border-dashed border-slate-800 bg-slate-900/50 flex items-center justify-center cursor-pointer group hover:border-blue-500/50 transition-all"
               onClick={() => fileInputRef.current?.click()}
             >
               {media ? (
-                <>
-                  <Image src={media.dataUrl} alt="Target" fill className="object-cover" />
-                  {isAnalyzing && (
-                    <div className="absolute inset-0 z-10 bg-blue-500/10 backdrop-blur-[2px] flex items-center justify-center">
-                       <Loader2 className="h-12 w-12 animate-spin text-blue-400" />
-                    </div>
-                  )}
-                </>
+                <Image src={media.dataUrl} alt="Room" fill className="object-cover" />
               ) : (
-                <div className="text-center space-y-4">
-                  <ScanSearch className="w-12 h-12 text-blue-400 mx-auto" />
-                  <p className="text-lg font-bold text-slate-300">फोटो अपलोड करें</p>
+                <div className="text-center space-y-3">
+                  <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <ScanSearch className="text-blue-500 w-8 h-8" />
+                  </div>
+                  <p className="font-bold text-slate-400 text-sm">Scan Wall, Floor or Room</p>
+                </div>
+              )}
+              {isAnalyzing && (
+                <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center z-20">
+                  <Loader2 className="w-12 h-12 animate-spin text-blue-500 mb-4" />
+                  <p className="text-blue-500 font-black animate-pulse uppercase tracking-widest text-xs">AI Deep Analysis...</p>
                 </div>
               )}
             </div>
-
-            <Button 
-              onClick={startAnalysis} 
-              disabled={!media || isAnalyzing}
-              className="w-full h-16 rounded-3xl text-xl font-black bg-blue-600 shadow-lg"
-            >
-              {isAnalyzing ? "Scanning..." : "START AI SCAN ✨"}
+            <Button onClick={startAnalysis} disabled={!media || isAnalyzing} className="w-full h-16 bg-blue-600 hover:bg-blue-700 rounded-3xl text-lg font-black shadow-xl shadow-blue-900/20">
+              ANALYZE NOW ✨
             </Button>
           </div>
         ) : (
-          <div className="space-y-6 animate-in zoom-in-95 duration-500">
-            <Card className="bg-slate-900 border-red-500/50 border-2 rounded-[32px] overflow-hidden">
-              <div className="bg-red-500 text-white px-6 py-2 flex items-center gap-2 font-bold uppercase text-xs">
-                <AlertCircle size={14} /> Problem Detected
-              </div>
-              <CardContent className="p-6">
-                <h2 className="text-xl font-bold text-white mb-2">{result.issue}</h2>
-                <p className="text-slate-400 text-sm">{result.details}</p>
+          <div className="space-y-6 pb-10 animate-in fade-in slide-in-from-bottom-5">
+            {/* Defect Card */}
+            <Card className="bg-red-500/5 border-red-500/20 rounded-[30px] overflow-hidden">
+              <CardContent className="p-5 flex items-start gap-4">
+                <div className="bg-red-500/20 p-2 rounded-xl"><AlertCircle className="text-red-500" /></div>
+                <div>
+                  <h3 className="font-bold text-red-400">{result.issue}</h3>
+                  <p className="text-xs text-slate-400 mt-1">{result.fix}</p>
+                </div>
               </CardContent>
             </Card>
 
-            <div className="space-y-4">
-              <h3 className="flex items-center gap-2 font-bold text-slate-300 ml-2 text-sm">
-                <ShoppingBag size={16} className="text-blue-400" /> Recommended Products:
-              </h3>
-              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                {result.marketProducts.map((p: any, i: number) => (
-                  <div key={i} className="min-w-[140px] bg-white rounded-2xl p-3 flex flex-col items-center">
-                    <img src={p.img} alt={p.name} className="h-16 object-contain mb-2" />
-                    <p className="text-[10px] text-black font-bold text-center line-clamp-1">{p.name}</p>
-                    <p className="text-blue-600 font-black text-sm">₹{p.price}</p>
-                  </div>
-                ))}
+            {/* Realistic AI Suggestion */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">AI Recommended Look</h4>
+              <div className="relative aspect-video rounded-[30px] overflow-hidden border border-white/5">
+                <Image src={result.realisticAfter} alt="Realistic Look" fill className="object-cover" />
+                <div className="absolute top-3 right-3 bg-blue-600 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                  <ShieldCheck size={10} /> AI VERIFIED
+                </div>
               </div>
             </div>
 
-            <Card className="bg-slate-900 border-white/10 rounded-[32px] overflow-hidden">
-               <div className="p-4 bg-white/5 flex justify-between items-center">
-                  <span className="text-slate-400 text-sm">Total Estimate:</span>
-                  <span className="text-xl font-black text-green-400">{result.totalEstimate}</span>
-               </div>
-               <div className="p-4">
-                  <Image src={result.aiDesign} alt="Design" width={400} height={200} className="rounded-xl object-cover" />
-               </div>
+            {/* Worker & Payment */}
+            <Card className="bg-slate-900/50 border-white/5 rounded-[30px] p-5">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center font-bold text-blue-400">R</div>
+                   <div>
+                     <p className="text-sm font-bold">{result.nearWorker.name}</p>
+                     <p className="text-[10px] text-slate-500 flex items-center gap-1"><MapPin size={10}/> {result.nearWorker.distance} away</p>
+                   </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-slate-500">Total Quote</p>
+                  <p className="text-xl font-black text-green-500">{result.estimate}</p>
+                </div>
+              </div>
+              <Button className="w-full h-14 bg-green-600 hover:bg-green-700 rounded-2xl font-black text-base shadow-lg shadow-green-900/20">
+                PAY & BOOK NOW <CheckCircle2 className="ml-2 w-5 h-5" />
+              </Button>
             </Card>
 
-            <Button className="w-full h-16 rounded-3xl text-xl font-black bg-green-600">
-              BOOK RAJU MISTRI
-            </Button>
-            
-            <Button variant="ghost" className="w-full text-slate-500" onClick={() => setResult(null)}>
-              SCAN AGAIN
-            </Button>
+            <Button variant="ghost" onClick={() => setResult(null)} className="w-full text-slate-500 text-xs font-bold">RE-SCAN AREA</Button>
           </div>
         )}
       </main>
