@@ -1,8 +1,5 @@
 'use server';
 
-import { config } from 'dotenv';
-config();
-
 import '@/ai/flows/defect-analysis.ts';
 import '@/ai/flows/verification-agent.ts';
 import '@/ai/flows/matching-agent.ts';

@@ -1,29 +1,28 @@
-import { BottomNavBar } from '@/components/bottom-nav-bar';
+import dynamic from 'next/dynamic';
+
+// BottomNavBar को dynamic तरीके से लोड करो (SSR बंद)
+const BottomNavBar = dynamic(
+  () => import('@/components/bottom-nav-bar'),
+  { ssr: false }  // ← ये लाइन बहुत जरूरी! Vercel/static export के लिए
+);
 
 export default function InteriorAnalysisPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      <main className="flex-1 p-6 pb-24">
-        <div className="max-w-md mx-auto space-y-6">
-          
-          <div className="bg-blue-600 rounded-3xl p-6 text-white text-center shadow-lg">
-            <h1 className="text-xl font-black italic">GHARKISEVA AI</h1>
-            <p className="text-xs opacity-90 mt-1">📍 Mumbai Active</p>
-          </div>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <main className="flex-1 p-6">
+        <h1 className="text-4xl font-bold text-center mb-10 text-blue-800">
+          AI Interior Analysis – Mumbai Ready
+        </h1>
 
-          <div className="bg-white border-4 border-dashed border-blue-200 rounded-[40px] p-10 text-center shadow-sm">
-            <div className="w-16 h-16 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl">📸</div>
-            <h2 className="text-lg font-bold text-slate-800">Upload Photo</h2>
-            <p className="text-[10px] text-slate-500 mt-2 uppercase font-bold tracking-widest">Walls • Floors • Analysis</p>
-          </div>
-
-          <div className="bg-white rounded-[30px] p-6 shadow-md border border-slate-100 space-y-4">
-            <h3 className="text-sm font-black text-slate-700 border-b pb-2">AI STATUS: READY ✅</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Our AI is ready to detect seepage, cracks, and suggest realistic repair costs in Mumbai.
-            </p>
-          </div>
-          
+        <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-xl p-10 text-center">
+          <div className="text-7xl mb-6">📸</div>
+          <h2 className="text-2xl font-semibold mb-4">Upload Room/Wall Photo</h2>
+          <p className="text-gray-600 mb-8">
+            AI will detect seepage, cracks, paint estimate & more (Andheri Service Active)
+          </p>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full text-lg">
+            Choose Photo
+          </button>
         </div>
       </main>
 
