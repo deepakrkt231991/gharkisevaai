@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, AlertTriangle, FileText, Bot, Wallet, RefreshCcw } from 'lucide-react';
+import { Sparkles, AlertTriangle, FileText, Bot, Wallet, RefreshCcw, Loader2 } from 'lucide-react';
 
 export default function InteriorAnalyzer() {
   const [analyzing, setAnalyzing] = useState(false);
@@ -42,7 +42,7 @@ export default function InteriorAnalyzer() {
           <CardContent>
             <p className="text-muted-foreground mb-6">Our AI combines internet guides and insights from pro workers to give you the best solution.</p>
             <Button onClick={startSmartAnalysis} disabled={analyzing} className="w-full h-14 text-lg">
-              {analyzing ? "AI Analyzing..." : "START SMART SCAN 📸"}
+              {analyzing ? <><Loader2 className="animate-spin mr-2"/>AI Analyzing...</> : "START SMART SCAN 📸"}
             </Button>
           </CardContent>
         </Card>
@@ -56,6 +56,7 @@ export default function InteriorAnalyzer() {
             </CardHeader>
             <CardContent>
                 <p className="font-bold text-white text-lg">{report.problem}</p>
+                 <p className="text-xs text-muted-foreground italic mt-1">{report.guide}</p>
             </CardContent>
           </Card>
 
