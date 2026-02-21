@@ -3,7 +3,7 @@ import { BottomNavBar } from '@/components/bottom-nav-bar';
 
 const InteriorAnalyzer = dynamic(() => import('@/components/interior-analyzer'), {
   ssr: false,
-  loading: () => <div className="h-screen bg-black flex items-center justify-center text-blue-400 font-bold animate-pulse uppercase tracking-widest">Initializing AI Scanner...</div>
+  loading: () => <div className="h-screen bg-black flex items-center justify-center text-blue-400 font-bold animate-pulse">Scanning...</div>
 });
 
 export default function InteriorAnalysisPage() {
