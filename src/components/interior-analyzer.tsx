@@ -1,19 +1,36 @@
+'use client';
 
-"use client";
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, AlertTriangle, FileText, Bot, Wallet, RefreshCcw, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, Sparkles, AlertTriangle, FileText, Bot, Wallet, RefreshCcw, Phone, Star, ShieldCheck } from 'lucide-react';
+import { mumbaiPainters, type WorkerProfile } from '@/lib/worker-database';
+import Image from 'next/image';
+
+interface Report {
+  problem: string;
+  guide: string;
+  howToFix: string[];
+  workerNote: string;
+  visualPreview: string;
+  budget: string;
+  recommendedWorker: WorkerProfile;
+}
 
 export default function InteriorAnalyzer() {
   const [analyzing, setAnalyzing] = useState(false);
-  const [report, setReport] = useState<any>(null);
+  const [report, setReport] = useState<Report | null>(null);
+  const [showAfter, setShowAfter] = useState(false);
 
   const startSmartAnalysis = () => {
     setAnalyzing(true);
     // AI Analysis Simulation
     setTimeout(() => {
-      setReport({
+      // Randomly select a painter
+      const randomWorker = mumbaiPainters[Math.floor(Math.random() * mumbaiPainters.length)];
+      
+      const newReport: Report = {
         problem: "Wall Dampness & Structural Cracks",
         guide: "Reference: iFixit Home Repair Guide #102",
         howToFix: [
@@ -21,12 +38,22 @@ export default function InteriorAnalyzer() {
           "2. Apply Anti-Damp Primer (3 layers).",
           "3. Use Waterproof Putty for cracks."
         ],
-        workerNote: "Note for Raju Painter: Use 400-grit sandpaper for smooth finish.",
-        visualPreview: "Modern Grey Wall with Oak Flooring (Suggested)",
-        budget: "₹4,500 - ₹6,000"
-      });
+        workerNote: "Note for Worker: Use 400-grit sandpaper for smooth finish.",
+        visualPreview: "Premium Royal Blue Finish",
+        budget: "₹4,500 - ₹6,000",
+        recommendedWorker: randomWorker,
+      };
+
+      setReport(newReport);
+      setShowAfter(false); // Reset to 'before' view on new analysis
       setAnalyzing(false);
     }, 2500);
+  };
+
+  const handleReset = () => {
+    setReport(null);
+    setAnalyzing(false);
+    setShowAfter(false);
   };
 
   return (
@@ -48,6 +75,36 @@ export default function InteriorAnalyzer() {
         </Card>
       ) : (
         <div className="space-y-4 animate-in fade-in duration-500">
+          
+          {/* Image with Style Toggle */}
+          <Card className="glass-card p-2">
+            <div className="relative aspect-video w-full rounded-xl overflow-hidden">
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={showAfter ? 'after' : 'before'}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={showAfter ? "https://picsum.photos/seed/royalblue/800/600" : "https://picsum.photos/seed/damagedwall/800/600"}
+                    alt={showAfter ? "Premium Royal Blue Finish" : "Damaged Wall"}
+                    fill
+                    className="object-cover"
+                    data-ai-hint={showAfter ? "blue wall" : "damaged wall"}
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            <div className="p-2">
+              <Button onClick={() => setShowAfter(!showAfter)} className="w-full">
+                {showAfter ? 'Show Before' : 'Toggle Style: Premium Blue'}
+              </Button>
+            </div>
+          </Card>
+
           <Card className="glass-card border-l-4 border-destructive">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-destructive">
@@ -68,19 +125,37 @@ export default function InteriorAnalyzer() {
             </CardHeader>
             <CardContent>
                 <ul className="text-sm space-y-2 text-muted-foreground">
-                {report.howToFix.map((step: string, i: number) => <li key={i}>{step}</li>)}
+                {report.howToFix.map((step, i) => <li key={i}>{step}</li>)}
                 </ul>
             </CardContent>
           </Card>
 
+          {/* Recommended Worker Card */}
           <Card className="glass-card bg-primary/10 border-primary/20">
              <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-primary">
-                   <Bot/> Note for Worker
+                   <Bot/> AI Recommended Worker
                 </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between items-center bg-background/50 p-3 rounded-lg">
+                <div>
+                  <h4 className="font-bold text-white">{report.recommendedWorker.name}</h4>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="flex items-center gap-1 text-yellow-400"><Star className="h-3 w-3 fill-current"/> {report.recommendedWorker.rating}</span>
+                    <span className="text-muted-foreground">({report.recommendedWorker.reviews} reviews)</span>
+                  </div>
+                </div>
+                {report.recommendedWorker.isSeepageExpert && (
+                  <span className="bg-destructive/20 text-destructive px-2 py-1 text-xs font-bold rounded">Seepage Expert</span>
+                )}
+              </div>
               <p className="text-xs text-muted-foreground italic">{report.workerNote}</p>
+              <Button asChild className="w-full">
+                <a href={`tel:${report.recommendedWorker.phone}`}>
+                  <Phone className="mr-2 h-4 w-4" /> Call Now
+                </a>
+              </Button>
             </CardContent>
           </Card>
           
@@ -96,7 +171,7 @@ export default function InteriorAnalyzer() {
             </CardContent>
           </Card>
 
-          <Button onClick={() => setReport(null)} variant="outline" className="w-full h-12">
+          <Button onClick={handleReset} variant="outline" className="w-full h-12">
             <RefreshCcw className="mr-2 h-4 w-4"/> Scan Another Defect
           </Button>
         </div>
