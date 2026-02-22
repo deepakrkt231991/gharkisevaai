@@ -1,6 +1,6 @@
 'use client';
 
-import { InteriorAnalyzer } from '@/components/interior-analyzer';
+import InteriorAnalyzer from '@/components/interior-analyzer';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
