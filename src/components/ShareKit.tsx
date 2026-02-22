@@ -1,3 +1,4 @@
+
 "use client";
 import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -29,19 +30,22 @@ export function ShareKit() {
     <div className="bg-gradient-to-br from-slate-900 via-black to-blue-950 p-8 rounded-[3rem] border border-white/10 shadow-2xl max-w-sm mx-auto text-white">
       <div className="flex flex-col items-center text-center space-y-6">
         
-        <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_0_50px_rgba(59,130,246,0.5)]">
-          <QRCodeSVG
-            value={appUrl}
-            size={200}
-            level="H"
-            includeMargin={true}
-            imageSettings={{
-              src: "/logo.png",
-              height: 40,
-              width: 40,
-              excavate: true,
-            }}
-          />
+        <div className="bg-white p-4 rounded-[2rem] shadow-[0_0_50px_rgba(59,130,246,0.5)]">
+            <div className="w-48 h-48">
+              <QRCodeSVG
+                value={appUrl}
+                size={192} // This size should fit well within a w-48 container
+                level="H"
+                includeMargin={true}
+                className="w-full h-full"
+                imageSettings={{
+                  src: "/logo.png",
+                  height: 35,
+                  width: 35,
+                  excavate: true,
+                }}
+              />
+            </div>
         </div>
         
         <div className="space-y-2">

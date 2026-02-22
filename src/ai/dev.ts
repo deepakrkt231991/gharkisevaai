@@ -1,3 +1,4 @@
+
 'use server';
 
 import '@/ai/flows/defect-analysis.ts';
@@ -15,4 +16,5 @@ import '@/ai/flows/transformation-video-agent.ts';
 import '@/ai/flows/social-media-agent.ts';
 import '@/ai/flows/property-verification-agent.ts';
 import '@/ai/flows/certificate-generator-agent.ts';
+import '@/ai/flows/chat-agent.ts';
     
