@@ -16,7 +16,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
-import { confirmProductDelivery, payForShipping, shipItem, cancelDeal, raiseDispute, completeToolRental } from '@/app/chat/[chatId]/actions';
+import { confirmDelivery, confirmProductDelivery, payForShipping, shipItem, cancelDeal, raiseDispute, completeToolRental } from '@/app/chat/[chatId]/actions';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 
@@ -39,6 +39,50 @@ const AiSuggestions = () => (
         <Button variant="secondary" size="sm" className="rounded-full bg-card h-8 whitespace-nowrap">I'll pay the advance</Button>
     </div>
 );
+
+const JobFlowControls = ({ job }: { job: Job | null }) => {
+    const { user } = useUser();
+    const { toast } = useToast();
+    if (!user || !job) return null;
+
+    const isCustomer = user.uid === job.customerId;
+
+    const handleConfirm = async () => {
+        toast({ title: 'Completing Job...' });
+        const result = await confirmDelivery(job.jobId);
+        if (result.success) {
+            toast({ title: 'Job Completed!', description: result.message, className: 'bg-green-600 text-white' });
+        } else {
+            toast({ title: 'Error', description: result.message, variant: 'destructive' });
+        }
+    };
+    
+    if (isCustomer && job.status === 'pending_confirmation') {
+         return (
+             <Card className="glass-card border-l-4 border-l-primary/80">
+                <CardHeader className="p-4">
+                     <CardTitle className="flex items-center gap-2 font-headline text-white">
+                        <Handshake size={20}/>
+                        Action Required
+                    </CardTitle>
+                    <CardDescription>Please confirm if the job has been completed to your satisfaction.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                     <Button onClick={handleConfirm} className="w-full h-12 bg-green-600 hover:bg-green-700">
+                        <CheckCircle className="mr-2" />
+                        Yes, Mark as Completed
+                    </Button>
+                    <Button variant="destructive" className="w-full">Raise a Dispute</Button>
+                     <div className="flex items-start gap-2 text-xs text-muted-foreground p-2 rounded-lg bg-black/20">
+                        <Bot size={20} className="flex-shrink-0 mt-0.5 text-primary"/>
+                        <p>Confirming will release the payment from the Safe Vault to the worker.</p>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+    return null;
+}
 
 const WarrantyCertificateCard = ({ job, worker }: { job: Job | null, worker: OtherUser | null }) => {
     if (!job || job.status !== 'completed') {
@@ -529,6 +573,7 @@ export function ChatInterface({ chatId }: { chatId: string }) {
             </header>
 
             <main className="flex-1 overflow-y-auto p-4 space-y-6">
+                {contextType === 'job' && <JobFlowControls job={contextDoc as Job | null} />}
                 {contextType === 'deal' && <ProductDealFlowControls deal={contextDoc as Deal | null} />}
                 {contextType === 'rental' && <ToolRentalFlowControls rental={contextDoc as Rental | null} />}
                 {contextType === 'job' && <InvoiceCard job={contextDoc as Job | null} contextType={contextType} />}
