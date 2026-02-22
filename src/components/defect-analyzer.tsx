@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useFormState, useFormStatus } from 'react-dom';
 
 // Actions and types
-import { analyzeDefect, findNearbyWorkers, generateVideo } from '@/app/analyze/actions';
+import { findNearbyWorkers, generateVideo } from '@/app/analyze/actions';
 
 // UI Components
 import { ArrowLeft, ScanSearch, Loader2, AlertCircle, Wrench, IndianRupee, Bot, Sparkles, Video, Users, RefreshCw, Clapperboard } from 'lucide-react';
@@ -14,51 +14,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Input } from './ui/input';
 import { ProfessionalCard, ProfessionalCardSkeleton } from './professional-card';
-import { useGeolocation } from '@/hooks/use-geolocation';
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" disabled={pending} className="w-full h-14 bg-primary text-primary-foreground rounded-2xl font-bold">
-      {pending ? (
-          <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Analyzing...
-          </>
-        ) : (
-          <>
-            <ScanSearch className="mr-2" />
-            START SCAN
-          </>
-        )}
-    </Button>
-  );
-}
+// This is the simulated output type, matching the expected structure
+type AnalysisResult = {
+  damage: string[];
+  steps: string[];
+  total_cost: string;
+  recommendedWorkerType: string;
+  painter: string;
+  ai_design: string;
+};
 
 export function DefectAnalyzer() {
   const [media, setMedia] = useState<{ dataUrl: string; file: File } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [description, setDescription] = useState('');
+
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   
-  const [analyzeState, analyzeAction] = useFormState(analyzeDefect, { success: false, message: '', data: null });
   const [videoState, videoAction] = useFormState(generateVideo, { success: false, message: '', data: null });
   const { pending: isGeneratingVideo } = useFormStatus();
   
   const [nearbyWorkers, setNearbyWorkers] = useState<any[]>([]);
   const [isLoadingWorkers, setIsLoadingWorkers] = useState(false);
-  const { latitude, longitude, error: geoError } = useGeolocation();
-  const [locationString, setLocationString] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (latitude && longitude) {
-        // In a real app, you'd use a reverse geocoding API here.
-        const storedLocation = localStorage.getItem('userLocation');
-        setLocationString(storedLocation || `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`);
-    } else if (geoError) {
-        setLocationString(localStorage.getItem('userLocation') || undefined);
-    }
-  }, [latitude, longitude, geoError]);
-  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -68,6 +51,36 @@ export function DefectAnalyzer() {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleScan = () => {
+    if (!media) {
+        setError('Please upload a photo first.');
+        return;
+    }
+    setIsAnalyzing(true);
+    setAnalysisResult(null);
+    setNearbyWorkers([]);
+    videoAction(new FormData()); // reset video state
+
+    setTimeout(() => {
+        const simulatedResult: AnalysisResult = {
+            damage: ["Wall Dampness 🔴", "Minor Plaster Cracks"],
+            steps: [
+            "1. Scrape the affected area to remove loose paint.",
+            "2. Apply 2 coats of 'Dr. Fixit Pidiproof LW+' waterproofing.",
+            "3. Fill cracks with 'JK Wall Putty' and sand smooth.",
+            "4. Apply 'Asian Paints Primer' and finish with 2 coats of 'Tractor Emulsion'."
+            ],
+            total_cost: "₹2,500 - ₹3,500",
+            recommendedWorkerType: "painter",
+            painter: 'Raju Painter - 9876543210',
+            ai_design: 'smooth_green_wall.jpg'
+        };
+        setAnalysisResult(simulatedResult);
+        setIsAnalyzing(false);
+    }, 2500);
+  };
+
 
   const handleFindWorkers = async (skill: string) => {
     setIsLoadingWorkers(true);
@@ -81,12 +94,14 @@ export function DefectAnalyzer() {
   
   const handleReset = () => {
     setMedia(null);
-    analyzeAction(new FormData()); // Resets the form state
-    videoAction(new FormData()); // Resets the video form state
+    setAnalysisResult(null);
     setNearbyWorkers([]);
+    setError(null);
+    if(fileInputRef.current) fileInputRef.current.value = "";
+    videoAction(new FormData()); 
   }
 
-  const result = analyzeState.data;
+  const result = analysisResult;
 
   return (
     <div className="dark bg-background text-foreground">
@@ -99,43 +114,51 @@ export function DefectAnalyzer() {
       </div>
 
       <main className="p-4 max-w-md mx-auto space-y-6 pb-24">
-        {analyzeState.message && !analyzeState.success && (
+        {error && !media && (
              <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Analysis Failed</AlertTitle>
-              <AlertDescription>{analyzeState.message}</AlertDescription>
+              <AlertTitle>Input Required</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
         )}
 
         {!result ? (
-          <form action={analyzeAction}>
-            <div className="space-y-6">
-                <div 
-                    className="aspect-[4/5] bg-card border-2 border-dashed border-border rounded-3xl flex items-center justify-center relative overflow-hidden cursor-pointer group"
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    {media ? (
-                    <Image src={media.dataUrl} alt="Preview" fill className="object-cover" />
-                    ) : (
-                    <div className="text-center text-muted-foreground p-8">
-                        <ScanSearch className="mx-auto mb-4 text-primary" size={48} />
-                        <h3 className="font-bold text-white">Upload Defect Photo</h3>
-                        <p className="text-sm">फोटो अपलोड करें</p>
-                    </div>
-                    )}
+          <div className="space-y-6">
+            <div 
+                className="aspect-[4/5] bg-card border-2 border-dashed border-border rounded-3xl flex items-center justify-center relative overflow-hidden cursor-pointer group"
+                onClick={() => fileInputRef.current?.click()}
+            >
+                {media ? (
+                <Image src={media.dataUrl} alt="Preview" fill className="object-cover" />
+                ) : (
+                <div className="text-center text-muted-foreground p-8">
+                    <ScanSearch className="mx-auto mb-4 text-primary" size={48} />
+                    <h3 className="font-bold text-white">Upload Defect Photo</h3>
+                    <p className="text-sm">फोटो अपलोड करें</p>
                 </div>
-
-                {media && (
-                  <div className="space-y-4">
-                    <Input name="description" placeholder="Optional: Describe the problem... (e.g., 'leak near tap')" className="bg-card"/>
-                    <input type="hidden" name="mediaDataUri" value={media.dataUrl} />
-                    <input type="hidden" name="userLocation" value={locationString} />
-                    <SubmitButton />
-                  </div>
                 )}
             </div>
+
+            {media && (
+              <div className="space-y-4">
+                <Input name="description" placeholder="Optional: Describe the problem... (e.g., 'leak near tap')" className="bg-card" onChange={(e) => setDescription(e.target.value)}/>
+                <Button onClick={handleScan} disabled={isAnalyzing} className="w-full h-14 bg-primary text-primary-foreground rounded-2xl font-bold">
+                    {isAnalyzing ? (
+                    <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Analyzing...
+                    </>
+                    ) : (
+                    <>
+                        <ScanSearch className="mr-2" />
+                        START SCAN
+                    </>
+                    )}
+                </Button>
+              </div>
+            )}
             <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
-          </form>
+          </div>
         ) : (
           <div className="space-y-6 animate-in fade-in-50">
             <Card className="glass-card">
